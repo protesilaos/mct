@@ -470,7 +470,7 @@ minibuffer."
   "Show line numbers and select one of them."
   (with-current-buffer "*Completions*"
     (let ((mct-show-completion-line-numbers t))
-      (if display-line-numbers-mode
+      (if (bound-and-true-p display-line-numbers-mode)
           (mct-goto-line)
         (unwind-protect
             (progn
