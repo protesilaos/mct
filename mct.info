@@ -113,6 +113,11 @@ commands are on offer:
      Completions’ buffer for the designated command without accounting
      for the minimum input threshold.
 
+   To inhibit live completion in the first place, ‘mct-live-completion’
+can be set to nil.  Given this customization, the Completions’ buffern
+is only displayed when requested manually.  ‘mct-completion-passlist’
+takes precedence over this option.
+
    Other customisations:
 
    • ‘mct-hide-completion-mode-line’ to hide the mode line of the
@@ -245,7 +250,7 @@ There are several ways to select a completion candidate.
      something else, so the behaviour does not work as expected.  One
      such case is ‘org-set-tags-command’ which uses ‘:’ as a separator.
 
-  6. Type ‘M-e’ (‘mct-edit-completion’) in the completions’ buffer to
+  1. Type ‘M-e’ (‘mct-edit-completion’) in the completions’ buffer to
      place the current candidate in the minibuffer, without exiting the
      session.  This allows you to edit the text before confirming it.
 
@@ -927,13 +932,13 @@ B.1 Function index
  [index ]
 * Menu:
 
-* mct-choose-completion-number:          Overview of mctel.     (line 6)
-* mct-edit-completion:                   Selecting candidates.  (line 6)
-* mct-list-completions-toggle:           Cyclic behaviour.      (line 6)
-* mct-next-completion-or-mini:           Cyclic behaviour.      (line 6)
-* mct-previous-completion-or-mini:       Cyclic behaviour.      (line 6)
-* mct-switch-to-completions-bottom:      Cyclic behaviour.      (line 6)
-* mct-switch-to-completions-top:         Cyclic behaviour.      (line 6)
+* mct-choose-completion-number:          Overview of mctel.    (line 57)
+* mct-edit-completion:                   Selecting candidates. (line 47)
+* mct-list-completions-toggle:           Cyclic behaviour.     (line 42)
+* mct-next-completion-or-mini:           Cyclic behaviour.     (line 35)
+* mct-previous-completion-or-mini:       Cyclic behaviour.     (line 35)
+* mct-switch-to-completions-bottom:      Cyclic behaviour.     (line 28)
+* mct-switch-to-completions-top:         Cyclic behaviour.     (line 28)
 
 
 File: mct.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
@@ -944,17 +949,18 @@ B.2 Variable index
  [index ]
 * Menu:
 
-* mct-apply-completion-stripes:          Overview of mctel.     (line 6)
-* mct-completion-blocklist:              Overview of mctel.     (line 6)
-* mct-completion-list-mode-map:          Keymaps.               (line 6)
-* mct-completion-passlist:               Overview of mctel.     (line 6)
-* mct-hide-completion-mode-line:         Overview of mctel.     (line 6)
-* mct-live-update-delay:                 Overview of mctel.     (line 6)
-* mct-minibuffer-local-completion-map:   Keymaps.               (line 6)
-* mct-minibuffer-local-filename-completion-map: Keymaps.        (line 6)
-* mct-minimum-input:                     Overview of mctel.     (line 6)
-* mct-remove-shadowed-file-name:         Overview of mctel.     (line 6)
-* mct-stripe:                            Overview of mctel.     (line 6)
+* mct-apply-completion-stripes:          Overview of mctel.    (line 64)
+* mct-completion-blocklist:              Overview of mctel.    (line 31)
+* mct-completion-list-mode-map:          Keymaps.              (line  6)
+* mct-completion-passlist:               Overview of mctel.    (line 34)
+* mct-hide-completion-mode-line:         Overview of mctel.    (line 45)
+* mct-live-completion:                   Overview of mctel.    (line 38)
+* mct-live-update-delay:                 Overview of mctel.    (line 26)
+* mct-minibuffer-local-completion-map:   Keymaps.              (line  6)
+* mct-minibuffer-local-filename-completion-map: Keymaps.       (line  6)
+* mct-minimum-input:                     Overview of mctel.    (line 26)
+* mct-remove-shadowed-file-name:         Overview of mctel.    (line 50)
+* mct-stripe:                            Overview of mctel.    (line 64)
 
 
 File: mct.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
@@ -979,20 +985,20 @@ B.3 Concept index
 Tag Table:
 Node: Top865
 Node: Overview of mctel2457
-Node: Basic usage5726
-Node: Cyclic behaviour5906
-Node: Selecting candidates7637
-Node: Installation10343
-Node: Sample setup11431
-Node: Keymaps13532
-Node: Extensions14176
-Node: Alternatives14971
-Node: Acknowledgements15364
-Node: GNU Free Documentation License15989
-Node: Indices41344
-Node: Function index41514
-Node: Variable index42164
-Node: Concept index43128
+Node: Basic usage5985
+Node: Cyclic behaviour6165
+Node: Selecting candidates7896
+Node: Installation10602
+Node: Sample setup11690
+Node: Keymaps13791
+Node: Extensions14435
+Node: Alternatives15230
+Node: Acknowledgements15623
+Node: GNU Free Documentation License16248
+Node: Indices41603
+Node: Function index41773
+Node: Variable index42423
+Node: Concept index43460
 
 End Tag Table
 
