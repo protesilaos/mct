@@ -278,7 +278,7 @@ following commands in a shell prompt:
    Finally, in your ‘init.el’ (or equivalent) evaluate this:
 
      ;; Make Elisp files in that directory available to the user.
-     (add-to-list 'load-path "~/.emacs.d/manual-packages/")
+     (add-to-list 'load-path "~/.emacs.d/manual-packages/mct")
 
    Everything is in place to set up the package.
 
@@ -417,7 +417,7 @@ Contributions to code or documentation
      Philip Kaludercic.
 
 Ideas and user feedback
-     Philip Kaludercic
+     Philip Kaludercic, Manuel Uberti.
 
 Inspiration for certain features
      ‘icomplete.el’ (built-in—multiple authors), Daniel Mendler
@@ -983,16 +983,16 @@ Node: Basic usage5726
 Node: Cyclic behaviour5906
 Node: Selecting candidates7637
 Node: Installation10343
-Node: Sample setup11428
-Node: Keymaps13529
-Node: Extensions14173
-Node: Alternatives14968
-Node: Acknowledgements15361
-Node: GNU Free Documentation License15970
-Node: Indices41325
-Node: Function index41495
-Node: Variable index42145
-Node: Concept index43109
+Node: Sample setup11431
+Node: Keymaps13532
+Node: Extensions14176
+Node: Alternatives14971
+Node: Acknowledgements15364
+Node: GNU Free Documentation License15989
+Node: Indices41344
+Node: Function index41514
+Node: Variable index42164
+Node: Concept index43128
 
 End Tag Table
 

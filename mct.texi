@@ -317,7 +317,7 @@ Finally, in your @samp{init.el} (or equivalent) evaluate this:
 
 @lisp
 ;; Make Elisp files in that directory available to the user.
-(add-to-list 'load-path "~/.emacs.d/manual-packages/")
+(add-to-list 'load-path "~/.emacs.d/manual-packages/mct")
 @end lisp
 
 Everything is in place to set up the package.
@@ -469,7 +469,7 @@ Protesilaos Stavrou.
 Philip Kaludercic.
 
 @item Ideas and user feedback
-Philip Kaludercic
+Philip Kaludercic, Manuel Uberti.
 
 @item Inspiration for certain features
 @samp{icomplete.el} (built-in---multiple
