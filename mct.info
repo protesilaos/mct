@@ -327,7 +327,8 @@ Minimal setup:
 
      (mct-mode 1)
 
-   Other useful extras from the Emacs source code:
+   Other useful extras from the Emacs source code (read their doc
+strings):
 
      (setq enable-recursive-minibuffers t)
      (setq minibuffer-eldef-shorten-default t)
@@ -335,6 +336,18 @@ Minimal setup:
      (file-name-shadow-mode 1)
      (minibuffer-depth-indicate-mode 1)
      (minibuffer-electric-default-mode 1)
+
+     ;;; Temporary window height
+
+     ;; Evaluate: (info "(emacs) Temporary Displays")
+     ;;
+     ;; Or read: ;; <https://www.gnu.org/software/emacs/manual/html_node/emacs/Temporary-Displays.html>.
+
+     (setq temp-buffer-max-height (lambda (buf) (/ (window-height) 4)))
+     ;; OR
+     ;; (setq temp-buffer-max-height (lambda (buf) (/ (frame-height) 4)))
+
+     (temp-buffer-resize-mode 1)
 
 
 File: mct.info,  Node: Keymaps,  Next: Extensions,  Prev: Sample setup,  Up: Top
@@ -971,15 +984,15 @@ Node: Cyclic behaviour5906
 Node: Selecting candidates7637
 Node: Installation10343
 Node: Sample setup11428
-Node: Keymaps13110
-Node: Extensions13754
-Node: Alternatives14549
-Node: Acknowledgements14942
-Node: GNU Free Documentation License15551
-Node: Indices40906
-Node: Function index41076
-Node: Variable index41726
-Node: Concept index42690
+Node: Keymaps13529
+Node: Extensions14173
+Node: Alternatives14968
+Node: Acknowledgements15361
+Node: GNU Free Documentation License15970
+Node: Indices41325
+Node: Function index41495
+Node: Variable index42145
+Node: Concept index43109
 
 End Tag Table
 

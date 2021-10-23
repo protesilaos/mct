@@ -324,7 +324,7 @@ And with more options:
 (mct-mode 1)
 #+end_src
 
-Other useful extras from the Emacs source code:
+Other useful extras from the Emacs source code (read their doc strings):
 
 #+begin_src emacs-lisp
 (setq enable-recursive-minibuffers t)
@@ -333,6 +333,18 @@ Other useful extras from the Emacs source code:
 (file-name-shadow-mode 1)
 (minibuffer-depth-indicate-mode 1)
 (minibuffer-electric-default-mode 1)
+
+;;; Temporary window height
+
+;; Evaluate: (info "(emacs) Temporary Displays")
+;;
+;; Or read: ;; <https://www.gnu.org/software/emacs/manual/html_node/emacs/Temporary-Displays.html>.
+
+(setq temp-buffer-max-height (lambda (buf) (/ (window-height) 4)))
+;; OR
+;; (setq temp-buffer-max-height (lambda (buf) (/ (frame-height) 4)))
+
+(temp-buffer-resize-mode 1)
 #+end_src
 
 * Keymaps
