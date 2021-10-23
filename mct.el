@@ -121,8 +121,7 @@ delay introduced by `mct-live-update-delay'."
   :group 'mct)
 
 (defcustom mct-display-buffer-action
-  '((display-buffer-in-side-window)
-    (side . bottom))
+  '((display-buffer-at-bottom))
   "The action used to display the Completions' buffer.
 
 The value has the form (FUNCTION . ALIST), where FUNCTIONS is
