@@ -501,8 +501,7 @@ Completions' buffer."
                  (active-minibuffer-window))
             (and (minibufferp)
                  (mct--get-completion-window)))
-        (mct--line-number-selection))
-    (user-error "Only use this inside the minibuffer or the Completions")))
+        (mct--line-number-selection))))
 
 (defvar crm-completion-table)
 
