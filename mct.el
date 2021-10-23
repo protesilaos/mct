@@ -277,14 +277,14 @@ Meant to be added to `after-change-functions'."
 (defun mct--setup-completions ()
   "Set up the completions' buffer."
   (cond
-   ((member this-command mct-completion-passlist)
+   ((memq this-command mct-completion-passlist)
     (setq-local mct-minimum-input 0)
     (setq-local mct-live-update-delay 0)
     (mct--show-completions)
     (add-hook 'after-change-functions #'mct--live-completions nil t))
    ((null mct-live-completion))
-   ((unless (member this-command mct-completion-blocklist)
-      (add-hook 'after-change-functions #'mct--live-completions-timer nil t)))))
+   ((not (memq this-command mct-completion-blocklist))
+    (add-hook 'after-change-functions #'mct--live-completions-timer nil t))))
 
 ;;;;; Alternating backgrounds (else "stripes")
 
