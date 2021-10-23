@@ -132,6 +132,15 @@ See Info node `(elisp) Displaying Buffers' for more details."
 	       alist)
   :group 'mct)
 
+(defcustom mct-completions-format 'one-column
+  "The Appearance and sorting used by `mct-mode'.
+See `completions-format' for possible values."
+  :set (lambda (var val)
+	 (when (bound-and-true-p mct-mode)
+	   (setq completions-format val))
+	 (set var val))
+  :type '(choice (const horizontal) (const vertical) (const one-column))
+  :group 'mct)
 
 ;;;; Basic helper functions
 
@@ -204,7 +213,8 @@ Add this to `completion-list-mode-hook'."
 (defun mct--hl-line ()
   "Set up line highlighting for the completions' buffer.
 Add this to `completion-list-mode-hook'."
-  (when (derived-mode-p 'completion-list-mode)
+  (when (and (derived-mode-p 'completion-list-mode)
+	     (eq mct-completions-format 'one-column))
     (face-remap-add-relative 'hl-line 'mct-hl-line)
     (hl-line-mode 1)))
 
@@ -424,12 +434,14 @@ by `mct-completion-windows-regexp'."
   (mct--switch-to-completions)
   (goto-char (point-max))
   (next-completion -1)
-  (goto-char (point-at-bol))
-  (recenter
-   (- -1
-      (min (max 0 scroll-margin)
-           (truncate (/ (window-body-height) 4.0))))
-   t))
+  (when (eq mct-completions-format 'one-column)
+    (goto-char (point-at-bol))
+    (recenter
+     (- -1
+	(min (max 0 scroll-margin)
+	     (truncate (/ (window-body-height) 4.0))))
+     t)))
+
 
 (defun mct-next-completion-or-mini (&optional arg)
   "Move to the next completion or switch to the minibuffer.
@@ -438,8 +450,7 @@ point can no longer move in that direction it switches to the
 minibuffer."
   (interactive "p" mct-mode)
   (if (or (eobp)
-          (eq (point-max)
-              (save-excursion (forward-line 1) (point))))
+          (= (point-max) (save-excursion (next-completion (or arg t)) (point))))
       (mct-focus-minibuffer)
     (next-completion (or arg 1)))
   (setq this-command 'next-line))
@@ -450,18 +461,14 @@ This performs a regular motion for optional ARG lines, but when
 point can no longer move in that direction it switches to the
 minibuffer."
   (interactive "p" mct-mode)
-  (let ((num (when (and (numberp arg) (> arg 0)) (* -1 arg))))
-    (if (or (bobp)
-            (and (save-excursion ; NOTE 2021-07-23: This `and' is for Emacs28 group titles
-                   (next-completion -1)
-                   (eq (line-number-at-pos) 1))
-                 (not
-                  (save-excursion
-                    (next-completion -1)
-                    (get-text-property (point) 'completion--string))))
-            (eq (point) (1+ (point-min)))) ; see hack in `mct--clean-completions'
-        (mct-focus-minibuffer)
-      (next-completion (or num 1)))))
+  (if (or (bobp)
+	  (save-excursion
+	    (previous-completion 1)
+	    (and (get-text-property (point) 'completion--string)
+		 (= (point) (point-min))))
+	  (eq (point) (1+ (point-min)))) ; see hack in `mct--clean-completions'
+      (mct-focus-minibuffer)
+    (previous-completion (if (natnump arg) arg 1))))
 
 ;;;;; Candidate selection
 
@@ -750,7 +757,7 @@ To be assigned to `minibuffer-setup-hook'."
         (setq resize-mini-windows t
               completion-show-help nil
               completion-auto-help t
-              completions-format 'one-column
+              completions-format mct-completions-format
               completions-detailed t)
         (let ((hook 'minibuffer-setup-hook))
           (add-hook hook #'mct--setup-completions)
