@@ -128,7 +128,9 @@ delay introduced by `mct-live-update-delay'."
 The value has the form (FUNCTION . ALIST), where FUNCTIONS is
 either an \"action function\" or a possibly empty list of action
 functions.  ALIST is a possibly empty \"action alist\".
-See Info node `(elisp) Displaying Buffers' for more details."
+
+See Info node `(elisp) Displaying Buffers' for more details
+and/or the documentation string of `display-buffer'."
   :type '(cons (choice (function :tag "Display Function")
 		       (repeat :tag "Display Functions" function))
 	       alist)
