@@ -64,6 +64,7 @@ modify this GNU manual.”
 :END:
 #+cindex: Overview of features
 #+findex: mct-choose-completion-number
+#+vindex: mct-live-completion
 #+vindex: mct-minimum-input
 #+vindex: mct-live-update-delay
 #+vindex: mct-completion-blocklist
@@ -101,6 +102,11 @@ a blocklist and a passlist for commands are on offer:
 + The passlist (~mct-completion-passlist~) always shows the Completions'
   buffer for the designated command without accounting for the minimum
   input threshold.
+
+To inhibit live completion in the first place, ~mct-live-completion~
+can be set to nil.  Given this customization, the Completions' buffern
+is only displayed when requested manually.  ~mct-completion-passlist~
+takes precedence over this option.
 
 Other customisations:
 

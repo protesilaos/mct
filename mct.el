@@ -71,6 +71,16 @@ Only works when variable `file-name-shadow-mode' is non-nil."
   :type 'boolean
   :group 'mct)
 
+(defcustom mct-live-completion t
+  "Automatically display the Completions buffer.
+
+When disabled, the user has to manually request completions,
+using the regular activating commands.  Note that
+`mct-completion-passlist' overrides this option, while taking
+precedence over `mct-completion-blocklist'."
+  :type 'boolean
+  :group 'mct)
+
 (defcustom mct-minimum-input 3
   "Live update completions when input is >= N.
 
@@ -257,6 +267,7 @@ Meant to be added to `after-change-functions'."
     (setq-local mct-live-update-delay 0)
     (mct--show-completions)
     (add-hook 'after-change-functions #'mct--live-completions nil t))
+   ((null mct-live-completion))
    ((unless (member this-command mct-completion-blocklist)
       (add-hook 'after-change-functions #'mct--live-completions-timer nil t)))))
 
