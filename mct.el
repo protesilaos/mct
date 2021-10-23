@@ -118,6 +118,21 @@ delay introduced by `mct-live-update-delay'."
   :type '(repeat symbol)
   :group 'mct)
 
+(defcustom mct-display-buffer-action
+  '((display-buffer-in-side-window)
+    (side . bottom))
+  "The action used to display the Completions' buffer.
+
+The value has the form (FUNCTION . ALIST), where FUNCTIONS is
+either an \"action function\" or a possibly empty list of action
+functions.  ALIST is a possibly empty \"action alist\".
+See Info node `(elisp) Displaying Buffers' for more details."
+  :type '(cons (choice (function :tag "Display Function")
+		       (repeat :tag "Display Functions" function))
+	       alist)
+  :group 'mct)
+
+
 ;;;; Basic helper functions
 
 ;; Copied from icomplete.el
@@ -217,6 +232,7 @@ Add this to `completion-list-mode-hook'."
 (defun mct--fit-completions-window ()
   "Fit Completions' buffer to its window."
   (setq-local window-resize-pixelwise t)
+  (select-window (mct--get-completion-window))
   (fit-window-to-buffer (mct--get-completion-window)
                         (floor (frame-height) 2) 1))
 
@@ -248,8 +264,7 @@ Meant to be added to `after-change-functions'."
                           ;; don't ring the bell in `minibuffer-completion-help'
                           ;; when <= 1 completion exists.
                           (ring-bell-function #'ignore))
-                      (minibuffer-completion-help)
-                      (mct--fit-completions-window))))
+		      (mct--show-completions))))
               (quit (abort-recursive-edit)))
           (minibuffer-hide-completions))))))
 
@@ -337,8 +352,11 @@ Meant to be added to `after-change-functions'."
 
 (defun mct--show-completions ()
   "Show the completions' buffer."
-  (save-excursion (minibuffer-completion-help))
-  (mct--fit-completions-window))
+  (let ((display-buffer-alist
+	 (cons (cons mct-completion-windows-regexp mct-display-buffer-action)
+	       display-buffer-alist)))
+    (save-excursion (minibuffer-completion-help)))
+  (fit-window-to-buffer (mct--get-completion-window)))
 
 ;;;###autoload
 (defun mct-focus-mini-or-completions ()
@@ -390,9 +408,8 @@ by `mct-completion-windows-regexp'."
 (defun mct--switch-to-completions ()
   "Subroutine for switching to the completions' buffer."
   (unless (mct--get-completion-window)
-    (save-excursion (minibuffer-completion-help)))
-  (switch-to-completions)
-  (mct--fit-completions-window))
+    (mct--show-completions))
+  (switch-to-completions))
 
 (defun mct-switch-to-completions-top ()
   "Switch to the top of the completions' buffer."
