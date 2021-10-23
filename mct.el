@@ -207,7 +207,7 @@ Add this to `completion-list-mode-hook'."
 (defun mct--fit-completions-window ()
   "Fit Completions' buffer to its window."
   (setq-local window-resize-pixelwise t)
-  (fit-window-to-buffer (get-buffer-window "*Completions*")
+  (fit-window-to-buffer (mct--get-completion-window)
                         (floor (frame-height) 2) 1))
 
 (defun mct--input-string ()
@@ -356,7 +356,7 @@ by `mct-completion-windows-regexp'."
 (defun mct-list-completions-toggle ()
   "Toggle the presentation of the completions' buffer."
   (interactive nil mct-mode)
-  (if (get-buffer-window "*Completions*" 0)
+  (if (mct--get-completion-window)
       (minibuffer-hide-completions)
     (mct--show-completions)))
 
@@ -378,7 +378,7 @@ by `mct-completion-windows-regexp'."
 
 (defun mct--switch-to-completions ()
   "Subroutine for switching to the completions' buffer."
-  (unless (get-buffer-window "*Completions*" 0)
+  (unless (mct--get-completion-window)
     (save-excursion (minibuffer-completion-help)))
   (switch-to-completions)
   (mct--fit-completions-window))
@@ -449,14 +449,14 @@ minibuffer."
 
 (defun mct--line-completion (n)
   "Select completion on Nth line."
-  (with-current-buffer "*Completions*"
+  (with-current-buffer (window-buffer (mct--get-completion-window))
     (goto-char (point-min))
     (forward-line (1- n))
     (choose-completion)))
 
 (defun mct--line-bounds (n)
   "Test if Nth line is in the buffer."
-  (with-current-buffer "*Completions*"
+  (with-current-buffer (window-buffer (mct--get-completion-window))
     (let ((bounds (count-lines (point-min) (point-max))))
       (unless (<= n bounds)
         (user-error "%d is not within the buffer bounds (%d)" n bounds)))))
@@ -471,7 +471,7 @@ minibuffer."
 
 (defun mct--line-number-selection ()
   "Show line numbers and select one of them."
-  (with-current-buffer "*Completions*"
+  (with-current-buffer (window-buffer (mct--get-completion-window))
     (let ((mct-show-completion-line-numbers t))
       (if (bound-and-true-p display-line-numbers-mode)
           (mct-goto-line)
@@ -495,7 +495,7 @@ Completions' buffer."
   (let ((mct-remove-shadowed-file-names t)
         (mct-live-update-delay most-positive-fixnum)
         (enable-recursive-minibuffers t))
-    (unless (get-buffer-window "*Completions*" 0)
+    (unless (mct--get-completion-window)
       (mct--show-completions))
     (if (or (and (derived-mode-p 'completion-list-mode)
                  (active-minibuffer-window))
@@ -535,10 +535,10 @@ Otherwise behave like `mct-choose-completion-exit'."
     ;; If we focus the Completions' buffer at least once, then
     ;; everything works as expected.
     (when (or (and (minibufferp)
-                   (get-buffer-window "*Completions*" 0))
+                   (mct--get-completion-window))
               (and (derived-mode-p 'completion-list-mode)
                    (active-minibuffer-window)))
-      (with-current-buffer "*Completions*"
+      (with-current-buffer (window-buffer (mct--get-completion-window))
         (setq string (get-text-property (point) 'completion--string)))
       (if string
           (progn
