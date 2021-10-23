@@ -63,16 +63,6 @@ modify this GNU manual.”
 :CUSTOM_ID: h:ba224631-618c-4e52-b373-e46970cb2242
 :END:
 #+cindex: Overview of features
-#+findex: mct-choose-completion-number
-#+vindex: mct-live-completion
-#+vindex: mct-minimum-input
-#+vindex: mct-live-update-delay
-#+vindex: mct-completion-blocklist
-#+vindex: mct-completion-passlist
-#+vindex: mct-hide-completion-mode-line
-#+vindex: mct-remove-shadowed-file-name
-#+vindex: mct-apply-completion-stripes
-#+vindex: mct-stripe
 
 Minibuffer and Completions in Tandem, also known as "MCT", "Mct", =mct=,
 or =mct.el=, is a package that enhances the default minibuffer and
@@ -92,17 +82,22 @@ outright or only displaying them on demand, MCT implements a minimum
 input threshold as well as a slight delay before it pops up the
 =*Completions*= buffer and starts updating it to respond to user input.
 
+#+vindex: mct-minimum-input
+#+vindex: mct-live-update-delay
 Customisation options control the input threshold (~mct-minimum-input~)
 and the delay between live updates (~mct-live-update-delay~).  Similarly,
 a blocklist and a passlist for commands are on offer:
 
+#+vindex: mct-completion-blocklist
 + The blocklist (~mct-completion-blocklist~) disables the live-updating
   functionality for the commands specified therein.
 
+#+vindex: mct-completion-passlist
 + The passlist (~mct-completion-passlist~) always shows the Completions'
   buffer for the designated command without accounting for the minimum
   input threshold.
 
+#+vindex: mct-live-completion
 To inhibit live completion in the first place, ~mct-live-completion~
 can be set to nil.  Given this customization, the Completions' buffern
 is only displayed when requested manually.  ~mct-completion-passlist~
@@ -110,11 +105,13 @@ takes precedence over this option.
 
 Other customisations:
 
+#+vindex: mct-hide-completion-mode-line
 + ~mct-hide-completion-mode-line~ to hide the mode line of the
   =*Completions*= buffer.  This removes the separation between it and the
   minibuffer, further contributing to the idea of a unified space
   between the two.
 
+#+vindex: mct-remove-shadowed-file-name
 + ~mct-remove-shadowed-file-name~ to clear shadowed file names when
   ~file-name-shadow-mode~ is enabled.  This means that in prompts that use
   file paths (such as ~find-file~) when you start in, say, =~/Git/mct.el=
@@ -122,6 +119,7 @@ Other customisations:
   inserted.  Whereas the default is to keep the original file name
   visible yet "shadowed" by a different colour.
 
+#+findex: mct-choose-completion-number
 + ~mct-show-completion-line-numbers~ to always display line numbers in the
   Completions' buffer.  This can be helpful to get a sense of the length
   of the completion candidates' list.  Though note that line numbers are
@@ -129,6 +127,8 @@ Other customisations:
   command, which is bound to =M-g M-g= in either the minibuffer or the
   =*Completions*= buffer.
 
+#+vindex: mct-apply-completion-stripes
+#+vindex: mct-stripe
 + ~mct-apply-completion-stripes~ applies alternative background colours in
   the Completions' buffer.  This is only tested with the =modus-themes=
   and will only work nicely if the main background is pure black or
@@ -145,11 +145,6 @@ Other customisations:
 :CUSTOM_ID: h:68c61a76-1d64-4f62-a77a-52e7b66a68fe
 :END:
 #+cindex: Cyclic behaviour
-#+findex: mct-switch-to-completions-top
-#+findex: mct-switch-to-completions-bottom
-#+findex: mct-previous-completion-or-mini
-#+findex: mct-next-completion-or-mini
-#+findex: mct-list-completions-toggle
 
 When ~mct-mode~ is enabled, some new keymaps are activated which add
 commands for cycling between the minibuffer and the completions.
@@ -175,6 +170,8 @@ Suppose the following standard layout:
 -----------------
 #+end_example
 
+#+findex: mct-switch-to-completions-top
+#+findex: mct-switch-to-completions-bottom
 When inside the minibuffer, pressing =C-n= (or down arrow) takes you to
 the top of the completions, while =C-p= (or up arrow) moves to the bottom.
 The commands are ~mct-switch-to-completions-top~ for the former and
@@ -182,6 +179,8 @@ The commands are ~mct-switch-to-completions-top~ for the former and
 are not shown, then the buffer pops up automatically and point moves to
 the given position.
 
+#+findex: mct-previous-completion-or-mini
+#+findex: mct-next-completion-or-mini
 Similarly, while inside the =*Completions*= buffer, =C-p= (or up arrow) at
 the top of the buffer switches to the minibuffer, while =C-n= (or down
 arrow) at the bottom of the buffer also goes to the minibuffer.  If
@@ -189,6 +188,7 @@ point is anywhere else inside the buffer, those key bindings perform a
 regular line motion.  The commands are ~mct-previous-completion-or-mini~
 and ~mct-next-completion-or-mini~.
 
+#+findex: mct-list-completions-toggle
 The display of the =*Completions*= can be toggled at any time from inside
 the minibuffer with =C-l= (mnemonic is "[l]ist completions" and the
 command is ~mct-list-completions-toggle~).
@@ -198,7 +198,6 @@ command is ~mct-list-completions-toggle~).
 :CUSTOM_ID: h:bb445062-2e39-4082-a868-2123bfb793cc
 :END:
 #+cindex: Candidate selection
-#+findex: mct-edit-completion
 
 There are several ways to select a completion candidate.
 
@@ -241,6 +240,7 @@ There are several ways to select a completion candidate.
    so the behaviour does not work as expected.  One such case is
    ~org-set-tags-command~ which uses =:= as a separator.
 
+#+findex: mct-edit-completion
 7. Type =M-e= (~mct-edit-completion~) in the completions' buffer to place
    the current candidate in the minibuffer, without exiting the session.
    This allows you to edit the text before confirming it.
