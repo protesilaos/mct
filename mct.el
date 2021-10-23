@@ -452,7 +452,7 @@ minibuffer."
   (with-current-buffer (window-buffer (mct--get-completion-window))
     (goto-char (point-min))
     (forward-line (1- n))
-    (choose-completion)))
+    (mct-choose-completion-exit)))
 
 (defun mct--line-bounds (n)
   "Test if Nth line is in the buffer."
