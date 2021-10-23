@@ -388,6 +388,24 @@ The only alternative I have used that is conceptually close to MCT is
 maintainer, Daniel Mendler, is an accomplished programmer.  Whereas MCT
 is mostly an excuse to practice my Elisp skills.
 
+* Acknowledgements
+:PROPERTIES:
+:CUSTOM_ID: h:e2f73255-55f1-4f4c-8d8b-99c9a4a83192
+:END:
+#+cindex: Contributors
+
+MCT is meant to be a collective effort.  Every bit of help matters.
+
++ Author/maintainer :: Protesilaos Stavrou.
+
++ Contributions to code or documentation :: Philip Kaludercic.
+
++ Ideas and user feedback :: Philip Kaludercic
+
++ Inspiration for certain features :: =icomplete.el= (built-in---multiple
+  authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
+  =live-completions=), Štěpán Němec (=stripes.el=).
+
 * GNU Free Documentation License
 :PROPERTIES:
 :APPENDIX: t

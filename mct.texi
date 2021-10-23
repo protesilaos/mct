@@ -68,6 +68,7 @@ Current development target is 0.2.0-dev.
 * Keymaps::
 * Extensions::
 * Alternatives::
+* Acknowledgements::
 * GNU Free Documentation License::
 * Indices::
 
@@ -440,6 +441,29 @@ The only alternative I have used that is conceptually close to MCT is
 @samp{vertico}.  Vertico is a more mature and feature-rich package, while its
 maintainer, Daniel Mendler, is an accomplished programmer.  Whereas MCT
 is mostly an excuse to practice my Elisp skills.
+
+@node Acknowledgements
+@chapter Acknowledgements
+
+@cindex Contributors
+
+MCT is meant to be a collective effort.  Every bit of help matters.
+
+@table @asis
+@item Author/maintainer
+Protesilaos Stavrou.
+
+@item Contributions to code or documentation
+Philip Kaludercic.
+
+@item Ideas and user feedback
+Philip Kaludercic
+
+@item Inspiration for certain features
+@samp{icomplete.el} (built-in---multiple
+authors), Daniel Mendler (@samp{vertico}), Omar Antolín Camarena (@samp{embark},
+@samp{live-completions}), Štěpán Němec (@samp{stripes.el}).
+@end table
 
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License

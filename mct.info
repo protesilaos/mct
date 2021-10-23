@@ -57,6 +57,7 @@ as such.
 * Keymaps::
 * Extensions::
 * Alternatives::
+* Acknowledgements::
 * GNU Free Documentation License::
 * Indices::
 
@@ -378,7 +379,7 @@ these exceptionally well-crafted extras:
      flex, initialism, etc.)  regardless of the order they appear in.
 
 
-File: mct.info,  Node: Alternatives,  Next: GNU Free Documentation License,  Prev: Extensions,  Up: Top
+File: mct.info,  Node: Alternatives,  Next: Acknowledgements,  Prev: Extensions,  Up: Top
 
 7 Alternatives
 **************
@@ -389,7 +390,29 @@ maintainer, Daniel Mendler, is an accomplished programmer.  Whereas MCT
 is mostly an excuse to practice my Elisp skills.
 
 
-File: mct.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Alternatives,  Up: Top
+File: mct.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Alternatives,  Up: Top
+
+8 Acknowledgements
+******************
+
+MCT is meant to be a collective effort.  Every bit of help matters.
+
+Author/maintainer
+     Protesilaos Stavrou.
+
+Contributions to code or documentation
+     Philip Kaludercic.
+
+Ideas and user feedback
+     Philip Kaludercic
+
+Inspiration for certain features
+     ‘icomplete.el’ (built-in—multiple authors), Daniel Mendler
+     (‘vertico’), Omar Antolín Camarena (‘embark’, ‘live-completions’),
+     Štěpán Němec (‘stripes.el’).
+
+
+File: mct.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
 
 Appendix A GNU Free Documentation License
 *****************************************
@@ -931,6 +954,7 @@ B.3 Concept index
 
 * Alternatives to MCT:                   Alternatives.          (line 6)
 * Candidate selection:                   Selecting candidates.  (line 6)
+* Contributors:                          Acknowledgements.      (line 6)
 * Cyclic behaviour:                      Cyclic behaviour.      (line 6)
 * Extra packages:                        Extensions.            (line 6)
 * Keymaps:                               Keymaps.               (line 6)
@@ -941,20 +965,21 @@ B.3 Concept index
 
 Tag Table:
 Node: Top865
-Node: Overview of mctel2436
-Node: Basic usage5705
-Node: Cyclic behaviour5885
-Node: Selecting candidates7616
-Node: Installation10322
-Node: Sample setup11407
-Node: Keymaps13089
-Node: Extensions13733
-Node: Alternatives14528
-Node: GNU Free Documentation License14935
-Node: Indices40286
-Node: Function index40456
-Node: Variable index41106
-Node: Concept index42070
+Node: Overview of mctel2457
+Node: Basic usage5726
+Node: Cyclic behaviour5906
+Node: Selecting candidates7637
+Node: Installation10343
+Node: Sample setup11428
+Node: Keymaps13110
+Node: Extensions13754
+Node: Alternatives14549
+Node: Acknowledgements14942
+Node: GNU Free Documentation License15551
+Node: Indices40906
+Node: Function index41076
+Node: Variable index41726
+Node: Concept index42690
 
 End Tag Table
 
