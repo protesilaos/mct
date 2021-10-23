@@ -139,8 +139,8 @@ Sample configuration:
 See Info node `(elisp) Displaying Buffers' for more details
 and/or the documentation string of `display-buffer'."
   :type '(cons (choice (function :tag "Display Function")
-		       (repeat :tag "Display Functions" function))
-	       alist)
+                       (repeat :tag "Display Functions" function))
+               alist)
   :group 'mct)
 
 (defcustom mct-completions-format 'one-column
@@ -150,9 +150,9 @@ See `completions-format' for possible values.
 NOTE that setting this option with `setq' requires a restart of
 `mct-mode'."
   :set (lambda (var val)
-	 (when (bound-and-true-p mct-mode)
-	   (setq completions-format val))
-	 (set var val))
+         (when (bound-and-true-p mct-mode)
+           (setq completions-format val))
+         (set var val))
   :type '(choice (const horizontal) (const vertical) (const one-column))
   :group 'mct)
 
@@ -228,7 +228,7 @@ Add this to `completion-list-mode-hook'."
   "Set up line highlighting for the completions' buffer.
 Add this to `completion-list-mode-hook'."
   (when (and (derived-mode-p 'completion-list-mode)
-	     (eq mct-completions-format 'one-column))
+             (eq mct-completions-format 'one-column))
     (face-remap-add-relative 'hl-line 'mct-hl-line)
     (hl-line-mode 1)))
 
@@ -288,7 +288,7 @@ Meant to be added to `after-change-functions'."
                           ;; don't ring the bell in `minibuffer-completion-help'
                           ;; when <= 1 completion exists.
                           (ring-bell-function #'ignore))
-		      (mct--show-completions))))
+                      (mct--show-completions))))
               (quit (abort-recursive-edit)))
           (minibuffer-hide-completions))))))
 
@@ -354,7 +354,7 @@ Meant to be added to `after-change-functions'."
             (setq overlay (make-overlay pt (point)))
             (overlay-put overlay 'face 'mct-stripe)
             (overlay-put overlay 'priority -100)))))))
-  
+
 ;;;; Commands and helper functions
 
 ;;;;; Focus minibuffer and/or show completions
@@ -377,8 +377,8 @@ Meant to be added to `after-change-functions'."
 (defun mct--show-completions ()
   "Show the completions' buffer."
   (let ((display-buffer-alist
-	 (cons (cons mct-completion-windows-regexp mct-display-buffer-action)
-	       display-buffer-alist)))
+         (cons (cons mct-completion-windows-regexp mct-display-buffer-action)
+               display-buffer-alist)))
     (save-excursion (minibuffer-completion-help)))
   (fit-window-to-buffer (mct--get-completion-window)))
 
@@ -452,8 +452,8 @@ by `mct-completion-windows-regexp'."
     (goto-char (point-at-bol))
     (recenter
      (- -1
-	(min (max 0 scroll-margin)
-	     (truncate (/ (window-body-height) 4.0))))
+        (min (max 0 scroll-margin)
+             (truncate (/ (window-body-height) 4.0))))
      t)))
 
 
@@ -476,11 +476,11 @@ point can no longer move in that direction it switches to the
 minibuffer."
   (interactive "p" mct-mode)
   (if (or (bobp)
-	  (save-excursion
-	    (previous-completion 1)
-	    (and (get-text-property (point) 'completion--string)
-		 (= (point) (point-min))))
-	  (eq (point) (1+ (point-min)))) ; see hack in `mct--clean-completions'
+          (save-excursion
+            (previous-completion 1)
+            (and (get-text-property (point) 'completion--string)
+                 (= (point) (point-min))))
+          (eq (point) (1+ (point-min)))) ; see hack in `mct--clean-completions'
       (mct-focus-minibuffer)
     (previous-completion (if (natnump arg) arg 1))))
 
