@@ -77,7 +77,9 @@ Only works when variable `file-name-shadow-mode' is non-nil."
 When disabled, the user has to manually request completions,
 using the regular activating commands.  Note that
 `mct-completion-passlist' overrides this option, while taking
-precedence over `mct-completion-blocklist'."
+precedence over `mct-completion-blocklist'.
+
+Live updating is subject to `mct-minimum-input'."
   :type 'boolean
   :group 'mct)
 
