@@ -144,8 +144,11 @@ and/or the documentation string of `display-buffer'."
   :group 'mct)
 
 (defcustom mct-completions-format 'one-column
-  "The Appearance and sorting used by `mct-mode'.
-See `completions-format' for possible values."
+  "The appearance and sorting used by `mct-mode'.
+See `completions-format' for possible values.
+
+NOTE that setting this option with `setq' requires a restart of
+`mct-mode'."
   :set (lambda (var val)
 	 (when (bound-and-true-p mct-mode)
 	   (setq completions-format val))
