@@ -255,8 +255,7 @@ Meant to be added to `after-change-functions'."
    ((member this-command mct-completion-passlist)
     (setq-local mct-minimum-input 0)
     (setq-local mct-live-update-delay 0)
-    (save-excursion (minibuffer-completion-help))
-    (mct--fit-completions-window)
+    (mct--show-completions)
     (add-hook 'after-change-functions #'mct--live-completions nil t))
    ((unless (member this-command mct-completion-blocklist)
       (add-hook 'after-change-functions #'mct--live-completions-timer nil t)))))
@@ -325,6 +324,11 @@ Meant to be added to `after-change-functions'."
       mct-completion-windows-regexp
       (buffer-name (window-buffer window))))))
 
+(defun mct--show-completions ()
+  "Show the completions' buffer."
+  (save-excursion (minibuffer-completion-help))
+  (mct--fit-completions-window))
+
 ;;;###autoload
 (defun mct-focus-mini-or-completions ()
   "Focus the active minibuffer or the completions' window.
@@ -354,8 +358,7 @@ by `mct-completion-windows-regexp'."
   (interactive nil mct-mode)
   (if (get-buffer-window "*Completions*" 0)
       (minibuffer-hide-completions)
-    (save-excursion (minibuffer-completion-help))
-    (mct--fit-completions-window)))
+    (mct--show-completions)))
 
 ;;;;; Commands for file completion
 
@@ -493,8 +496,7 @@ Completions' buffer."
         (mct-live-update-delay most-positive-fixnum)
         (enable-recursive-minibuffers t))
     (unless (get-buffer-window "*Completions*" 0)
-      (save-excursion (minibuffer-completion-help))
-      (mct--fit-completions-window))
+      (mct--show-completions))
     (if (or (and (derived-mode-p 'completion-list-mode)
                  (active-minibuffer-window))
             (and (minibufferp)
