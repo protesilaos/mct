@@ -381,7 +381,7 @@ Meant to be added to `after-change-functions'."
          (cons (cons mct-completion-windows-regexp mct-display-buffer-action)
                display-buffer-alist)))
     (save-excursion (minibuffer-completion-help)))
-  (fit-window-to-buffer (mct--get-completion-window)))
+  (mct--fit-completions-window))
 
 ;;;###autoload
 (defun mct-focus-mini-or-completions ()
