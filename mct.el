@@ -256,10 +256,10 @@ Add this to `completion-list-mode-hook'."
 
 (defun mct--fit-completions-window ()
   "Fit Completions' buffer to its window."
-  (setq-local window-resize-pixelwise t)
-  (select-window (mct--get-completion-window))
-  (fit-window-to-buffer (mct--get-completion-window)
-                        (floor (frame-height) 2) 1))
+  (when-let ((window (mct--get-completion-window)))
+    (with-current-buffer (window-buffer window)
+      (setq-local window-resize-pixelwise t))
+    (fit-window-to-buffer window (floor (frame-height) 2) 1)))
 
 (defun mct--input-string ()
   "Return the contents of the minibuffer as a string."
