@@ -755,7 +755,6 @@ To be assigned to `minibuffer-setup-hook'."
 (defvar mct--completion-show-help nil)
 (defvar mct--completion-auto-help nil)
 (defvar mct--completions-format nil)
-(defvar mct--completions-detailed nil)
 
 ;;;###autoload
 (define-minor-mode mct-mode
@@ -767,13 +766,11 @@ To be assigned to `minibuffer-setup-hook'."
         (setq mct--resize-mini-windows resize-mini-windows
               mct--completion-show-help completion-show-help
               mct--completion-auto-help completion-auto-help
-              mct--completions-format completions-format
-              mct--completions-detailed completions-detailed)
+              mct--completions-format completions-format)
         (setq resize-mini-windows t
               completion-show-help nil
               completion-auto-help t
-              completions-format mct-completions-format
-              completions-detailed t)
+              completions-format mct-completions-format)
         (let ((hook 'minibuffer-setup-hook))
           (add-hook hook #'mct--setup-completions)
           (add-hook hook #'mct--minibuffer-local-completion-map)
@@ -799,8 +796,7 @@ To be assigned to `minibuffer-setup-hook'."
     (setq resize-mini-windows mct--resize-mini-windows
           completion-show-help mct--completion-show-help
           completion-auto-help mct--completion-auto-help
-          completions-format mct--completions-format
-          completions-detailed mct--completions-detailed)
+          completions-format mct--completions-format)
     (let ((hook 'minibuffer-setup-hook))
       (remove-hook hook #'mct--setup-completions)
       (remove-hook hook #'mct--minibuffer-local-completion-map)

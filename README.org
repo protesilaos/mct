@@ -333,6 +333,7 @@ And with more options:
 Other useful extras from the Emacs source code (read their doc strings):
 
 #+begin_src emacs-lisp
+(setq completions-detailed t)
 (setq enable-recursive-minibuffers t)
 (setq minibuffer-eldef-shorten-default t)
 
