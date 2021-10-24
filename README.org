@@ -349,25 +349,35 @@ And with more options:
 Other useful extras from the Emacs source code (read their doc strings):
 
 #+begin_src emacs-lisp
+;; Add `orderless' to the completion styles, if you have it installed.
+(setq completion-styles
+      '(substring initials flex partial-completion))
+(setq completion-category-overrides
+        '((file (styles . (partial-completion initials substring)))))
+
+(setq completion-ignore-case t)
 (setq completions-detailed t)
+
 (setq enable-recursive-minibuffers t)
+(setq minibuffer-eldef-shorten-default t)
+
+(setq read-buffer-completion-ignore-case t)
+(setq read-file-name-completion-ignore-case t)
+
+(setq resize-mini-windows t)
 (setq minibuffer-eldef-shorten-default t)
 
 (file-name-shadow-mode 1)
 (minibuffer-depth-indicate-mode 1)
 (minibuffer-electric-default-mode 1)
 
-;;; Temporary window height
-
-;; Evaluate: (info "(emacs) Temporary Displays")
-;;
-;; Or read: ;; <https://www.gnu.org/software/emacs/manual/html_node/emacs/Temporary-Displays.html>.
-
-(setq temp-buffer-max-height (lambda (buf) (/ (window-height) 4)))
-;; OR
-;; (setq temp-buffer-max-height (lambda (buf) (/ (frame-height) 4)))
-
-(temp-buffer-resize-mode 1)
+;;; Minibuffer history
+(require 'savehist)
+(setq savehist-file (locate-user-emacs-file "savehist"))
+(setq history-length 10000)
+(setq history-delete-duplicates t)
+(setq savehist-save-minibuffer-history t)
+(add-hook 'after-init-hook #'savehist-mode)
 #+end_src
 
 * Keymaps
