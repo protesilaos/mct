@@ -131,10 +131,11 @@ functions.  ALIST is a possibly empty \"action alist\".
 Sample configuration:
 
     (setq mct-display-buffer-action
-          '((display-buffer-in-side-window)
-            (side . left)
-            (slot . 99)
-            (window-width . 0.3)))
+          (quote ((display-buffer-reuse-window
+                   display-buffer-in-side-window)
+                  (side . left)
+                  (slot . 99)
+                  (window-width . 0.3))))
 
 See Info node `(elisp) Displaying Buffers' for more details
 and/or the documentation string of `display-buffer'."
