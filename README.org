@@ -193,6 +193,12 @@ The display of the =*Completions*= can be toggled at any time from inside
 the minibuffer with =C-l= (mnemonic is "[l]ist completions" and the
 command is ~mct-list-completions-toggle~).
 
+#+vindex: mct-display-buffer-action
+By default, the =*Completions*= buffer appears in a window at the bottom
+of the frame.  Users can change its placement by configuring the
+variable ~mct-display-buffer-action~ (its doc string explains how and
+provides sample code).
+
 ** Selecting candidates
 :PROPERTIES:
 :CUSTOM_ID: h:bb445062-2e39-4082-a868-2123bfb793cc
@@ -326,6 +332,16 @@ And with more options:
         Info-index
         Info-menu
         vc-retrieve-tag))
+
+;; You can place the Completions' buffer wherever you want, by following
+;; the syntax of `display-buffer'.  For example, try this:
+
+;; (setq mct-display-buffer-action
+;;       (quote ((display-buffer-reuse-window
+;;                display-buffer-in-side-window)
+;;               (side . left)
+;;               (slot . 99)
+;;               (window-width . 0.3))))
 
 (mct-mode 1)
 #+end_src
