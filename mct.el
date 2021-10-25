@@ -630,16 +630,18 @@ are always visible).
 This command can be invoked from either the minibuffer or the
 Completions' buffer."
   (interactive nil mct-mode)
-  (let ((mct-remove-shadowed-file-names t)
-        (mct-live-update-delay most-positive-fixnum)
-        (enable-recursive-minibuffers t))
-    (unless (mct--get-completion-window)
-      (mct--show-completions))
-    (if (or (and (derived-mode-p 'completion-list-mode)
-                 (active-minibuffer-window))
-            (and (minibufferp)
-                 (mct--get-completion-window)))
-        (mct--line-number-selection))))
+  (if (not (eq completions-format 'one-column))
+      (user-error "Cannot select by line in grid view")
+    (let ((mct-remove-shadowed-file-names t)
+          (mct-live-update-delay most-positive-fixnum)
+          (enable-recursive-minibuffers t))
+      (unless (mct--get-completion-window)
+        (mct--show-completions))
+      (if (or (and (derived-mode-p 'completion-list-mode)
+                   (active-minibuffer-window))
+              (and (minibufferp)
+                   (mct--get-completion-window)))
+          (mct--line-number-selection)))))
 
 (defvar crm-completion-table)
 
