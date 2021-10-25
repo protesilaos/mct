@@ -664,23 +664,39 @@ Otherwise behave like `mct-choose-completion-exit'."
         (let ((inhibit-message t))
           (switch-to-completions))))))
 
+(defun mct--completion-string (point)
+  "Get completion string at POINT."
+  (get-text-property point 'completion--string))
+
 (defun mct-edit-completion ()
-  "Edit the candidate from the Completions in the minibuffer."
+  "Edit the current completion candidate inside the minibuffer.
+
+The current candidate is the one at point while inside the
+Completions' buffer.
+
+When point is in the minibuffer, the current candidate is
+determined as follows:
+
++ The one at the last known position in the Completions'
+  window (if the window is deleted and produced again, this value
+  is reset).
+
++ The first candidate in the Completions' buffer.
+
+A candidate is recognised for as long as point is not past its
+last character."
   (interactive nil mct-mode)
   (let (string)
-    ;; BUG 2021-07-26: When we use `mct-list-completions-toggle'
-    ;; the first line is active even without switching to the
-    ;; Completions' buffer, so the user would expect that this command
-    ;; would capture the candidate at that point.  It does not.
-    ;;
-    ;; If we focus the Completions' buffer at least once, then
-    ;; everything works as expected.
     (when (or (and (minibufferp)
                    (mct--get-completion-window))
               (and (derived-mode-p 'completion-list-mode)
                    (active-minibuffer-window)))
-      (with-current-buffer (window-buffer (mct--get-completion-window))
-        (setq string (get-text-property (point) 'completion--string)))
+      (let ((window (mct--get-completion-window)))
+        (with-current-buffer (window-buffer window)
+          (when-let ((old-point (window-old-point window)))
+            (if (= old-point (point-min))
+                (setq string (mct--completion-string (mct--first-completion-point)))
+              (setq string (mct--completion-string old-point))))))
       (if string
           (progn
             (select-window (active-minibuffer-window) nil)
