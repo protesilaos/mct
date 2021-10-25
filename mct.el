@@ -620,10 +620,12 @@ minibuffer."
           (display-line-numbers-mode -1))))))
 
 (defun mct-choose-completion-number ()
-  "Select completion candidate on line number with completion.
+  "Select completion candidate on a given line number.
+Upon selecting the candidate, exit the minibuffer (i.e. confirm
+the choice right away).
 
 If the Completions' buffer is not visible, it is displayed.  Line
-numbers are shown there for the duration of the operation (unless
+numbers are shown on the side for during the operation (unless
 `mct-show-completion-line-numbers' is non-nil, in which case they
 are always visible).
 
