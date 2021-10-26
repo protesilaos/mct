@@ -312,6 +312,10 @@ And with more options:
 (setq mct-minimum-input 3)
 (setq mct-live-update-delay 0.6)
 
+;; NOTE: setting this variable with `setq', requires `mct-mode' to be
+;; reloaded.
+(setq mct-completions-format 'one-column)
+
 ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
 ;; of candidates, depending also on how low `mct-minimum-input' is.
 ;; With the settings shown here this is not required, otherwise I would
@@ -351,9 +355,9 @@ Other useful extras from the Emacs source code (read their doc strings):
 #+begin_src emacs-lisp
 ;; Add `orderless' to the completion styles, if you have it installed.
 (setq completion-styles
-      '(substring initials flex partial-completion))
+      '(basic substring initials flex partial-completion))
 (setq completion-category-overrides
-        '((file (styles . (partial-completion initials substring)))))
+        '((file (styles . (basic partial-completion initials substring)))))
 
 (setq completion-ignore-case t)
 (setq completions-detailed t)
