@@ -584,6 +584,14 @@ minibuffer."
     (choose-completion)
     (minibuffer-force-complete-and-exit)))
 
+(defun mct-choose-completion-no-exit ()
+  "Run `choose-completion' in the Completions without exiting."
+  (interactive nil mct-mode)
+  (when (and (derived-mode-p 'completion-list-mode)
+             (active-minibuffer-window))
+    (let ((completion-no-auto-exit t))
+      (choose-completion))))
+
 (defvar display-line-numbers-mode)
 
 (defun mct--line-completion (n)
