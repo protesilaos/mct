@@ -157,28 +157,29 @@ NOTE that setting this option with `setq' requires a restart of
   :type '(choice (const horizontal) (const vertical) (const one-column))
   :group 'mct)
 
-;;;; Basic helper functions
+;;;; Completion metadata
 
-;; Copied from icomplete.el
 (defun mct--field-beg ()
   "Determine beginning of completion."
-  (if (window-minibuffer-p)
-      (minibuffer-prompt-end)
+  (if-let ((window (active-minibuffer-window)))
+      (with-current-buffer (window-buffer window)
+        (minibuffer-prompt-end))
     (nth 0 completion-in-region--data)))
 
-;; Copied from icomplete.el
 (defun mct--field-end ()
   "Determine end of completion."
-  (if (window-minibuffer-p)
-      (point-max)
+  (if-let ((window (active-minibuffer-window)))
+      (with-current-buffer (window-buffer window)
+        (point-max))
     (nth 1 completion-in-region--data)))
 
-;; Copied from icomplete.el
 (defun mct--completion-category ()
   "Return completion category."
-  (let* ((beg (mct--field-beg))
-         (md (when (window-minibuffer-p) (completion--field-metadata beg))))
-    (alist-get 'category (cdr md))))
+  (when-let ((window (active-minibuffer-window)))
+    (with-current-buffer (window-buffer window)
+      (let* ((beg (mct--field-beg))
+             (md (completion--field-metadata beg)))
+        (alist-get 'category (cdr md))))))
 
 ;;;; Basics of intersection between minibuffer and Completions' buffer
 
