@@ -579,18 +579,23 @@ minibuffer."
 (defun mct-choose-completion-exit ()
   "Run `choose-completion' in the Completions buffer and exit."
   (interactive nil mct-mode)
-  (when (and (derived-mode-p 'completion-list-mode)
-             (active-minibuffer-window))
-    (choose-completion)
-    (minibuffer-force-complete-and-exit)))
+  (when (active-minibuffer-window)
+    (when-let* ((window (mct--get-completion-window))
+                (buffer (window-buffer)))
+      (with-current-buffer buffer
+        (choose-completion))
+      (minibuffer-force-complete-and-exit))))
 
 (defun mct-choose-completion-no-exit ()
   "Run `choose-completion' in the Completions without exiting."
   (interactive nil mct-mode)
-  (when (and (derived-mode-p 'completion-list-mode)
-             (active-minibuffer-window))
-    (let ((completion-no-auto-exit t))
-      (choose-completion))))
+  (when-let* ((window (mct--get-completion-window))
+              (buffer (window-buffer))
+              (mini (active-minibuffer-window)))
+    (with-current-buffer buffer
+      (let ((completion-no-auto-exit t))
+        (choose-completion)))
+    (select-window mini nil)))
 
 (defvar display-line-numbers-mode)
 
