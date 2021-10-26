@@ -663,12 +663,12 @@ Completions' buffer."
 
 (defun mct-choose-completion-dwim ()
   "Append to minibuffer when at `completing-read-multiple' prompt.
-In any other `completing-read' prompt use `mct-edit-completion'."
+In any other prompt use `mct-choose-completion-no-exit'."
   (interactive nil mct-mode)
   (when-let* ((mini (active-minibuffer-window))
               (window (mct--get-completion-window))
               (buffer (window-buffer window)))
-    (mct-edit-completion)
+    (mct-choose-completion-no-exit)
     (with-current-buffer (window-buffer mini)
       (when crm-completion-table
         ;; FIXME 2021-10-22: How to deal with commands that let-bind the
