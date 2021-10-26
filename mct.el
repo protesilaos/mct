@@ -673,10 +673,6 @@ Otherwise behave like `mct-choose-completion-exit'."
         (let ((inhibit-message t))
           (switch-to-completions))))))
 
-(defun mct--completion-string (point)
-  "Get completion string at POINT."
-  (get-text-property point 'completion--string))
-
 (defun mct-edit-completion ()
   "Edit the current completion candidate inside the minibuffer.
 
@@ -695,23 +691,23 @@ determined as follows:
 A candidate is recognised for as long as point is not past its
 last character."
   (interactive nil mct-mode)
-  (let (string)
-    (when (or (and (minibufferp)
-                   (mct--get-completion-window))
-              (and (derived-mode-p 'completion-list-mode)
-                   (active-minibuffer-window)))
-      (let ((window (mct--get-completion-window)))
-        (with-current-buffer (window-buffer window)
-          (when-let ((old-point (window-old-point window)))
-            (if (= old-point (point-min))
-                (setq string (mct--completion-string (mct--first-completion-point)))
-              (setq string (mct--completion-string old-point))))))
-      (if string
-          (progn
-            (select-window (active-minibuffer-window) nil)
-            (delete-region (minibuffer-prompt-end) (point-max))
-            (insert string))
-        (user-error "Could not find completion at point")))))
+  (let* ((window (mct--get-completion-window))
+         (buffer (window-buffer window))
+         (mini (active-minibuffer-window))
+         pos)
+    (when (and mini window)
+      (with-current-buffer buffer
+        (when-let ((old-point (window-old-point window)))
+          (if (= old-point (point-min))
+              (setq pos (mct--first-completion-point))
+            (setq pos old-point))))
+      (when pos
+        ;; NOTE 2021-10-26: why must we `switch-to-completions' to get a
+        ;; valid candidate?  Why can't this be part of the above
+        ;; `with-current-buffer'?
+        (switch-to-completions)
+        (goto-char pos)
+        (mct-choose-completion-no-exit)))))
 
 ;;;;; Miscellaneous commands
 
