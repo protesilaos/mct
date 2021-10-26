@@ -663,14 +663,13 @@ Completions' buffer."
 
 (defun mct-choose-completion-dwim ()
   "Append to minibuffer when at `completing-read-multiple' prompt.
-Otherwise behave like `mct-choose-completion-exit'."
+In any other `completing-read' prompt use `mct-edit-completion'."
   (interactive nil mct-mode)
-  (when (and (derived-mode-p 'completion-list-mode)
-             (active-minibuffer-window))
-    (choose-completion)
-    (with-current-buffer (window-buffer (active-minibuffer-window))
-      (unless (eq (mct--completion-category) 'file)
-        (minibuffer-force-complete))
+  (when-let* ((mini (active-minibuffer-window))
+              (window (mct--get-completion-window))
+              (buffer (window-buffer window)))
+    (mct-edit-completion)
+    (with-current-buffer (window-buffer mini)
       (when crm-completion-table
         ;; FIXME 2021-10-22: How to deal with commands that let-bind the
         ;; crm-separator?  For example: `org-set-tags-command'.
