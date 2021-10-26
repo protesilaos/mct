@@ -716,7 +716,7 @@ last character."
 (defun mct-beginning-of-buffer ()
   "Go to the top of the Completions buffer."
   (interactive nil mct-mode)
-  (goto-char (1+ (point-min))))
+  (goto-char (mct--first-completion-point)))
 
 (defun mct-keyboard-quit-dwim ()
   "Control the exit behaviour for completions' buffers.
