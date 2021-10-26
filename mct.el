@@ -811,7 +811,7 @@ To be assigned to `minibuffer-setup-hook'."
 
 (defvar mct-completion-list-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "<tab>") #'choose-completion)
+    (define-key map (kbd "<tab>") #'mct-choose-completion-no-exit)
     (define-key map (kbd "M-v") #'scroll-down-command)
     (define-key map [remap goto-line] #'mct-choose-completion-number)
     (define-key map (kbd "M-e") #'mct-edit-completion)
