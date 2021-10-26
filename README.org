@@ -208,48 +208,79 @@ provides sample code).
 There are several ways to select a completion candidate.
 
 1. Suppose that you are typing =mod= with the intent to select the
-   =modus-themes.el= buffer.  To complete the first candidate follow up
-   =mod= with the =TAB= key.  This is how you would do it with the default
-   minibuffer.  If done fast enough, no completions will be shown
-   (depending on your minimum input threshold and the live-update
+   =modus-themes.el= buffer.  To force complete the first candidate follow
+   up =mod= with the =TAB= key (~minibuffer-force-complete~).  This does not
+   exit the minibuffer, meaning that it does not confirm your choice.
+   It just expands your input to the first likely candidate.  To confirm
+   your choice, use =RET=.  If done fast enough, no completions will be
+   shown (depending on your minimum input threshold and the live-update
    delay).
 
-2. Upon cycling through the completions, type =RET= to select the
-   candidate at point and exit the minibuffer.  This works for all types
-   of completion prompts.
+   #+findex: mct-choose-completion-exit
+2. While cycling through the completions' buffer, type =RET= to select and
+   confirm the current candidate (~mct-choose-completion-exit~).  This
+   works for all types of completion prompts.
 
-3. For certain contexts where selecting a candidate does not necessarily
-   mean that the process has to be finalised (e.g. when using ~find-file~)
-   selection in the =*Completions*= buffer can be done with =TAB= which
-   completes the item at point but does not exit the minibuffer.  The
-   command is instead renewed to update the list of completions with the
-   new candidates.
+   #+findex: mct-choose-completion-no-exit
+3. Similar to the above, but without exiting the minibuffer (i.e. to
+   confirm your choice) is ~mct-choose-completion-no-exit~ which is bound
+   to =TAB= in the completions' buffer.  This is particularly useful for
+   certain contexts where selecting a candidate does not necessarily
+   mean that the process has to be finalised (e.g. when using
+   ~find-file~).  In those cases, the event triggered by =TAB= is followed
+   by the renewal of the list of completions, where relevant (e.g. =TAB=
+   over a directory in ~find-file~, which then shows the contents of that
+   directory).
 
-4. Select a candidate by its line number by typing =M-g M-g= in either the
+   The command can correctly expand completion candidates even when the
+   active style in ~completion-styles~ is =partial-completion=.  In other
+   words, if the minibuffer contains input like =~/G/P/m= and the point is
+   in the completions' buffer over =Git/Projects/mct/= the minibuffer'
+   contents will become =~/Git/Projects/mct/= and then show the contents
+   of that directory.
+
+   #+findex: mct-edit-completion
+4. Type =M-e= (~mct-edit-completion~) in the completions' buffer to place
+   the current candidate in the minibuffer, without exiting the session.
+   This allows you to edit the text before confirming it.  If point is
+   in the minibuffer before performing this action, the current
+   candidate is either the one at the top of the completions' buffer or
+   that which is under the last known point in said buffer (the last
+   known position is reset when the window is deleted).  Internally,
+   ~mct-edit-completion~ uses ~mct-choose-completion-no-exit~ to expand the
+   completion candidate, so it retains its behaviour (as explained right
+   above).
+
+   #+findex: mct-choose-completion-number
+5. Select a candidate by its line number by typing =M-g M-g= in either the
    minibuffer or the =*Completions*= buffer.  This calls the command
    ~mct-choose-completion-number~ which internally enables line numbers
-   and always makes the completions' buffer visible.
+   and always makes the completions' buffer visible.  Selection in this
+   way exits the minibuffer.
 
-5. In prompts that allow the selection of multiple candidates
+   #+vindex: mct-completions-format
+   NOTE: This method only works when ~mct-completions-format~ is set to
+   its default value of =one-column=.  The other formats show completions
+   in a grid view, which makes navigation based on line numbers
+   imprecise.
+
+   #+findex: mct-choose-completion-dwim
+6. In prompts that allow the selection of multiple candidates
    (internally via the ~completing-read-multiple~ function) a =[CRM]= label
    is added to the text of the prompt.  The user thus knows that
-   pressing =M-RET= in the =*Completions*= will append the candidate at
-   point to the list of selections and keep the completions available so
-   that another item may be selected.  Any of the aforementioned
-   applicable methods can confirm the final selection.  If, say, you
-   want to pick a total of three candidates, do =M-RET= for the first two
-   and =RET= for the last one.  In contexts that are not CRM-powered, the
-   =M-RET= has the same effect as =RET=.
+   pressing =M-RET= (~mct-choose-completion-dwim~) in the =*Completions*= will
+   append the candidate at point to the list of selections and keep the
+   completions available so that another item may be selected.  Any of
+   the aforementioned applicable methods can confirm the final
+   selection.  If, say, you want to pick a total of three candidates, do
+   =M-RET= for the first two and =RET= (~mct-choose-completion-exit~) for the
+   last one.  In contexts that are not CRM-powered, the =M-RET= has the
+   same effect as =TAB= (~mct-choose-completion-no-exit~).
 
    NOTE 2021-10-22: this assumes the ~crm-separator~ to be constant (the
    comma =,= character) but some commands ~let~ bind it to something else,
    so the behaviour does not work as expected.  One such case is
    ~org-set-tags-command~ which uses =:= as a separator.
-
-#+findex: mct-edit-completion
-7. Type =M-e= (~mct-edit-completion~) in the completions' buffer to place
-   the current candidate in the minibuffer, without exiting the session.
-   This allows you to edit the text before confirming it.
 
 * Installation
 :PROPERTIES:
