@@ -214,7 +214,9 @@ There are several ways to select a completion candidate.
    It just expands your input to the first likely candidate.  To confirm
    your choice, use =RET=.  If done fast enough, no completions will be
    shown (depending on your minimum input threshold and the live-update
-   delay).
+   delay).  If you made a mistake, just use ~undo~.  If the candidates
+   meet the ~completion-cycle-threshold~ hit =TAB= again to switch between
+   them.
 
    #+findex: mct-choose-completion-exit
 2. While cycling through the completions' buffer, type =RET= to select and
@@ -390,6 +392,7 @@ Other useful extras from the Emacs source code (read their doc strings):
 (setq completion-category-overrides
         '((file (styles . (basic partial-completion initials substring)))))
 
+(setq completion-cycle-threshold 2)
 (setq completion-ignore-case t)
 (setq completions-detailed t)
 
