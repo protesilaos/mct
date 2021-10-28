@@ -471,29 +471,45 @@ these exceptionally well-crafted extras:
 :END:
 #+cindex: Alternatives to MCT
 
+Like MCT, these alternatives provide a thin layer of functionality over
+the built-in infrastructure.  They all make for a natural complement to
+the standard Emacs experience (also [[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Extensions]]).
+
 + [[https://github.com/minad/vertico][Vertico]] by Daniel Mendler :: this is a more mature and feature-rich
-  package with a large user base, while its maintainer is an
-  accomplished programmer.  Whereas MCT is mostly an excuse to practice
-  my Elisp skills.
+  package with a large user base and a highly competent maintainer.
 
-  Just like MCT, Vertico works with the standard ~completing-read~
-  infrastructure, so it makes for a natural complement to the standard
-  Emacs experience.
+  Vertico has some performance optimisations on how candidates are
+  sorted and presented, which means that it displays results right away
+  without any noticeable performance penalty.  Whereas MCT does not
+  change the underlying behaviour of how candidates are displayed.  As
+  such, MCT will be slower in scenaria where there are lots of
+  candidates because core Emacs lacks those optimisations.  One such
+  case is with the ~describe-symbol~ (=C-h o=) prompt.  If the user asks for
+  the completions' buffer without inputting any character (so without
+  narrowing the list), there will be a noticeable delay before the
+  buffer is rendered.  This is mitigated in MCT by the requirement for
+  ~mct-minimum-input~, though the underlying mechanics remain in tact.
 
-  The main difference between Vertico and MCT is that the former uses
-  the minibuffer by default and shows the completions there.  Whereas
-  MCT keeps the =*Completions*= buffer and the minibuffer as separate
-  entities, the way standard Emacs does it.
+  In terms of the interaction model, the main difference between Vertico
+  and MCT is that the former uses the minibuffer by default and shows
+  the completions there.  The minibuffer is expanded to show the
+  candidates in a vertical list.  Whereas MCT keeps the =*Completions*=
+  buffer and the minibuffer as separate entities, the way standard Emacs
+  does it.
 
   The presence of a fully fledged buffer means that the user can invoke
   all relevant commands at their disposal, such as to write the buffer
   to a file for future review, use Isearch to move around, copy a string
-  or rectangle to a register, and so on.
+  or rectangle to a register, and so on.  Also, the placement of such a
+  buffer is configurable (as with all buffers---though refer, in
+  particular, to ~mct-display-buffer-action~).
 
-  Vertico can optionally use a standalone buffer as well, by means of an
-  extension found in Vertico's git repository, so this is not a major
-  point anyway.  Plus, users of Embark can always create a buffer out of
-  any list of completions.
+  Vertico also supports buffer display, though only for the placement of
+  the buffer.  There is an extension for that in the git repository
+  called =vertico-buffer.el=.  Note, however, that the common combination
+  of Vertico and Embark means that users can always place the list of
+  completion candidates in a standalone buffer by means of Embark's
+  collect/export facilities.
 
 + [[https://github.com/karthink/elmo][Elmo - Embark Live MOde for Emacs]] by Karthik Chikmagalur :: this
   package is best described as a sibling of MCT both in terms of its
