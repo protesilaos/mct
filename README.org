@@ -471,10 +471,46 @@ these exceptionally well-crafted extras:
 :END:
 #+cindex: Alternatives to MCT
 
-The only alternative I have used that is conceptually close to MCT is
-=vertico=.  Vertico is a more mature and feature-rich package, while its
-maintainer, Daniel Mendler, is an accomplished programmer.  Whereas MCT
-is mostly an excuse to practice my Elisp skills.
++ [[https://github.com/minad/vertico][Vertico]] by Daniel Mendler :: this is a more mature and feature-rich
+  package with a large user base, while its maintainer is an
+  accomplished programmer.  Whereas MCT is mostly an excuse to practice
+  my Elisp skills.
+
+  Just like MCT, Vertico works with the standard ~completing-read~
+  infrastructure, so it makes for a natural complement to the standard
+  Emacs experience.
+
+  The main difference between Vertico and MCT is that the former uses
+  the minibuffer by default and shows the completions there.  Whereas
+  MCT keeps the =*Completions*= buffer and the minibuffer as separate
+  entities, the way standard Emacs does it.
+
+  The presence of a fully fledged buffer means that the user can invoke
+  all relevant commands at their disposal, such as to write the buffer
+  to a file for future review, use Isearch to move around, copy a string
+  or rectangle to a register, and so on.
+
+  Vertico can optionally use a standalone buffer as well, by means of an
+  extension found in Vertico's git repository, so this is not a major
+  point anyway.  Plus, users of Embark can always create a buffer out of
+  any list of completions.
+
++ [[https://github.com/karthink/elmo][Elmo - Embark Live MOde for Emacs]] by Karthik Chikmagalur :: this
+  package is best described as a sibling of MCT both in terms of its
+  functionality and overall interaction model.  In fact, the cyclic
+  motions that are at the core of the MCT experience were first
+  developed as part of my personal Emacs setup to cycle between the
+  minibuffer and Embark's "live completions" buffer.  That was until
+  Emacs28 got some refinements to the presentation of the =*Completions*=
+  buffer which allowed for a vertical, single-column view.
+
+  Elmo can, in principle, have identical functionality with MCT, given
+  that the only substantive difference is that the former uses an Embark
+  buffer to show live-updating completions, while the latter relies on
+  the generic =*Completions*= buffer.
+
+  For users who are on Emacs 27, Elmo is a better choice because MCT
+  only works as intended with Emacs 28 or higher.
 
 * Acknowledgements
 :PROPERTIES:
