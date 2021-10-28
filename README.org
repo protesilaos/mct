@@ -449,16 +449,21 @@ same as above, minus the =mct-= prefix).
 MCT only tweaks the default minibuffer.  To get more out of it, consider
 these exceptionally well-crafted extras:
 
-+ =consult= :: Adds several commands that make interacting with the
-  minibuffer more powerful.  There also are several packages that build
-  on it, such as =consult-dir=.
-+ =embark= :: Provides configurable contextual actions for completions and
-  many other constructs inside buffers.
-+ =marginalia= :: Displays informative annotations for all known types of
-  completion candidates.
-+ =orderless= :: A completion style that matches a variety of patterns
-  (regexp, flex, initialism, etc.) regardless of the order they appear
-  in.
++ [[https://github.com/minad/consult/][Consult]] by Daniel Mendler :: Adds several commands that make
+  interacting with the minibuffer more powerful.  There also are
+  multiple packages that build on it, such as [[https://github.com/karthink/consult-dir][consult-dir]] by Karthik
+  Chikmagalur and [[https://codeberg.org/jao/consult-notmuch][consult-notmuch]] by José Antonio Ortega Ruiz.
+
++ [[https://github.com/oantolin/embark/][Embark]] by Omar Antolín Camarena :: Provides configurable contextual
+  actions for completions and many other constructs inside buffers.  A
+  genius package!
+
++ [[https://github.com/minad/marginalia][Marginalia]] by Daniel and Omar :: Displays informative annotations for
+  all known types of completion candidates.
+
++ [[https://github.com/oantolin/orderless/][Orderless]] by Omar :: A completion style that matches a variety of
+  patterns (regexp, flex, initialism, etc.) regardless of the order they
+  appear in.
 
 * Alternatives
 :PROPERTIES:
