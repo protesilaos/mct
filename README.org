@@ -281,11 +281,6 @@ There are several ways to select a completion candidate.
    last one.  In contexts that are not CRM-powered, the =M-RET= has the
    same effect as =TAB= (~mct-choose-completion-no-exit~).
 
-   NOTE 2021-10-22: this assumes the ~crm-separator~ to be constant (the
-   comma =,= character) but some commands ~let~ bind it to something else,
-   so the behaviour does not work as expected.  One such case is
-   ~org-set-tags-command~ which uses =:= as a separator.
-
 ** Other commands
 :PROPERTIES:
 :CUSTOM_ID: h:b46a3366-6a7a-49ed-8caa-693d6ee437e9
