@@ -574,6 +574,39 @@ minibuffer."
             (line-move-to-column col)))
       (previous-completion (if (natnump arg) arg 1))))))
 
+(defun mct-next-completion-group (&optional arg)
+  "Move to the next completion group.
+If ARG is supplied, move that many completion groups at a time."
+  (interactive "p" mct-mode)
+  (dotimes (_ (or arg 1))
+    (when-let (group (save-excursion
+                       (text-property-search-forward 'face
+                                                     'completions-group-separator
+                                                     t nil)))
+      (let ((pos (prop-match-end group)))
+        (unless (eq pos (point-max))
+          (goto-char pos)
+          (next-completion 1))))))
+
+(defun mct-previous-completion-group (&optional arg)
+  "Move to the previous completion group.
+If ARG is supplied, move that many completion groups at a time."
+  (interactive "p" mct-mode)
+  (dotimes (_ (or arg 1))
+    ;; skip back, so if we're at the top of a group, we go to the previous one...
+    (next-line -1)
+    (if-let (group (save-excursion
+                     (text-property-search-backward 'face
+                                                    'completions-group-separator
+                                                    t nil)))
+        (let ((pos (prop-match-beginning group)))
+          (unless (eq pos (point-min))
+            (goto-char pos)
+            (next-completion 1)))
+      ;; ...and if there was a match, go back down, so the point doesn't
+      ;; end in the group separator
+      (next-line 1))))
+
 ;;;;; Candidate selection
 
 (defun mct-choose-completion-exit ()
@@ -831,6 +864,8 @@ To be assigned to `minibuffer-setup-hook'."
     (define-key map [remap next-line] #'mct-next-completion-or-mini)
     (define-key map (kbd "n") #'mct-next-completion-or-mini)
     (define-key map [remap previous-line] #'mct-previous-completion-or-mini)
+    (define-key map (kbd "<left>") #'mct-previous-completion-group)
+    (define-key map (kbd "<right>") #'mct-next-completion-group)
     (define-key map (kbd "p") #'mct-previous-completion-or-mini)
     (define-key map (kbd "M-e") #'mct-edit-completion)
     (define-key map (kbd "<tab>") #'mct-choose-completion-no-exit)
