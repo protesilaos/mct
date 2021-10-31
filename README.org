@@ -286,6 +286,27 @@ There are several ways to select a completion candidate.
    so the behaviour does not work as expected.  One such case is
    ~org-set-tags-command~ which uses =:= as a separator.
 
+** Other commands
+:PROPERTIES:
+:CUSTOM_ID: h:b46a3366-6a7a-49ed-8caa-693d6ee437e9
+:END:
+#+cindex: Miscellaneous commands
+
+  #+findex: mct-next-completion-group
+  #+findex: mct-previous-completion-group
++ Emacs 28 has the ability to group candidates inside the completions'
+  buffer under headings.  MCT provides motions that jump between such
+  heading, placing the point at the first candidate right below the
+  heading's text.  Use =M-n= (~mct-next-completion-group~) and =M-p=
+  (~mct-previous-completion-group~) to move to the next or previous one,
+  respectively.  Both commands accept an optional numeric argument.
+
+  #+findex: mct-backward-updir
++ When using completion categories that involve file paths, such as
+  ~find-file~, the backspace key (=DEL=) goes up a directory if point is
+  right after a path's directory delimiter (a forward slash).
+  Otherwise it deletes a single character backwards.
+
 * Installation
 :PROPERTIES:
 :CUSTOM_ID: h:1b501ed4-f16c-4118-9a4a-7a5e29143077
