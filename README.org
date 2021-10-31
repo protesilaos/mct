@@ -135,7 +135,7 @@ Other customisations:
   white---other themes would need to add support for the faces we define
   or, at least, users must modify the ~mct-stripe~ face.
 
-* Basic usage
+* Usage
 :PROPERTIES:
 :CUSTOM_ID: h:884d6702-8666-4d89-87a2-7d74843653f3
 :END:
@@ -186,7 +186,9 @@ the top of the buffer switches to the minibuffer, while =C-n= (or down
 arrow) at the bottom of the buffer also goes to the minibuffer.  If
 point is anywhere else inside the buffer, those key bindings perform a
 regular line motion.  The commands are ~mct-previous-completion-or-mini~
-and ~mct-next-completion-or-mini~.
+and ~mct-next-completion-or-mini~.  Both accept an optional numeric
+argument.  If the Nth line lies outside the boundaries of the
+completions' buffer, they move the point to the minibuffer.
 
 #+findex: mct-list-completions-toggle
 The display of the =*Completions*= can be toggled at any time from inside
