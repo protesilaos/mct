@@ -708,7 +708,7 @@ Completions' buffer."
                      bos "[" (1+ blank) "]*"
                      (group (1+ any))
                      "[" (1+ blank) "]*" eos)
-                    regex) 
+                    regex)
       (match-string 1 regex))
      ;; literal character
      ((string= regex (regexp-quote regex))
