@@ -661,6 +661,20 @@ Completions' buffer."
 
 (defvar crm-completion-table)
 
+(defun mct--regex-to-separator (regex)
+  (save-match-data
+    (cond
+     ;; whitespace-delimited, like default & org-set-tag-command
+     ((string-match (rx
+                     bos "[" (1+ blank) "]*"
+                     (group (1+ any))
+                     "[" (1+ blank) "]*" eos)
+                    regex) 
+      (match-string 1 regex))
+     ;; literal character
+     ((string= regex (regexp-quote regex))
+      regex))))
+
 (defun mct-choose-completion-dwim ()
   "Append to minibuffer when at `completing-read-multiple' prompt.
 In any other prompt use `mct-choose-completion-no-exit'."
@@ -671,9 +685,9 @@ In any other prompt use `mct-choose-completion-no-exit'."
     (mct-choose-completion-no-exit)
     (with-current-buffer (window-buffer mini)
       (when crm-completion-table
-        ;; FIXME 2021-10-22: How to deal with commands that let-bind the
-        ;; crm-separator?  For example: `org-set-tags-command'.
-        (insert ",")
+        (let ((separator (or (mct--regex-to-separator crm-separator)
+                             ",")))
+          (insert separator))
         (let ((inhibit-message t))
           (switch-to-completions))))))
 
