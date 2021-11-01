@@ -547,6 +547,26 @@ the standard Emacs experience (also [[#h:03227254-d467-4147-b8cf-2fe05a2e279b][E
   For users who are on Emacs 27, Elmo is a better choice because MCT
   only works as intended with Emacs 28 or higher.
 
++ Icomplete and fido-mode (built-in, multiple authors) :: Icomplete is
+  closer in spirit to Vertico, as it too uses the minibuffer to display
+  completion candidates.  By default, it presents the list horizontally,
+  though there exists ~icomplete-vertical-mode~ (and ~fido-vertical-mode~).
+
+  For our purposes, Icomplete and Fido are the same in terms of the
+  paradigm they follow.  The latter is a re-spin of the former, as it
+  adjusts certain variables and binds some commands for the convenience
+  of the end-user.  ~fido-mode~ and its accoutrements are defined in
+  =icomplete.el=.
+
+  What MCT borrows from Icomplete is the ~mct-backward-updir~ command, the
+  tidying of the shadowed file paths, and ideas for the input delay
+  (explained elsewhere in this document).  Internally, I also learnt how
+  to extend local keymaps by studying =icomplete.el=.
+
+  I used Icomplete for several months prior to switching to what would
+  eventually become =mct.el=.  I think it is excellent at providing a thin
+  layer over the built-in infrastructure.
+
 * Acknowledgements
 :PROPERTIES:
 :CUSTOM_ID: h:e2f73255-55f1-4f4c-8d8b-99c9a4a83192
