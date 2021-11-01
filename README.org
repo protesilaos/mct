@@ -299,8 +299,9 @@ There are several ways to select a completion candidate.
   #+findex: mct-backward-updir
 + When using completion categories that involve file paths, such as
   ~find-file~, the backspace key (=DEL=) goes up a directory if point is
-  right after a path's directory delimiter (a forward slash).
-  Otherwise it deletes a single character backwards.
+  right after a path's directory delimiter (a forward slash).  Otherwise
+  it deletes a single character backwards.  The command's symbol is
+  ~mct-backward-updir~.
 
 * Installation
 :PROPERTIES:
