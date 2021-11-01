@@ -326,7 +326,7 @@ mkdir manual-packages
 cd manual-packages
 
 # Clone this repo and name it "mct"
-git clone https://gitlab.com/protesilaos/mct.el.git mct
+git clone https://gitlab.com/protesilaos/mct.git mct
 #+end_src
 
 Finally, in your =init.el= (or equivalent) evaluate this:
