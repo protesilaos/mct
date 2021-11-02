@@ -563,9 +563,9 @@ the standard Emacs experience (also [[#h:03227254-d467-4147-b8cf-2fe05a2e279b][E
   (explained elsewhere in this document).  Internally, I also learnt how
   to extend local keymaps by studying =icomplete.el=.
 
-  I had used Icomplete for several months prior to switching to what
-  would eventually become =mct.el=.  I think it is excellent at providing
-  a thin layer over the built-in infrastructure.
+  I have used Icomplete for several months before moving to what now has
+  become =mct.el=.  I think it is excellent at providing a thin layer over
+  the built-in infrastructure.
 
 * Acknowledgements
 :PROPERTIES:
