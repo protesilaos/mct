@@ -90,18 +90,39 @@ a blocklist and a passlist for commands are on offer:
 
 #+vindex: mct-completion-blocklist
 + The blocklist (~mct-completion-blocklist~) disables the live-updating
-  functionality for the commands specified therein.
+  functionality for the functions specified therein.
 
 #+vindex: mct-completion-passlist
 + The passlist (~mct-completion-passlist~) always shows the Completions'
-  buffer for the designated command without accounting for the minimum
+  buffer for the designated function without accounting for the minimum
   input threshold.
 
 #+vindex: mct-live-completion
-To inhibit live completion in the first place, ~mct-live-completion~
-can be set to nil.  Given this customization, the Completions' buffern
-is only displayed when requested manually.  ~mct-completion-passlist~
-takes precedence over this option.
+The user option ~mct-live-completion~ controls the overall behaviour of
+the Completions' buffer:
+
++ When nil, the user has to manually request completions, using the
+  regular activating commands.  The Completions' buffer is never updated
+  live to match user input.  Updating has to be handled manually.  This
+  is like the out-of-the-box minibuffer completion experience.
+
++ When set to the value =visible=, the Completions' buffer is live
+  updated only if it is visible.  The actual display of the completions
+  is still handled manually.  For this reason, the =visible= style does
+  not read the ~mct-minimum-input~, meaning that it will always try to
+  live update the visible completions, regardless of input length.
+
++ When non-nil (the default), the Completions' buffer is automatically
+  displayed once the ~mct-minimum-input~ is met and is hidden once the
+  input drops below that threshold.  While visible, the buffer is
+  updated live to match the user input.
+
++ Note that every function in the ~mct-completion-passlist~ ignores this
+  option altogether.  This means that every such command will always
+  show the Completions' buffer automatically and will always update its
+  contents live.  Same principle for every function declared in the
+  ~mct-completion-blocklist~, which will always disable both the automatic
+  display and live updating of the Completions' buffer.
 
 Other customisations:
 
