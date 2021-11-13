@@ -437,6 +437,8 @@ Other useful extras from the Emacs source code (read their doc strings):
 
 (setq completion-cycle-threshold 2)
 (setq completion-ignore-case t)
+(setq completion-show-inline-help nil)
+
 (setq completions-detailed t)
 
 (setq enable-recursive-minibuffers t)
