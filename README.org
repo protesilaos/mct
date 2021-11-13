@@ -426,11 +426,10 @@ And with more options:
 Other useful extras from the Emacs source code (read their doc strings):
 
 #+begin_src emacs-lisp
-;; Add `orderless' to the completion styles, if you have it installed.
 (setq completion-styles
       '(basic substring initials flex partial-completion))
 (setq completion-category-overrides
-        '((file (styles . (basic partial-completion initials substring)))))
+      '((file (styles . (basic partial-completion initials substring)))))
 
 (setq completion-cycle-threshold 2)
 (setq completion-ignore-case t)
@@ -456,6 +455,29 @@ Other useful extras from the Emacs source code (read their doc strings):
 (setq history-delete-duplicates t)
 (setq savehist-save-minibuffer-history t)
 (add-hook 'after-init-hook #'savehist-mode)
+
+;;; Extensions
+
+;;;; Enable Consult previews in the Completions buffer.
+;; Requires the Consult package.
+(add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode)
+
+;;;; Setup for Orderless
+;; Requires the Orderless package
+
+;; We make the SPC key insert a literal space and the same for the
+;; question mark.  Spaces are used to delimit orderless groups, while
+;; the quedtion mark is a valid regexp character.
+(let ((map minibuffer-local-completion-map))
+  (define-key map (kbd "SPC") nil)
+  (define-key map (kbd "?") nil))
+
+;; Because SPC works for Orderless and is trivial to activate, I like to
+;; put `orderless' at the end of my `completion-styles'.  Like this:
+(setq completion-styles
+      '(basic substring initials flex partial-completion orderless))
+(setq completion-category-overrides
+      '((file (styles . (basic partial-completion orderless)))))
 #+end_src
 
 * Keymaps
@@ -504,6 +526,19 @@ these exceptionally well-crafted extras:
 + [[https://github.com/oantolin/orderless/][Orderless]] by Omar :: A completion style that matches a variety of
   patterns (regexp, flex, initialism, etc.) regardless of the order they
   appear in.
+
+** Enable Consult previews
+:PROPERTIES:
+:CUSTOM_ID: h:85268cb1-9d49-452c-ba5f-c9215d4b8b62
+:END:
+
+One of the nice features of the Consult package is the ability to
+preview the candidate at point.  All we need to enable it in the
+=*Completions*= buffer is the following snippet:
+
+#+begin_src emacs-lisp
+(add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode)
+#+end_src
 
 * Alternatives
 :PROPERTIES:
@@ -601,8 +636,8 @@ MCT is meant to be a collective effort.  Every bit of help matters.
 + Contributions to code or documentation :: James Norman Vladimir Cash,
   Philip Kaludercic.
 
-+ Ideas and user feedback :: Jonathan Irving, Kostadin Ninev, Manuel
-  Uberti, Philip Kaludercic.
++ Ideas and user feedback :: Jonathan Irving, José Antonio Ortega Ruiz,
+  Kostadin Ninev, Manuel Uberti, Philip Kaludercic.
 
 + Inspiration for certain features :: =icomplete.el= (built-in---multiple
   authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
