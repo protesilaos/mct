@@ -16,7 +16,7 @@
 
 #+texinfo_filename: mct.info
 #+texinfo_dir_category: Emacs misc features
-#+texinfo_dir_title: Minibuffer and Completions in Tandem: (mct)
+#+texinfo_dir_title: MCT: (mct)
 #+texinfo_dir_desc: Enhancement of the default minibuffer completion
 #+texinfo_header: @set MAINTAINERSITE @uref{https://protesilaos.com,maintainer webpage}
 #+texinfo_header: @set MAINTAINER Protesilaos Stavrou
@@ -58,7 +58,7 @@ included in the section entitled “GNU Free Documentation License.”
 modify this GNU manual.”
 #+end_quote
 
-* Overview of mct.el
+* Overview of MCT
 :PROPERTIES:
 :CUSTOM_ID: h:ba224631-618c-4e52-b373-e46970cb2242
 :END:
