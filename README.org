@@ -311,11 +311,15 @@ There are several ways to select a completion candidate.
   #+findex: mct-next-completion-group
   #+findex: mct-previous-completion-group
 + Emacs 28 has the ability to group candidates inside the completions'
-  buffer under headings.  MCT provides motions that jump between such
-  heading, placing the point at the first candidate right below the
-  heading's text.  Use =M-n= (~mct-next-completion-group~) and =M-p=
+  buffer under headings.  For example, the Consult package makes good
+  use of those ([[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Extensions]]).  MCT provides motions that jump between
+  such headings, placing the point at the first candidate right below
+  the heading's text.  Use =M-n= (~mct-next-completion-group~) and =M-p=
   (~mct-previous-completion-group~) to move to the next or previous one,
-  respectively.  Both commands accept an optional numeric argument.
+  respectively.  Both commands accept an optional numeric argument.  For
+  the sake of avoiding surprises, these commands do not cycle between
+  the completions and the minibuffer: they stop at the first or last
+  heading.
 
   #+findex: mct-backward-updir
 + When using completion categories that involve file paths, such as
