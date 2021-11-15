@@ -800,7 +800,11 @@ last character."
         (mct-choose-completion-no-exit)))))
 
 (defun mct-complete-and-exit ()
-  "Complete current input as with \\<mct-minibuffer-local-completion-map>\\[mct-edit-completion], and exit the minibuffer with that candidate."
+  "Complete current input and exit.
+
+This is the same as with
+\\<mct-minibuffer-local-completion-map>\\[mct-edit-completion],
+followed by exiting the minibuffer with that candidate."
   (interactive nil mct-mode)
   (mct-edit-completion)
   (minibuffer-complete-and-exit))
