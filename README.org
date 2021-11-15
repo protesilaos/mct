@@ -302,6 +302,13 @@ There are several ways to select a completion candidate.
    last one.  In contexts that are not CRM-powered, the =M-RET= has the
    same effect as =TAB= (~mct-choose-completion-no-exit~).
 
+   #+findex: mct-complete-and-exit
+7. When point is at the minibuffer, select the current candidate in
+   the completions buffer with =C-RET= (~mct-complete-and-exit~), which
+   has the same effect as first completing with =TAB= and then
+   immediately exit the minibuffer with the completed candidate as the
+   selected one.
+
 ** Other commands
 :PROPERTIES:
 :CUSTOM_ID: h:b46a3366-6a7a-49ed-8caa-693d6ee437e9
