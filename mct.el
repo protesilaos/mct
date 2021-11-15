@@ -799,6 +799,12 @@ last character."
         (goto-char pos)
         (mct-choose-completion-no-exit)))))
 
+(defun mct-complete-and-exit ()
+  "Complete current input as with \\<mct-minibuffer-local-completion-map>\\[mct-edit-completion], and exit the minibuffer with that candidate."
+  (interactive nil mct-mode)
+  (mct-edit-completion)
+  (minibuffer-complete-and-exit))
+
 ;;;;; Miscellaneous commands
 
 ;; This is needed to circumvent `mct--clean-completions' with regard to
@@ -920,6 +926,7 @@ To be assigned to `minibuffer-setup-hook'."
     (define-key map (kbd "<tab>") #'minibuffer-force-complete)
     (define-key map [remap goto-line] #'mct-choose-completion-number)
     (define-key map (kbd "M-e") #'mct-edit-completion)
+    (define-key map (kbd "<C-return>" #'mct-complete-and-exit))
     (define-key map (kbd "C-n") #'mct-switch-to-completions-top)
     (define-key map (kbd "<down>") #'mct-switch-to-completions-top)
     (define-key map (kbd "C-p") #'mct-switch-to-completions-bottom)
