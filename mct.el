@@ -926,7 +926,7 @@ To be assigned to `minibuffer-setup-hook'."
     (define-key map (kbd "<tab>") #'minibuffer-force-complete)
     (define-key map [remap goto-line] #'mct-choose-completion-number)
     (define-key map (kbd "M-e") #'mct-edit-completion)
-    (define-key map (kbd "<C-return>" #'mct-complete-and-exit))
+    (define-key map (kbd "<C-return>") #'mct-complete-and-exit)
     (define-key map (kbd "C-n") #'mct-switch-to-completions-top)
     (define-key map (kbd "<down>") #'mct-switch-to-completions-top)
     (define-key map (kbd "C-p") #'mct-switch-to-completions-bottom)
