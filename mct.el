@@ -206,8 +206,12 @@ NOTE that setting this option with `setq' requires a restart of
 
 ;;;; Basics of intersection between minibuffer and Completions' buffer
 
+;; TODO 2021-11-16: Is there a better way to check that the current
+;; command does not do completion?  This is fragile.
 (defvar mct--no-complete-functions
-  '(eval-expression)
+  '( eval-expression query-replace query-replace-regexp
+     isearch-forward isearch-backward
+     isearch-forward-regexp isearch-backward-regexp)
   "List of functions that do not do completion.")
 
 (define-obsolete-variable-alias
