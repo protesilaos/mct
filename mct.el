@@ -206,14 +206,17 @@ NOTE that setting this option with `setq' requires a restart of
 
 ;;;; Basics of intersection between minibuffer and Completions' buffer
 
-(defface mct-hl-line
+(define-obsolete-variable-alias
+  'mct-hl-line 'mct-highlight-candidate "0.3.0")
+
+(defface mct-highlight-candidate
   '((default :extend t)
     (((class color) (min-colors 88) (background light))
      :background "#b0d8ff" :foreground "#000000")
     (((class color) (min-colors 88) (background dark))
      :background "#103265" :foreground "#ffffff")
     (t :inherit highlight))
-  "Face for current line in the completions' buffer."
+  "Face for current candidate in the completions' buffer."
   :group 'mct)
 
 (defface mct-line-number
@@ -248,16 +251,6 @@ Add this to `completion-list-mode-hook'."
     (face-remap-add-relative 'line-number-current-line
                              'mct-line-number-current-line)
     (display-line-numbers-mode 1)))
-
-(defvar hl-line-face)
-
-(defun mct--hl-line ()
-  "Set up line highlighting for the completions' buffer.
-Add this to `completion-list-mode-hook'."
-  (when (and (derived-mode-p 'completion-list-mode)
-             (eq mct-completions-format 'one-column))
-    (face-remap-add-relative hl-line-face 'mct-hl-line)
-    (hl-line-mode 1)))
 
 ;; Thanks to Omar Antolín Camarena for recommending the use of
 ;; `cursor-sensor-functions' and the concomitant hook with
@@ -384,8 +377,8 @@ Meant to be added to `after-change-functions'."
                 (forward-line 1)
               (user-error (goto-char (point-max))))
             ;; We set the overlay this way and give it a low priority so
-            ;; that `hl-line-mode' and/or the active region can override
-            ;; it.
+            ;; that `mct--highlight-overlay' and/or the active region
+            ;; can override it.
             (setq overlay (make-overlay pt (point)))
             (overlay-put overlay 'face 'mct-stripe)
             (overlay-put overlay 'priority -100)))))))
@@ -903,6 +896,61 @@ ARGS."
 To be assigned to `minibuffer-setup-hook'."
   (add-hook 'after-change-functions #'mct--shadow-filenames nil t))
 
+;;;;; Highlight current candidate
+
+(defvar-local mct--highlight-overlay nil
+  "Overlay to highlight candidate in the Completions' buffer.")
+
+(defvar mct--overlay-priority -50
+  "Priority used on the `mct--highlight-overlay'.
+This value means that it takes precedence over lines that have
+the `mct-stripe' face, while it is overriden by the active
+region.")
+
+;; TODO 2021-11-16: Maybe there is a better way to get the boundaries of
+;; the completion at point?  What we do here saves us from highlighting
+;; empty space.
+(defun mct--completions-completion-beg ()
+  "Return point of completion candidate at START and END."
+  (if-let ((string (get-text-property (point) 'completion--string)))
+      (save-excursion
+        (next-completion -1)
+        (next-completion 1)
+        (point))
+    (point)))
+
+(defun mct--completions-completion-end ()
+  "Return end of completion candidate."
+  (if-let ((string (get-text-property (point) 'completion--string)))
+      (save-excursion
+        (next-completion 1)
+        (forward-char -1)
+        (point))
+    (point)))
+
+(defun mct--overlay-make ()
+  "Make overlay to highlight current candidate."
+  (let ((ol (make-overlay (point) (point))))
+    (overlay-put ol 'priority mct--overlay-priority)
+    (overlay-put ol 'face 'mct-highlight-candidate)
+    ol))
+
+(defun mct--overlay-move (overlay)
+  "Highlight the candidate at point with OVERLAY."
+  (let* ((beg (mct--completions-completion-beg))
+         (end (mct--completions-completion-end)))
+	(move-overlay overlay beg end)))
+
+(defun mct--completions-candidate-highlight ()
+  "Activate `mct--highlight-overlay'."
+  (unless (overlayp mct--highlight-overlay)
+    (setq mct--highlight-overlay (mct--overlay-make)))
+  (mct--overlay-move mct--highlight-overlay))
+
+(defun mct--completions-highlighting ()
+  "Highlight the current completion in the Completions' buffer."
+  (add-hook 'post-command-hook #'mct--completions-candidate-highlight nil t))
+
 ;;;;; Keymaps
 
 (defvar mct-completion-list-mode-map
@@ -996,7 +1044,7 @@ To be assigned to `minibuffer-setup-hook'."
           (add-hook hook #'mct--setup-completions-styles)
           (add-hook hook #'mct--completion-list-mode-map)
           (add-hook hook #'mct--truncate-lines-silently)
-          (add-hook hook #'mct--hl-line)
+          (add-hook hook #'mct--completions-highlighting)
           (add-hook hook #'mct--display-line-numbers)
           (add-hook hook #'cursor-sensor-mode))
         (add-hook 'completion-setup-hook #'mct--clean-completions)
@@ -1021,7 +1069,7 @@ To be assigned to `minibuffer-setup-hook'."
       (remove-hook hook #'mct--setup-completions-styles)
       (remove-hook hook #'mct--completion-list-mode-map)
       (remove-hook hook #'mct--truncate-lines-silently)
-      (remove-hook hook #'mct--hl-line)
+      (remove-hook hook #'mct--completions-highlighting)
       (remove-hook hook #'mct--display-line-numbers)
       (remove-hook hook #'cursor-sensor-mode))
     (remove-hook 'completion-setup-hook #'mct--clean-completions)
