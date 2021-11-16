@@ -206,6 +206,10 @@ NOTE that setting this option with `setq' requires a restart of
 
 ;;;; Basics of intersection between minibuffer and Completions' buffer
 
+(defvar mct--no-complete-functions
+  '(eval-expression)
+  "List of functions that do not do completion.")
+
 (define-obsolete-variable-alias
   'mct-hl-line 'mct-highlight-candidate "0.3.0")
 
@@ -326,7 +330,7 @@ Meant to be added to `after-change-functions'."
 
 (defun mct--setup-completions ()
   "Set up the completions' buffer."
-  (when (mct--completion-category)
+  (unless (memq this-command mct--no-complete-functions)
     (cond
      ((memq this-command mct-completion-passlist)
       (setq-local mct-minimum-input 0)
@@ -1007,14 +1011,14 @@ region.")
 
 (defun mct--completion-list-mode-map ()
   "Hook to `completion-setup-hook'."
-  (when (mct--completion-category)
+  (unless (memq this-command mct--no-complete-functions)
     (use-local-map
      (make-composed-keymap mct-completion-list-mode-map
                            (current-local-map)))))
 
 (defun mct--minibuffer-local-completion-map ()
   "Hook to `minibuffer-setup-hook'."
-  (when (mct--completion-category)
+  (unless (memq this-command mct--no-complete-functions)
     (use-local-map
      (make-composed-keymap mct-minibuffer-local-completion-map
                            (current-local-map)))))
