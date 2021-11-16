@@ -998,21 +998,24 @@ region.")
 
 (defun mct--completion-list-mode-map ()
   "Hook to `completion-setup-hook'."
-  (use-local-map
-   (make-composed-keymap mct-completion-list-mode-map
-                         (current-local-map))))
+  (when (mct--completion-category)
+    (use-local-map
+     (make-composed-keymap mct-completion-list-mode-map
+                           (current-local-map)))))
 
 (defun mct--minibuffer-local-completion-map ()
   "Hook to `minibuffer-setup-hook'."
-  (use-local-map
-   (make-composed-keymap mct-minibuffer-local-completion-map
-                         (current-local-map))))
-
+  (when (mct--completion-category)
+    (use-local-map
+     (make-composed-keymap mct-minibuffer-local-completion-map
+                           (current-local-map)))))
+    
 (defun mct--minibuffer-local-filename-completion-map ()
   "Hook to `minibuffer-setup-hook'."
-  (use-local-map
-   (make-composed-keymap mct-minibuffer-local-filename-completion-map
-                         (current-local-map))))
+  (when (mct--completion-category)
+    (use-local-map
+     (make-composed-keymap mct-minibuffer-local-filename-completion-map
+                           (current-local-map)))))
 
 ;;;;; mct-mode declaration
 
