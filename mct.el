@@ -824,7 +824,7 @@ This is the same as with
 followed by exiting the minibuffer with that candidate."
   (interactive nil mct-mode)
   (mct-edit-completion)
-  (minibuffer-complete-and-exit))
+  (exit-minibuffer))
 
 ;;;;; Miscellaneous commands
 
