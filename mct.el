@@ -447,13 +447,18 @@ by `mct-completion-windows-regexp'."
 (defun mct-backward-updir ()
   "Delete char before point or go up a directory."
   (interactive nil mct-mode)
-  (if (and (eq (char-before) ?/)
-           (eq (mct--completion-category) 'file))
-      (save-excursion
-        (goto-char (1- (point)))
-        (when (search-backward "/" (minibuffer-prompt-end) t)
-          (delete-region (1+ (point)) (point-max))))
-    (call-interactively 'backward-delete-char)))
+  (cond
+   ((and (eq (char-before) ?/)
+         (eq (mct--completion-category) 'file))
+    (when (string-equal (minibuffer-contents) "~/")
+      (delete-region (mct--minibuffer-field-beg) (mct--minibuffer-field-end))
+      (insert (expand-file-name "~/"))
+      (goto-char (line-end-position)))
+    (save-excursion
+      (goto-char (1- (point)))
+      (when (search-backward "/" (point-min) t)
+        (delete-region (1+ (point)) (point-max)))))
+   (t (call-interactively 'backward-delete-char))))
 
 ;;;;; Cyclic motions between minibuffer and completions' buffer
 
