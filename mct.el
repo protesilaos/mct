@@ -516,7 +516,9 @@ a `one-column' value."
         (setq old-point (window-old-point window)
               old-line (line-number-at-pos old-point))
         (when (= (line-number-at-pos line) old-line)
-          (goto-char old-point))))))
+          (if (eq old-point (point-min))
+              (goto-char (mct--first-completion-point))
+            (goto-char old-point)))))))
 
 (defun mct-switch-to-completions-top ()
   "Switch to the top of the completions' buffer."
@@ -532,6 +534,8 @@ a `one-column' value."
   (goto-char (point-max))
   (next-completion -1)
   (goto-char (point-at-bol))
+  (unless (get-text-property (point) 'completion--string)
+    (next-completion 1))
   (mct--restore-old-point-in-grid (point))
   (recenter
    (- -1
