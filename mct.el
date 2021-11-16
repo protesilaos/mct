@@ -496,7 +496,7 @@ a `one-column' value."
   "Check if ARGth line has a completion candidate."
   (save-excursion
     (vertical-motion arg)
-    (get-text-property (point) 'completion--string)))
+    (eq 'completions-group-separator (get-text-property (point) 'face))))
 
 (defun mct--switch-to-completions ()
   "Subroutine for switching to the completions' buffer."
@@ -564,13 +564,13 @@ minibuffer."
         ;; Retaining the column number ensures that things work
         ;; intuitively in a grid view.
         (let ((col (current-column)))
-          ;; The `unless' is meant to skip past lines that do not
+          ;; The `when' is meant to skip past lines that do not
           ;; contain completion candidates, such as those with
           ;; `completions-group-format'.
-          (unless (mct--completions-no-completion-line-p (or arg 1))
+          (when (mct--completions-no-completion-line-p (or arg 1))
             (if arg
-                (setq arg (1+ arg))
-              (setq arg 2)))
+                (setq arg 2)
+              (setq arg (1+ arg))))
           (vertical-motion (or arg 1))
           (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
             (line-move-to-column col))
@@ -601,13 +601,13 @@ minibuffer."
         ;; Retaining the column number ensures that things work
         ;; intuitively in a grid view.
         (let ((col (current-column)))
-          ;; The `unless' is meant to skip past lines that do not
+          ;; The `when' is meant to skip past lines that do not
           ;; contain completion candidates, such as those with
           ;; `completions-group-format'.
-          (unless (mct--completions-no-completion-line-p (or (- arg) -1))
+          (when (mct--completions-no-completion-line-p (or (- arg) -1))
             (if arg
-                (setq arg (1+ arg))
-              (setq arg 2)))
+                (setq arg 2)
+              (setq arg (1+ arg))))
           (vertical-motion (or (- arg) -1))
           (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
             (line-move-to-column col))
