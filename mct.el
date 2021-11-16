@@ -927,12 +927,9 @@ region.")
 
 (defun mct--completions-completion-end ()
   "Return end of completion candidate."
-  (if-let ((string (get-text-property (point) 'completion--string)))
-      (save-excursion
-        (next-completion 1)
-        (forward-char -1)
-        (point))
-    (point)))
+  (save-excursion
+    (goto-char (mct--completions-completion-beg))
+    (re-search-forward "\s\\|$")))
 
 (defun mct--overlay-make ()
   "Make overlay to highlight current candidate."
