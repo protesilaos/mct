@@ -927,17 +927,12 @@ This value means that it takes precedence over lines that have
 the `mct-stripe' face, while it is overriden by the active
 region.")
 
-;; TODO 2021-11-16: Maybe there is a better way to get the boundaries of
-;; the completion at point?  What we do here saves us from highlighting
-;; empty space.
 (defun mct--completions-completion-beg ()
   "Return point of completion candidate at START and END."
   (if-let ((string (get-text-property (point) 'completion--string)))
       (save-excursion
-        (next-completion -1)
-        (next-completion 1)
-        (point))
-    (point)))
+        (prop-match-beginning (text-property-search-forward 'completion--string))))
+  (point))
 
 (defun mct--completions-completion-end ()
   "Return end of completion candidate."
