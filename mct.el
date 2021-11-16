@@ -468,14 +468,14 @@ by `mct-completion-windows-regexp'."
 ;;;;; Cyclic motions between minibuffer and completions' buffer
 
 (defun mct--first-completion-point ()
-  "Find the `point' of the first completion."
+  "Return the `point' of the first completion."
   (save-excursion
     (goto-char (point-min))
     (next-completion 1)
     (point)))
 
 (defun mct--last-completion-point ()
-  "Find the `point' of the last completion."
+  "Return the `point' of the last completion."
   (save-excursion
     (goto-char (point-max))
     (next-completion -1)
