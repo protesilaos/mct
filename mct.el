@@ -935,8 +935,8 @@ region.")
   "Return point of completion candidate at START and END."
   (if-let ((string (get-text-property (point) 'completion--string)))
       (save-excursion
-        (prop-match-beginning (text-property-search-forward 'completion--string))))
-  (point))
+        (prop-match-beginning (text-property-search-forward 'completion--string)))
+    (point)))
 
 (defun mct--completions-completion-end ()
   "Return end of completion candidate."
