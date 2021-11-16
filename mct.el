@@ -943,9 +943,9 @@ region.")
   "Return end of completion candidate."
   (if-let ((string (get-text-property (point) 'completion--string)))
       (save-excursion
-        (next-completion 1)
-        (forward-char -1)
-        (point))
+        (if (eq completions-format 'one-column)
+            (1+ (prop-match-end (text-property-search-forward 'completion--string)))
+          (prop-match-end (text-property-search-forward 'completion--string))))
     (point)))
 
 (defun mct--overlay-make ()
