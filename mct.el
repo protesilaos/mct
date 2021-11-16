@@ -182,15 +182,15 @@ NOTE that setting this option with `setq' requires a restart of
 
 ;;;; Completion metadata
 
-(defun mct--field-beg ()
-  "Determine beginning of completion."
+(defun mct--minibuffer-field-beg ()
+  "Determine beginning of completion in the minibuffer."
   (if-let ((window (active-minibuffer-window)))
       (with-current-buffer (window-buffer window)
         (minibuffer-prompt-end))
     (nth 0 completion-in-region--data)))
 
-(defun mct--field-end ()
-  "Determine end of completion."
+(defun mct--minibuffer-field-end ()
+  "Determine end of completion in the minibuffer."
   (if-let ((window (active-minibuffer-window)))
       (with-current-buffer (window-buffer window)
         (point-max))
@@ -200,7 +200,7 @@ NOTE that setting this option with `setq' requires a restart of
   "Return completion category."
   (when-let ((window (active-minibuffer-window)))
     (with-current-buffer (window-buffer window)
-      (let* ((beg (mct--field-beg))
+      (let* ((beg (mct--minibuffer-field-beg))
              (md (completion--field-metadata beg)))
         (alist-get 'category (cdr md))))))
 
@@ -892,7 +892,7 @@ ARGS."
            (eq (mct--completion-category) 'file)
            rfn-eshadow-overlay (overlay-buffer rfn-eshadow-overlay)
            (eq this-command 'self-insert-command)
-           (= saved-point (mct--field-end))
+           (= saved-point (mct--minibuffer-field-end))
            (or (>= (- (point) (overlay-end rfn-eshadow-overlay)) 2)
                (eq ?/ (char-before (- (point) 2)))))
       (delete-region (overlay-start rfn-eshadow-overlay)
