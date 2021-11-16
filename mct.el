@@ -563,7 +563,9 @@ minibuffer."
               (setq arg 2)))
           (vertical-motion (or arg 1))
           (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
-            (line-move-to-column col)))
+            (line-move-to-column col))
+          (unless (get-text-property (point) 'completion--string)
+            (next-completion -1)))
       (next-completion (or arg 1))))
    (setq this-command 'next-line)))
 
@@ -597,7 +599,9 @@ minibuffer."
               (setq arg 2)))
           (vertical-motion (or (- arg) -1))
           (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
-            (line-move-to-column col)))
+            (line-move-to-column col))
+          (unless (get-text-property (point) 'completion--string)
+            (next-completion -1)))
       (previous-completion (if (natnump arg) arg 1))))))
 
 (declare-function text-property-search-backward "text-property-search" (property &optional value predicate not-current))
