@@ -66,7 +66,7 @@ modify this GNU manual.”
 
 Minibuffer and Completions in Tandem, also known as "MCT", "Mct", =mct=,
 or =mct.el=, is a package that enhances the default minibuffer and
-=*Completions*= buffer of Emacs 28 (or higher) so that they work together
+=*Completions*= buffer of Emacs 27 (or higher) so that they work together
 as part of a unified framework.  The idea is to make the presentation
 and overall functionality be consistent with other popular, vertically
 aligned completion UIs while leveraging built-in functionality.
@@ -613,8 +613,10 @@ the standard Emacs experience (also [[#h:03227254-d467-4147-b8cf-2fe05a2e279b][E
   buffer to show live-updating completions, while the latter relies on
   the generic =*Completions*= buffer.
 
-  For users who are on Emacs 27, Elmo is a better choice because MCT
-  only works as intended with Emacs 28 or higher.
+  For users who are on Emacs 27 and who need a single-column view, Elmo
+  is a better choice because MCT can only display such a view on Emacs
+  28 or higher (though it has been meticulously tested with the grid
+  views of Emacs 27 and should work perfectly fine with them).
 
 + Icomplete and fido-mode (built-in, multiple authors) :: Icomplete is
   closer in spirit to Vertico, as it too uses the minibuffer to display
