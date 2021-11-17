@@ -511,7 +511,7 @@ minibuffer and the =*Completions*= buffer, respectively:
 
 You can invoke ~describe-keymap~ to learn more about them.
 
-If you want to edit any key bindings, do it in those keymaps, not in
+If you want to edit any key bindings, do it in these keymaps, not in
 those they extend and override (the names of the original ones are the
 same as above, minus the =mct-= prefix).
 
