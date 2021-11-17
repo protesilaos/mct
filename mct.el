@@ -751,6 +751,7 @@ Completions' buffer."
 (defvar crm-separator)
 
 (defun mct--regex-to-separator (regex)
+  "Parse REGEX of `crm-separator' in `mct-choose-completion-dwim'."
   (save-match-data
     (cond
      ;; whitespace-delimited, like default & org-set-tag-command
