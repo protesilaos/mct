@@ -88,11 +88,11 @@ Customisation options control the input threshold (~mct-minimum-input~)
 and the delay between live updates (~mct-live-update-delay~).  Similarly,
 a blocklist and a passlist for commands are on offer:
 
-#+vindex: mct-completion-blocklist
+  #+vindex: mct-completion-blocklist
 + The blocklist (~mct-completion-blocklist~) disables the live-updating
   functionality for the functions specified therein.
 
-#+vindex: mct-completion-passlist
+  #+vindex: mct-completion-passlist
 + The passlist (~mct-completion-passlist~) always shows the Completions'
   buffer for the designated function without accounting for the minimum
   input threshold.
@@ -126,13 +126,13 @@ the Completions' buffer:
 
 Other customisations:
 
-#+vindex: mct-hide-completion-mode-line
+  #+vindex: mct-hide-completion-mode-line
 + ~mct-hide-completion-mode-line~ to hide the mode line of the
   =*Completions*= buffer.  This removes the separation between it and the
   minibuffer, further contributing to the idea of a unified space
   between the two.
 
-#+vindex: mct-remove-shadowed-file-name
+  #+vindex: mct-remove-shadowed-file-name
 + ~mct-remove-shadowed-file-name~ to clear shadowed file names when
   ~file-name-shadow-mode~ is enabled.  This means that in prompts that use
   file paths (such as ~find-file~) when you start in, say, =~/Git/mct.el=
@@ -140,7 +140,7 @@ Other customisations:
   inserted.  Whereas the default is to keep the original file name
   visible yet "shadowed" by a different colour.
 
-#+findex: mct-choose-completion-number
+  #+findex: mct-choose-completion-number
 + ~mct-show-completion-line-numbers~ to always display line numbers in the
   Completions' buffer.  This can be helpful to get a sense of the length
   of the completion candidates' list.  Though note that line numbers are
@@ -148,8 +148,8 @@ Other customisations:
   command, which is bound to =M-g M-g= in either the minibuffer or the
   =*Completions*= buffer.
 
-#+vindex: mct-apply-completion-stripes
-#+vindex: mct-stripe
+  #+vindex: mct-apply-completion-stripes
+  #+vindex: mct-stripe
 + ~mct-apply-completion-stripes~ applies alternative background colours in
   the Completions' buffer.  This is only tested with the =modus-themes=
   and will only work nicely if the main background is pure black or
