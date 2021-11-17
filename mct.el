@@ -227,37 +227,13 @@ NOTE that setting this option with `setq' requires a restart of
   "Face for current candidate in the completions' buffer."
   :group 'mct)
 
-(defface mct-line-number
-  '((default :inherit default)
-    (((class color) (min-colors 88) (background light))
-     :background "#f2eff3" :foreground "#252525")
-    (((class color) (min-colors 88) (background dark))
-     :background "#151823" :foreground "#dddddd")
-    (t :inverse-video t))
-  "Face for line numbers in the completions' buffer."
-  :group 'mct)
-
-(defface mct-line-number-current-line
-  '((default :inherit default)
-    (((class color) (min-colors 88) (background light))
-     :background "#8ac7ff" :foreground "#000000")
-    (((class color) (min-colors 88) (background dark))
-     :background "#142a79" :foreground "#ffffff")
-    (t :inverse-video t))
-  "Face for current line number in the completions' buffer."
-  :group 'mct)
-
 (declare-function display-line-numbers-mode "display-line-numbers")
-(declare-function face-remap-remove-relative "face-remap" (cookie))
 
 (defun mct--display-line-numbers ()
   "Set up line numbers for the completions' buffer.
 Add this to `completion-list-mode-hook'."
   (when (and (derived-mode-p 'completion-list-mode)
              mct-show-completion-line-numbers)
-    (face-remap-add-relative 'line-number 'mct-line-number)
-    (face-remap-add-relative 'line-number-current-line
-                             'mct-line-number-current-line)
     (display-line-numbers-mode 1)))
 
 ;; Thanks to Omar Antolín Camarena for recommending the use of
