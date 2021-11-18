@@ -390,7 +390,7 @@ Meant to be added to `after-change-functions'."
   "Test if we have a one-column view available."
   (and (eq completions-format 'one-column)
        (eq mct-completions-format 'one-column)
-       (> emacs-major-version 28)))
+       (>= emacs-major-version 28)))
 
 ;;;;; Focus minibuffer and/or show completions
 
