@@ -340,11 +340,24 @@ There are several ways to select a completion candidate.
 :CUSTOM_ID: h:1b501ed4-f16c-4118-9a4a-7a5e29143077
 :END:
 
-MCT is not in any package archive for the time being, though I plan to
-submit it to GNU ELPA (as such, any non-trivial patches require
-copyright assignment to the Free Software Foundation).  Users can rely
-on =straight.el=, =quelpa=, or equivalent to fetch the source.  Below are
-the essentials for those who prefer the manual method.
+** Install the package
+:PROPERTIES:
+:CUSTOM_ID: h:a191dbaa-22f6-4ad6-8185-1de64fe0a9bc
+:END:
+
+=mct= is available on the official GNU ELPA archive for users of Emacs
+version 27 or higher.  One can install the package without any further
+configuration.  The following commands shall suffice:
+
+#+begin_src emacs-lisp
+M-x package-refresh-contents
+M-x package-install RET mct
+#+end_src
+
+** Manual installation method
+:PROPERTIES:
+:CUSTOM_ID: h:663ec536-056b-443e-9272-2a365eb28b83
+:END:
 
 Assuming your Emacs files are found in =~/.emacs.d/=, execute the
 following commands in a shell prompt:
