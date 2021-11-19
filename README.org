@@ -678,6 +678,15 @@ MCT is meant to be a collective effort.  Every bit of help matters.
   authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
   =live-completions=), Štěpán Němec (=stripes.el=).
 
+* Official sources
+:PROPERTIES:
+:CUSTOM_ID: h:32f474f2-f596-4a7e-a0da-023344136be1
+:END:
+
++ Manual :: <https://protesilaos.com/emacs/mct>
++ Change log :: <https://protesilaos.com/emacs/mct-changelog>
++ Source code :: <https://gitlab.com/protesilaos/mct>
+
 * GNU Free Documentation License
 :PROPERTIES:
 :APPENDIX: t
