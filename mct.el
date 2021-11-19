@@ -89,7 +89,7 @@ regardless of input length.
 
 When non-nil (the default), the Completions' buffer is
 automatically displayed once the `mct-minimum-input' is met and
-is hidden once the input drops below that threshold.  While
+is hidden if the input drops below that threshold.  While
 visible, the buffer is updated live to match the user input.
 
 Note that every function in the `mct-completion-passlist' ignores
