@@ -1,0 +1,286 @@
+#+TITLE: Change log of the Minibuffer and Completions in Tandem (mct)
+#+AUTHOR: Protesilaos Stavrou
+#+EMAIL: info@protesilaos.com
+#+OPTIONS: ':nil toc:nil num:nil author:nil email:nil
+
+This document contains the release notes that are included in each
+tagged commit on the project's main git repository:
+<https://gitlab.com/protesilaos/mct>.
+
+The newest release is at the top.  For further details, please consult
+the manual: <https://protesilaos.com/emacs/mct>.
+
+* Version 0.3.0 on 2021-11-19
+:PROPERTIES:
+:CUSTOM_ID: h:902574cf-edf0-4182-9d34-5e8e28730193
+:END:
+
+This entry describes the changes to Minibuffer and Completions in Tandem
+(mct) since the release of [[#h:4fab7648-d672-4af3-90b5-74242292f633][version 0.2.0 on 2021-11-12]].  There have been
+more than 40 commits since then.  For further details, please consult
+the manual online: <https://protesilaos.com/emacs/mct>.  Or evaluate
+the following expression if you have the =mct= package installed:
+
+#+begin_src emacs-lisp
+(info "(mct) Top")
+#+end_src
+
+As this release is a continuation of version =0.2.0=, the changelog for
+that version is also provided below (I released version =0.2.0= earlier
+than anticipated so that users could get a stable package on GNU ELPA).
+Here is a brief description of what has been achieved in =0.3.0=.
+
+** MCT on Emacs 27
+
++ MCT now works on Emacs 27.  This was not possible in the past because
+  ~mct-mode~ was originally designed to operate with the =one-column= style
+  of the ~completions-format~, which was added in Emacs 28.  To make
+  everything behave intuitively, several parts had to be abstracted and
+  refactored (the changelog of version =0.2.0= (further below) covers
+  everything not mentioned here).
+
++ The scenaria where the functionality was thoroughly tested involve all
+  the available formats and cover commands that fulfil the following
+  criteria:
+
+  - Plain completion candidates, as in ~switch-to-buffer~.
+  - Dynamic completion like that of ~find-file~.
+  - Annotated candidates, as seen in ~describe-symbol~ for versions of
+    Emacs 28 or higher.
+  - Commands where candidates are grouped by heading, as done by various
+    extensions of the =consult= package, such as ~consult-imenu~.
+  - Commands where no completion category is associated with them.
+
++ The only change which is visible to the user is the implementation
+  of a bespoke overlay to highlight the current candidate.  In
+  previous versions, this was provided by the built-in ~hl-line-mode~,
+  though that does not work as intended with either the =vertical= or
+  =horizontal= layouts of the ~completions-format~ as it covers the whole
+  line instead of the candidate at point.
+
++ The highlight extends to the edge of the window when the =one-column=
+  format is used for the ~completions-format~ (Emacs 28 or higher).  In
+  the other views it stretches from the beginning to the end of the
+  completion candidate.
+
++ Thanks to Case Duckworth for the initial request and subsequent
+  testing in issue 1: <https://gitlab.com/protesilaos/mct/-/issues/1>.
+
+** Miscellaneous changes
+
++ There is a new command that is active in the minibuffer which allows
+  to complete and exit immediately: =C-RET= (~mct-complete-and-exit~).  This
+  economises on key presses when all the user wants is to select the
+  top-most candidate (or last highlighted one) without first switching
+  to the Completions' buffer and then confirming it from there (=RET= in
+  the =*Completions*= buffer completes and exits directly).
+
+  - Thanks to José Antonio Ortega Ruiz for the contribution in merge
+    requests 3 and 4 as discussed in issue 8:
+
+    + <https://gitlab.com/protesilaos/mct/-/merge_requests/3>
+    + <https://gitlab.com/protesilaos/mct/-/merge_requests/4>
+    + <https://gitlab.com/protesilaos/mct/-/issues/8>
+
+  - Note that "exit" in this context denotes the process of terminating
+    the session while accepting the current input.  The term used to
+    quit without accepting the input is "abort".
+
++ The ~mct-mode~ does not get activated in contexts where (i) the
+  minibuffer is involved but (ii) no completion takes place.  For
+  example, the ~eval-expression~ command (bound to =M-:= by default).
+
++ ~mct-mode~ no longer remaps the faces of the ~display-line-numbers-mode~.
+  This was a useful experiment from the early days of the code base,
+  although it is bad practice for a user-facing package.
+
++ Various tweaks and refinements to the manual.
+
++ Retroactive introduction of a CHANGELOG.org file and coverage of all
+  noteworthy changes hitherto.
+
+* Version 0.2.0 on 2021-11-12
+:PROPERTIES:
+:CUSTOM_ID: h:4fab7648-d672-4af3-90b5-74242292f633
+:END:
+
+This entry describes the changes to Minibuffer and Completions in Tandem
+(mct) since the release of [[#h:a4b2152a-96e2-46fc-b9e0-ba223028118f][version 0.1.0 on 2021-10-22]].  There have been
+70 commits since then.  For further details, please consult the manual
+online: <https://protesilaos.com/emacs/mct>.  Or evaluate the following
+expression if you have the =mct= package installed:
+
+#+begin_src emacs-lisp
+(info "(mct) Top")
+#+end_src
+
+** Packaged version of MCT
+:PROPERTIES:
+:CUSTOM_ID: h:0fb1fb23-636f-41f3-97bf-880d83ac42e0
+:END:
+
+=mct= is now available on the official GNU ELPA archive for users of Emacs
+version 28 or higher.  One can install the package without any further
+configuration.  The following commands shall suffice:
+
+#+begin_src
+M-x package-refresh-contents
+M-x package-install RET mct
+#+end_src
+
+** Changes to the format and placement of the Completions
+:PROPERTIES:
+:CUSTOM_ID: h:97eba994-45ad-4f86-945f-a60772f764b5
+:END:
+
++ The user option ~mct-live-completion~ controls how and when the
+  Completions' buffer should be placed in a window and be updated live
+  in response to user feedback.  Copying from the doc string:
+
+  #+begin_quote
+  mct-live-completion is a variable defined in ‘mct.el’.
+
+  Its value is t
+
+  Control auto-display and live-update of Completions' buffer.
+
+  When nil, the user has to manually request completions, using the
+  regular activating commands.  The Completions' buffer is never updated
+  live to match user input.  Updating has to be handled manually.  This
+  is like the out-of-the-box minibuffer completion experience.
+
+  When set to the value =visible=, the Completions' buffer is live
+  updated only if it is visible.  The actual display of the completions
+  is still handled manually.  For this reason, the =visible= style does
+  not read the =mct-minimum-input=, meaning that it will always try to
+  live update the visible completions, regardless of input length.
+
+  When non-nil (the default), the Completions' buffer is automatically
+  displayed once the =mct-minimum-input= is met and is hidden if the
+  input drops below that threshold.  While visible, the buffer is
+  updated live to match the user input.
+
+  Note that every function in the =mct-completion-passlist= ignores this
+  option altogether.  This means that every such command will always
+  show the Completions' buffer automatically and will always update its
+  contents live.  Same principle for every function declared in the
+  =mct-completion-blocklist=, which will always disable both the
+  automatic display and live updating of the Completions' buffer.
+  #+end_quote
+
+  - Thanks to Jonathan Irving for the feedback in issue 4:
+    <https://gitlab.com/protesilaos/mct/-/issues/4>.
+
++ As with all buffers, the placement of the =*Completions*= can be
+  controlled with the ~display-buffer~ machinery.  The default is to show
+  the completions at the bottom of the frame, though users can easily
+  move it to, say, the left side window.  The doc string of the user
+  option ~mct-display-buffer-action~ explains how to do so.
+
+  - Thanks to Philip Kaludercic for the initial implementation in commit
+    =436b24e= (was sent via email as a patch).
+
+  - Thanks to Kostadin Ninev for reporting a bug where the Completions'
+    buffer would proliferate during completion:
+    <https://gitlab.com/protesilaos/mct/-/issues/3>.  It was fixed by
+    Philip Kaludercic in commit =51c1e17=.
+
++ MCT now supports all the available styles of the ~completions-format~,
+  whereas the original design was only meant to work with the value
+  =one-column=, which was introduced in Emacs 28.  The user option is
+  ~mct-completions-format~.  If that variable is set with ~setq~, the
+  ~mct-mode~ has to be restarted manually for changes to take effect
+  (setting the variable through ~customize-set-variable~ (and related)
+  handles the mode reloading automatically).
+
+  - Thanks to Philip Kaludercic for the patch in commit =b392b0b=.
+
+  - Several changes were then made to ensure that the cyclic motions
+    that move between the =*Completions*= and the minibuffer work
+    intuitively in a grid view.  In short: =C-n=, =C-p= or the down/up arrow
+    keys, perform a vertical motion, while the left/right arrow keys
+    move laterally.  Prior to those changes, =C-n= or down arrow as well
+    as =C-p= or up arrow, would perform a lateral motion as that is
+    internally the meaning of the next/previous completion candidate.
+
+  - The command ~mct-choose-completion-number~ was updated to throw a user
+    error when a grid view is active.  That is because it is designed to
+    jump to a given line number, which only works as intended when there
+    is only one candidate per line. (Perhaps a future release should
+    overlay characters over candidates in the grid view to select them
+    directly.)
+
++ The ~mct-mode~ no longer sets the =completions-detailed= variable.  That
+  is a matter of user preference.  It is not integral to the
+  functionality of MCT.
+
+** Group motions
+
++ Emacs 28 provides infrastructure for commands to group candidates
+  based on their contents.  These groups can have their own heading in
+  the Completions' buffer, as well as a separator.  Overall, it makes
+  things look more organised.  The commands ~mct-next-completion-group~
+  and ~mct-previous-completion-group~ move between those headings.  While
+  in the =*Completions*= buffer, they are bound to =M-n= and =M-p=,
+  respectively.  Thanks to James Norman Vladimir Cash for the
+  contribution in merge request 2:
+  <https://gitlab.com/protesilaos/mct/-/merge_requests/2>.
+
+** Miscellaneous changes
+
++ The =TAB= key in the Completions' buffer never exits the minibuffer (the
+  command is ~mct-choose-completion-no-exit~).  Instead, it expands the
+  current candidate in the minibuffer and switches focus to it.  Before,
+  this behaviour would only happen in ~find-file~ and related prompts, but
+  consistency/predictability is better.
+
+  [ By contrast, =RET= (~mct-choose-completion-exit~) in the Completions
+    buffer always exits with the candidate at point. ]
+
+  Note that in this context "exit" means to close the session and accept
+  the current input.
+
++ There is a new heuristic to deal with commands that ~let~ bind the
+  ~crm-separator~ (e.g. ~org-set-tags-command~ sets the separator to =:=).
+  This is used to make =M-RET= (~mct-choose-completion-dwim~) in the
+  Completions buffer work in all ~completing-read-multiple~ contexts.
+  Thanks to James Norman Vladimir Cash for contributing the heuristic in
+  merge request 1:
+  <https://gitlab.com/protesilaos/mct/-/merge_requests/1>.
+
++ The aforementioned =M-RET= command used to have the same effect as =RET=
+  when not in a ~completing-read-multiple~ prompt ("CRM prompt").  This
+  has now been revised to behave like =TAB= instead (as described further
+  above), which is consistent with the ordinary behaviour of =M-RET= in
+  CRM prompts where it appends the candidate at point to the minibuffer
+  without exiting.
+
++ The check for ~display-line-numbers-mode~ tests whether it is bound,
+  thus avoiding possible errors.  Thanks to Philip Kaludercic for the
+  patch in commit =6bd2457=.
+
++ Made several improvements to doc strings and various snippets of code.
+
+** Updates to the manual
+
++ All of the aforementioned were documented, where appropriate.
++ A Makefile is now on offer, which is used to generate the mct.info and
+  mct.texi files.  Thanks to Philip Kaludercic for the patch in commit
+  =295bac0=.
++ A sample setup is available for =mct= as well as several built-in
+  options pertaining to the minibuffer.
++ There are sections about third-party extensions as well as one that
+  describes alternatives to MCT.  Thanks to Manuel Uberti for the
+  feedback in issue 5: <https://gitlab.com/protesilaos/mct/-/issues/5>.
++ The "Acknowledgements" section includes the names of people who have
+  contributed to the project in one way or another (code, ideas, user
+  feedback, ...).
+
+* Version 0.1.0 on 2021-10-22
+:PROPERTIES:
+:CUSTOM_ID: h:a4b2152a-96e2-46fc-b9e0-ba223028118f
+:END:
+
+Initial release.  The mct.el file derived from the now-deprecated
+prot-minibuffer.el (part of [[https://gitlab.com/protesilaos/dotfiles][my dotfiles]]), which I had been using for
+more than six months full time.
