@@ -264,14 +264,10 @@ Add this to `completion-list-mode-hook'."
       (setq-local window-resize-pixelwise t))
     (fit-window-to-buffer window (floor (frame-height) 2) 1)))
 
-(defun mct--input-string ()
-  "Return the contents of the minibuffer as a string."
-  (buffer-substring-no-properties (minibuffer-prompt-end) (point-max)))
-
 (defun mct--minimum-input ()
   "Test for minimum requisite input for live completions.
 See `mct-minimum-input'."
-  (>= (length (mct--input-string)) mct-minimum-input))
+  (>= (- (point-max) (minibuffer-prompt-end)) mct-minimum-input))
 
 ;;;;; Live-updating Completions' buffer
 
