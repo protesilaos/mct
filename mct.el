@@ -182,27 +182,17 @@ NOTE that setting this option with `setq' requires a restart of
 
 ;;;; Completion metadata
 
-(defun mct--minibuffer-field-beg ()
-  "Determine beginning of completion in the minibuffer."
-  (if-let ((window (active-minibuffer-window)))
-      (with-current-buffer (window-buffer window)
-        (minibuffer-prompt-end))
-    (nth 0 completion-in-region--data)))
-
-(defun mct--minibuffer-field-end ()
-  "Determine end of completion in the minibuffer."
-  (if-let ((window (active-minibuffer-window)))
-      (with-current-buffer (window-buffer window)
-        (point-max))
-    (nth 1 completion-in-region--data)))
-
 (defun mct--completion-category ()
   "Return completion category."
   (when-let ((window (active-minibuffer-window)))
     (with-current-buffer (window-buffer window)
-      (let* ((beg (mct--minibuffer-field-beg))
-             (md (completion--field-metadata beg)))
-        (alist-get 'category (cdr md))))))
+      (completion-metadata-get
+       (completion-metadata (buffer-substring-no-properties
+                             (minibuffer-prompt-end)
+                             (max (minibuffer-prompt-end) (point)))
+                            minibuffer-completion-table
+                            minibuffer-completion-predicate)
+       'category))))
 
 ;;;; Basics of intersection between minibuffer and Completions' buffer
 
@@ -454,7 +444,7 @@ by `mct-completion-windows-regexp'."
    ((and (eq (char-before) ?/)
          (eq (mct--completion-category) 'file))
     (when (string-equal (minibuffer-contents) "~/")
-      (delete-region (mct--minibuffer-field-beg) (mct--minibuffer-field-end))
+      (delete-minibuffer-contents)
       (insert (expand-file-name "~/"))
       (goto-char (line-end-position)))
     (save-excursion
@@ -899,7 +889,7 @@ ARGS."
            (eq (mct--completion-category) 'file)
            rfn-eshadow-overlay (overlay-buffer rfn-eshadow-overlay)
            (eq this-command 'self-insert-command)
-           (= saved-point (mct--minibuffer-field-end))
+           (= saved-point (point-max))
            (or (>= (- (point) (overlay-end rfn-eshadow-overlay)) 2)
                (eq ?/ (char-before (- (point) 2)))))
       (delete-region (overlay-start rfn-eshadow-overlay)
