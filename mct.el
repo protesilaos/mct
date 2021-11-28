@@ -800,21 +800,13 @@ determined as follows:
 A candidate is recognised for as long as point is not past its
 last character."
   (interactive nil mct-mode)
-  (let* ((window (mct--get-completion-window))
-         (buffer (window-buffer window))
-         (mini (active-minibuffer-window))
-         pos)
-    (when (and mini window)
-      (with-current-buffer buffer
-        (when-let ((old-point (window-old-point window)))
-          (if (= old-point (point-min))
-              (setq pos (mct--first-completion-point))
-            (setq pos old-point))))
-      (when pos
-        ;; NOTE 2021-10-26: why must we `switch-to-completions' to get a
-        ;; valid candidate?  Why can't this be part of the above
-        ;; `with-current-buffer'?
-        (switch-to-completions)
+  (when-let ((window (mct--get-completion-window))
+             (_mini (active-minibuffer-window)))
+    (with-selected-window window
+      (when-let* ((old-point (window-old-point window))
+                  (pos (if (= old-point (point-min))
+                           (mct--first-completion-point)
+                         old-point)))
         (goto-char pos)
         (mct-choose-completion-no-exit)))))
 
