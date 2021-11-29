@@ -667,8 +667,8 @@ MCT is meant to be a collective effort.  Every bit of help matters.
 
 + Author/maintainer :: Protesilaos Stavrou.
 
-+ Contributions to code or documentation :: James Norman Vladimir Cash,
-  José Antonio Ortega Ruiz, Philip Kaludercic.
++ Contributions to code or documentation :: Daniel Mendler, James Norman
+  Vladimir Cash, José Antonio Ortega Ruiz, Philip Kaludercic.
 
 + Ideas and user feedback :: Case Duckworth, Jonathan Irving, José
   Antonio Ortega Ruiz, Kostadin Ninev, Manuel Uberti, Philip Kaludercic,
