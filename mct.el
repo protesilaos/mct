@@ -302,7 +302,9 @@ Meant to be added to `after-change-functions'."
       (buffer-local-value 'mct--active buf)))
 
 (defun mct--display-completion-list-advice (&rest app)
-  (let ((completions-format mct-completions-format))
+  (if (mct--active-p)
+      (let ((completions-format mct-completions-format))
+        (apply app))
     (apply app)))
 
 (defun mct--completing-read-advice (&rest app)
