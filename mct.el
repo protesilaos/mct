@@ -196,19 +196,6 @@ NOTE that setting this option with `setq' requires a restart of
 
 ;;;; Basics of intersection between minibuffer and Completions' buffer
 
-;; TODO 2021-11-16: Is there a better way to check that the current
-;; command does not do completion?  This is fragile.
-(defvar mct--no-complete-functions
-  '( eval-expression query-replace query-replace-regexp
-     isearch-forward isearch-backward
-     isearch-forward-regexp isearch-backward-regexp)
-  "List of functions that do not do completion.")
-
-(defun mct--no-completion-p ()
-  "Check whether it is appropriate to use Mct-mode."
-  (or (memq this-command mct--no-complete-functions)
-      (bound-and-true-p completion-in-region-mode)))
-  
 (define-obsolete-variable-alias
   'mct-hl-line 'mct-highlight-candidate "0.3.0")
 
@@ -301,18 +288,35 @@ Meant to be added to `after-change-functions'."
 
 (defun mct--setup-completions ()
   "Set up the completions' buffer."
-  (unless (mct--no-completion-p)
-    (cond
-     ((memq this-command mct-completion-passlist)
-      (setq-local mct-minimum-input 0)
-      (setq-local mct-live-update-delay 0)
-      (mct--show-completions)
-      (add-hook 'after-change-functions #'mct--live-completions nil t))
-     ((null mct-live-completion))
-     ((not (memq this-command mct-completion-blocklist))
-      (if (eq mct-live-completion 'visible)
-          (add-hook 'after-change-functions #'mct--live-completions-visible-timer nil t)
-        (add-hook 'after-change-functions #'mct--live-completions-timer nil t))))))
+  (cond
+   ((memq this-command mct-completion-passlist)
+    (setq-local mct-minimum-input 0)
+    (setq-local mct-live-update-delay 0)
+    (mct--show-completions)
+    (add-hook 'after-change-functions #'mct--live-completions nil t))
+   ((null mct-live-completion))
+   ((not (memq this-command mct-completion-blocklist))
+    (if (eq mct-live-completion 'visible)
+        (add-hook 'after-change-functions #'mct--live-completions-visible-timer nil t)
+      (add-hook 'after-change-functions #'mct--live-completions-timer nil t)))))
+
+(defvar-local mct--active nil
+  "Minibuffer local variable, t if Mct is active.")
+
+(defun mct--active-p ()
+  "Return t if Mct is active."
+  (when-let* ((win (active-minibuffer-window))
+              (buf (window-buffer win)))
+      (buffer-local-value 'mct--active buf)))
+
+(defun mct--completing-read-advice (&rest app)
+  (minibuffer-with-setup-hook
+      (lambda ()
+        (setq mct--active t)
+        (mct--setup-completions)
+        (mct--setup-keymap)
+        (mct--setup-shadow-files))
+    (apply app)))
 
 ;;;;; Alternating backgrounds (else "stripes")
 
@@ -901,8 +905,7 @@ ARGS."
                      (overlay-end rfn-eshadow-overlay)))))
 
 (defun mct--setup-shadow-files ()
-  "Set up shadowed file name deletion.
-To be assigned to `minibuffer-setup-hook'."
+  "Set up shadowed file name deletion."
   (add-hook 'after-change-functions #'mct--shadow-filenames nil t))
 
 ;;;;; Highlight current candidate
@@ -963,7 +966,7 @@ region.")
 
 (defun mct--completions-highlighting ()
   "Highlight the current completion in the Completions' buffer."
-  (unless (mct--no-completion-p)
+  (when (mct--active-p)
     (add-hook 'post-command-hook #'mct--completions-candidate-highlight nil t)))
 
 ;;;;; Keymaps
@@ -1010,22 +1013,17 @@ region.")
 
 (defun mct--completion-list-mode-map ()
   "Hook to `completion-setup-hook'."
-  (unless (mct--no-completion-p)
+  (when (mct--active-p)
     (use-local-map
      (make-composed-keymap mct-completion-list-mode-map
                            (current-local-map)))))
 
-(defun mct--minibuffer-local-completion-map ()
-  "Hook to `minibuffer-setup-hook'."
-  (unless (mct--no-completion-p)
-    (use-local-map
-     (make-composed-keymap mct-minibuffer-local-completion-map
-                           (current-local-map)))))
-
-(defun mct--minibuffer-local-filename-completion-map ()
-  "Hook to `minibuffer-setup-hook'."
-  (when (and (eq (mct--completion-category) 'file)
-             (not (bound-and-true-p completion-in-region-mode)))
+(defun mct--setup-keymap ()
+  "Setup minibuffer keymaps."
+  (use-local-map
+   (make-composed-keymap mct-minibuffer-local-completion-map
+                         (current-local-map)))
+  (when (eq (mct--completion-category) 'file)
     (use-local-map
      (make-composed-keymap mct-minibuffer-local-filename-completion-map
                            (current-local-map)))))
@@ -1054,11 +1052,6 @@ region.")
               completion-show-help nil
               completion-auto-help t
               completions-format mct-completions-format)
-        (let ((hook 'minibuffer-setup-hook))
-          (add-hook hook #'mct--setup-completions)
-          (add-hook hook #'mct--minibuffer-local-completion-map)
-          (add-hook hook #'mct--minibuffer-local-filename-completion-map)
-          (add-hook hook #'mct--setup-shadow-files))
         (let ((hook 'completion-list-mode-hook))
           (add-hook hook #'mct--setup-completions-styles)
           (add-hook hook #'mct--completion-list-mode-map)
@@ -1073,6 +1066,8 @@ region.")
                       minibuffer-complete-and-exit
                       minibuffer-force-complete-and-exit))
           (advice-add fn :around #'mct--messageless))
+        (advice-add #'completing-read-default :around #'mct--completing-read-advice)
+        (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator)
         (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
@@ -1080,10 +1075,6 @@ region.")
           completion-show-help mct--completion-show-help
           completion-auto-help mct--completion-auto-help
           completions-format mct--completions-format)
-    (let ((hook 'minibuffer-setup-hook))
-      (remove-hook hook #'mct--setup-completions)
-      (remove-hook hook #'mct--minibuffer-local-completion-map)
-      (remove-hook hook #'mct--minibuffer-local-filename-completion-map))
     (let ((hook 'completion-list-mode-hook))
       (remove-hook hook #'mct--setup-completions-styles)
       (remove-hook hook #'mct--completion-list-mode-map)
@@ -1098,6 +1089,8 @@ region.")
                   minibuffer-complete-and-exit
                   minibuffer-force-complete-and-exit))
       (advice-remove fn #'mct--messageless))
+    (advice-remove #'completing-read-default #'mct--completing-read-advice)
+    (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--crm-indicator)
     (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)
     (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily)))
