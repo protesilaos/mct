@@ -312,6 +312,8 @@ Meant to be added to `after-change-functions'."
 (defun mct--completing-read-advice (&rest app)
   (minibuffer-with-setup-hook
       (lambda ()
+        (setq-local resize-mini-windows t
+                    completion-auto-help t)
         (setq mct--active t)
         (mct--setup-live-completions)
         (mct--setup-keymap)
@@ -1028,6 +1030,8 @@ region.")
 
 (defun mct--setup-completion-list ()
   (when (mct--active-p)
+    (setq-local completion-show-help nil
+                completions-format mct-completions-format)
     ;; TODO use a uniform naming scheme here?
     ;; mct--setup-completions-* or mct--setup-*
     (mct--setup-completions-styles) ;; TODO this name is confusing, because of `completion-styles'
@@ -1041,11 +1045,6 @@ region.")
 
 (declare-function minibuf-eldef-setup-minibuffer "minibuf-eldef")
 
-(defvar mct--resize-mini-windows nil)
-(defvar mct--completion-show-help nil)
-(defvar mct--completion-auto-help nil)
-(defvar mct--completions-format nil)
-
 ;;;###autoload
 (define-minor-mode mct-mode
   "Set up opinionated default completion UI."
@@ -1053,14 +1052,6 @@ region.")
   :group 'mct
   (if mct-mode
       (progn
-        (setq mct--resize-mini-windows resize-mini-windows
-              mct--completion-show-help completion-show-help
-              mct--completion-auto-help completion-auto-help
-              mct--completions-format completions-format)
-        (setq resize-mini-windows t
-              completion-show-help nil
-              completion-auto-help t
-              completions-format mct-completions-format)
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
         (add-hook 'completion-setup-hook #'mct--clean-completions)
         (dolist (fn '(exit-minibuffer
@@ -1074,10 +1065,6 @@ region.")
         (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator)
         (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
-    (setq resize-mini-windows mct--resize-mini-windows
-          completion-show-help mct--completion-show-help
-          completion-auto-help mct--completion-auto-help
-          completions-format mct--completions-format)
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
     (remove-hook 'completion-setup-hook #'mct--clean-completions)
     (dolist (fn '(exit-minibuffer
