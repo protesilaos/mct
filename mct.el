@@ -286,7 +286,7 @@ Meant to be added to `after-change-functions'."
   (when (window-live-p (mct--get-completion-window))
     (mct--live-completions-timer)))
 
-(defun mct--setup-completions ()
+(defun mct--setup-live-completions ()
   "Set up the completions' buffer."
   (cond
    ((memq this-command mct-completion-passlist)
@@ -313,7 +313,7 @@ Meant to be added to `after-change-functions'."
   (minibuffer-with-setup-hook
       (lambda ()
         (setq mct--active t)
-        (mct--setup-completions)
+        (mct--setup-live-completions)
         (mct--setup-keymap)
         (mct--setup-shadow-files))
     (apply app)))
