@@ -211,9 +211,8 @@ NOTE that setting this option with `setq' requires a restart of
 
 (declare-function display-line-numbers-mode "display-line-numbers")
 
-(defun mct--display-line-numbers ()
-  "Set up line numbers for the completions' buffer.
-Add this to `completion-list-mode-hook'."
+(defun mct--setup-line-numbers ()
+  "Set up line numbers for the completions' buffer."
   (when (and (derived-mode-p 'completion-list-mode)
              mct-show-completion-line-numbers)
     (display-line-numbers-mode 1)))
@@ -225,7 +224,7 @@ Add this to `completion-list-mode-hook'."
 ;; candidates could be found at point (e.g. it would break `embark-act'
 ;; as it could not read the topmost candidate when point was at the
 ;; beginning of the line, unless the point was moved forward).
-(defun mct--clean-completions ()
+(defun mct--setup-clean-completions ()
   "Keep only completion candidates in the Completions."
   (with-current-buffer standard-output
     (let ((inhibit-read-only t))
@@ -715,7 +714,7 @@ If ARG is supplied, move that many completion groups at a time."
           (mct-goto-line)
         (unwind-protect
             (progn
-              (mct--display-line-numbers)
+              (mct--setup-line-numbers)
               (mct-goto-line))
           (display-line-numbers-mode -1))))))
 
@@ -819,7 +818,7 @@ followed by exiting the minibuffer with that candidate."
 
 ;;;;; Miscellaneous commands
 
-;; This is needed to circumvent `mct--clean-completions' with regard to
+;; This is needed to circumvent `mct--setup-clean-completions' with regard to
 ;; `cursor-sensor-functions'.
 (defun mct-beginning-of-buffer ()
   "Go to the top of the Completions buffer."
@@ -876,15 +875,15 @@ ARGS."
   (let ((inhibit-modification-hooks t))
     (apply fn args)))
 
-(defun mct--setup-completions-styles ()
-  "Set up variables for default completions."
+(defun mct--setup-appearance ()
+  "Set up variables for the appearance of the Completions' buffer."
   (when mct-hide-completion-mode-line
     (setq-local mode-line-format nil))
   (if mct-apply-completion-stripes
       (mct--add-stripes)
     (mct--remove-stripes)))
 
-(defun mct--truncate-lines-silently ()
+(defun mct--setup-silent-line-truncation ()
   "Toggle line truncation without printing messages."
   (let ((inhibit-message t))
     (toggle-truncate-lines t)))
@@ -966,7 +965,7 @@ region.")
     (setq mct--highlight-overlay (mct--overlay-make)))
   (mct--overlay-move mct--highlight-overlay))
 
-(defun mct--completions-highlighting ()
+(defun mct--setup-highlighting ()
   "Highlight the current completion in the Completions' buffer."
   (add-hook 'post-command-hook #'mct--completions-candidate-highlight nil t))
 
@@ -1012,8 +1011,8 @@ region.")
     map)
   "Derivative of `minibuffer-local-filename-completion-map'.")
 
-(defun mct--completion-list-mode-map ()
-  "Hook to `completion-setup-hook'."
+(defun mct--setup-completion-list-keymap ()
+  "Set up completion list keymap."
   (use-local-map
    (make-composed-keymap mct-completion-list-mode-map
                          (current-local-map))))
@@ -1032,14 +1031,12 @@ region.")
   (when (mct--active-p)
     (setq-local completion-show-help nil
                 completions-format mct-completions-format)
-    (mct--clean-completions)
-    ;; TODO use a uniform naming scheme here?
-    ;; mct--setup-completions-* or mct--setup-*
-    (mct--setup-completions-styles) ;; TODO this name is confusing, because of `completion-styles'
-    (mct--completion-list-mode-map)
-    (mct--truncate-lines-silently)
-    (mct--completions-highlighting)
-    (mct--display-line-numbers)
+    (mct--setup-clean-completions)
+    (mct--setup-appearance)
+    (mct--setup-completion-list-keymap)
+    (mct--setup-silent-line-truncation)
+    (mct--setup-highlighting)
+    (mct--setup-line-numbers)
     (cursor-sensor-mode)))
 
 ;;;;; mct-mode declaration
