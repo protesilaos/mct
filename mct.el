@@ -966,8 +966,7 @@ region.")
 
 (defun mct--completions-highlighting ()
   "Highlight the current completion in the Completions' buffer."
-  (when (mct--active-p)
-    (add-hook 'post-command-hook #'mct--completions-candidate-highlight nil t)))
+  (add-hook 'post-command-hook #'mct--completions-candidate-highlight nil t))
 
 ;;;;; Keymaps
 
@@ -1013,10 +1012,9 @@ region.")
 
 (defun mct--completion-list-mode-map ()
   "Hook to `completion-setup-hook'."
-  (when (mct--active-p)
-    (use-local-map
-     (make-composed-keymap mct-completion-list-mode-map
-                           (current-local-map)))))
+  (use-local-map
+   (make-composed-keymap mct-completion-list-mode-map
+                         (current-local-map))))
 
 (defun mct--setup-keymap ()
   "Setup minibuffer keymaps."
@@ -1027,6 +1025,17 @@ region.")
     (use-local-map
      (make-composed-keymap mct-minibuffer-local-filename-completion-map
                            (current-local-map)))))
+
+(defun mct--setup-completion-list ()
+  (when (mct--active-p)
+    ;; TODO use a uniform naming scheme here?
+    ;; mct--setup-completions-* or mct--setup-*
+    (mct--setup-completions-styles) ;; TODO this name is confusing, because of `completion-styles'
+    (mct--completion-list-mode-map)
+    (mct--truncate-lines-silently)
+    (mct--completions-highlighting)
+    (mct--display-line-numbers)
+    (cursor-sensor-mode)))
 
 ;;;;; mct-mode declaration
 
@@ -1052,13 +1061,7 @@ region.")
               completion-show-help nil
               completion-auto-help t
               completions-format mct-completions-format)
-        (let ((hook 'completion-list-mode-hook))
-          (add-hook hook #'mct--setup-completions-styles)
-          (add-hook hook #'mct--completion-list-mode-map)
-          (add-hook hook #'mct--truncate-lines-silently)
-          (add-hook hook #'mct--completions-highlighting)
-          (add-hook hook #'mct--display-line-numbers)
-          (add-hook hook #'cursor-sensor-mode))
+        (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
         (add-hook 'completion-setup-hook #'mct--clean-completions)
         (dolist (fn '(exit-minibuffer
                       choose-completion
@@ -1075,13 +1078,7 @@ region.")
           completion-show-help mct--completion-show-help
           completion-auto-help mct--completion-auto-help
           completions-format mct--completions-format)
-    (let ((hook 'completion-list-mode-hook))
-      (remove-hook hook #'mct--setup-completions-styles)
-      (remove-hook hook #'mct--completion-list-mode-map)
-      (remove-hook hook #'mct--truncate-lines-silently)
-      (remove-hook hook #'mct--completions-highlighting)
-      (remove-hook hook #'mct--display-line-numbers)
-      (remove-hook hook #'cursor-sensor-mode))
+    (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
     (remove-hook 'completion-setup-hook #'mct--clean-completions)
     (dolist (fn '(exit-minibuffer
                   choose-completion
