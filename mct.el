@@ -963,7 +963,8 @@ region.")
 
 (defun mct--completions-highlighting ()
   "Highlight the current completion in the Completions' buffer."
-  (add-hook 'post-command-hook #'mct--completions-candidate-highlight nil t))
+  (unless (mct--no-completion-p)
+    (add-hook 'post-command-hook #'mct--completions-candidate-highlight nil t)))
 
 ;;;;; Keymaps
 
