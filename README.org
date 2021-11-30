@@ -408,9 +408,6 @@ And with more options:
 (setq mct-apply-completion-stripes t)
 (setq mct-minimum-input 3)
 (setq mct-live-update-delay 0.6)
-
-;; NOTE: setting this variable with `setq', requires `mct-mode' to be
-;; reloaded.
 (setq mct-completions-format 'one-column)
 
 ;; NOTE: `mct-completion-blocklist' can be used for commands with lots

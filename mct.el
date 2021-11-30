@@ -169,14 +169,7 @@ and/or the documentation string of `display-buffer'."
 
 (defcustom mct-completions-format 'one-column
   "The appearance and sorting used by `mct-mode'.
-See `completions-format' for possible values.
-
-NOTE that setting this option with `setq' requires a restart of
-`mct-mode'."
-  :set (lambda (var val)
-         (when (bound-and-true-p mct-mode)
-           (setq completions-format val))
-         (set var val))
+See `completions-format' for possible values."
   :type '(choice (const horizontal) (const vertical) (const one-column))
   :group 'mct)
 
@@ -308,6 +301,10 @@ Meant to be added to `after-change-functions'."
               (buf (window-buffer win)))
       (buffer-local-value 'mct--active buf)))
 
+(defun mct--display-completion-list-advice (&rest app)
+  (let ((completions-format mct-completions-format))
+    (apply app)))
+
 (defun mct--completing-read-advice (&rest app)
   (minibuffer-with-setup-hook
       (lambda ()
@@ -384,8 +381,7 @@ Meant to be added to `after-change-functions'."
 ;; We need this to make things work on Emacs 27.
 (defun mct--one-column-p ()
   "Test if we have a one-column view available."
-  (and (eq completions-format 'one-column)
-       (eq mct-completions-format 'one-column)
+  (and (eq mct-completions-format 'one-column)
        (>= emacs-major-version 28)))
 
 ;;;;; Focus minibuffer and/or show completions
@@ -1029,8 +1025,7 @@ region.")
 
 (defun mct--setup-completion-list ()
   (when (mct--active-p)
-    (setq-local completion-show-help nil
-                completions-format mct-completions-format)
+    (setq-local completion-show-help nil)
     (mct--setup-clean-completions)
     (mct--setup-appearance)
     (mct--setup-completion-list-keymap)
@@ -1060,6 +1055,7 @@ region.")
         (advice-add #'completing-read-default :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator)
+        (advice-add #'display-completion-list :around #'mct--display-completion-list-advice)
         (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
@@ -1072,6 +1068,7 @@ region.")
     (advice-remove #'completing-read-default #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--crm-indicator)
+    (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
     (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)
     (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily)))
 
