@@ -1024,7 +1024,8 @@ region.")
 
 (defun mct--minibuffer-local-filename-completion-map ()
   "Hook to `minibuffer-setup-hook'."
-  (when (eq (mct--completion-category) 'file)
+  (when (and (eq (mct--completion-category) 'file)
+             (not (bound-and-true-p completion-in-region-mode)))
     (use-local-map
      (make-composed-keymap mct-minibuffer-local-filename-completion-map
                            (current-local-map)))))
