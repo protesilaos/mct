@@ -1032,6 +1032,7 @@ region.")
   (when (mct--active-p)
     (setq-local completion-show-help nil
                 completions-format mct-completions-format)
+    (mct--clean-completions)
     ;; TODO use a uniform naming scheme here?
     ;; mct--setup-completions-* or mct--setup-*
     (mct--setup-completions-styles) ;; TODO this name is confusing, because of `completion-styles'
@@ -1053,7 +1054,6 @@ region.")
   (if mct-mode
       (progn
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-        (add-hook 'completion-setup-hook #'mct--clean-completions)
         (dolist (fn '(exit-minibuffer
                       choose-completion
                       minibuffer-force-complete
@@ -1066,7 +1066,6 @@ region.")
         (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-    (remove-hook 'completion-setup-hook #'mct--clean-completions)
     (dolist (fn '(exit-minibuffer
                   choose-completion
                   minibuffer-force-complete
