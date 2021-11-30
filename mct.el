@@ -204,6 +204,11 @@ NOTE that setting this option with `setq' requires a restart of
      isearch-forward-regexp isearch-backward-regexp)
   "List of functions that do not do completion.")
 
+(defun mct--no-completion-p ()
+  "Check whether it is appropriate to use Mct-mode."
+  (or (memq this-command mct--no-complete-functions)
+      (bound-and-true-p completion-in-region-mode)))
+  
 (define-obsolete-variable-alias
   'mct-hl-line 'mct-highlight-candidate "0.3.0")
 
@@ -296,7 +301,7 @@ Meant to be added to `after-change-functions'."
 
 (defun mct--setup-completions ()
   "Set up the completions' buffer."
-  (unless (memq this-command mct--no-complete-functions)
+  (unless (mct--no-completion-p)
     (cond
      ((memq this-command mct-completion-passlist)
       (setq-local mct-minimum-input 0)
@@ -1004,14 +1009,14 @@ region.")
 
 (defun mct--completion-list-mode-map ()
   "Hook to `completion-setup-hook'."
-  (unless (memq this-command mct--no-complete-functions)
+  (unless (mct--no-completion-p)
     (use-local-map
      (make-composed-keymap mct-completion-list-mode-map
                            (current-local-map)))))
 
 (defun mct--minibuffer-local-completion-map ()
   "Hook to `minibuffer-setup-hook'."
-  (unless (memq this-command mct--no-complete-functions)
+  (unless (mct--no-completion-p)
     (use-local-map
      (make-composed-keymap mct-minibuffer-local-completion-map
                            (current-local-map)))))
