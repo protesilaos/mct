@@ -302,12 +302,17 @@ Meant to be added to `after-change-functions'."
       (buffer-local-value 'mct--active buf)))
 
 (defun mct--display-completion-list-advice (&rest app)
+  "Prepare advice around `display-completion-list'.
+Apply APP by first let binding the `completions-format' to
+`mct-completions-format'."
   (if (mct--active-p)
       (let ((completions-format mct-completions-format))
         (apply app))
     (apply app)))
 
 (defun mct--completing-read-advice (&rest app)
+  "Prepare advice around `completing-read-default'.
+Apply APP by first setting up the minibuffer to work with Mct."
   (minibuffer-with-setup-hook
       (lambda ()
         (setq-local resize-mini-windows t
@@ -843,11 +848,10 @@ this command is then required to abort the session."
 
 ;; Thanks to Omar Antolín Camarena for providing the messageless and
 ;; stealthily.  Source: <https://github.com/oantolin/emacs-config>.
-(defun mct--messageless (fn &rest args)
-  "Set `minibuffer-message-timeout' to 0.
-Meant as advice around minibuffer completion FN with ARGS."
+(defun mct--messageless (&rest app)
+  "Set `minibuffer-message-timeout' to 0 while applying APP."
   (let ((minibuffer-message-timeout 0))
-    (apply fn args)))
+    (apply app)))
 
 ;; Copied from Daniel Mendler's `vertico' library:
 ;; <https://github.com/minad/vertico>.
@@ -857,21 +861,18 @@ Meant as advice around minibuffer completion FN with ARGS."
 
 ;; Adapted from Omar Antolín Camarena's live-completions library:
 ;; <https://github.com/oantolin/live-completions>.
-(defun mct--honor-inhibit-message (fn &rest args)
-  "Skip applying FN to ARGS if `inhibit-message' is t.
-Meant as `:around' advice for `minibuffer-message', which does
-not honor minibuffer message."
+(defun mct--honor-inhibit-message (&rest app)
+  "Honor `inhibit-message' while applying APP."
   (unless inhibit-message
-    (apply fn args)))
+    (apply app)))
 
 ;; Note that this solves bug#45686:
 ;; <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=45686>
-(defun mct--stealthily (fn &rest args)
+(defun mct--stealthily (&rest app)
   "Prevent minibuffer default from counting as a modification.
-Meant as advice for FN `minibuf-eldef-setup-minibuffer' with rest
-ARGS."
+Apply APP while inhibiting modification hooks."
   (let ((inhibit-modification-hooks t))
-    (apply fn args)))
+    (apply app)))
 
 (defun mct--setup-appearance ()
   "Set up variables for the appearance of the Completions' buffer."
@@ -1025,6 +1026,7 @@ region.")
                            (current-local-map)))))
 
 (defun mct--setup-completion-list ()
+  "Set up the completion-list for Mct."
   (when (mct--active-p)
     (setq-local completion-show-help nil)
     (mct--setup-clean-completions)
