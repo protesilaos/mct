@@ -231,15 +231,14 @@ provides sample code).
 There are several ways to select a completion candidate.
 
 1. Suppose that you are typing =mod= with the intent to select the
-   =modus-themes.el= buffer.  To force complete the first candidate follow
-   up =mod= with the =TAB= key (~minibuffer-force-complete~).  This does not
-   exit the minibuffer, meaning that it does not confirm your choice.
-   It just expands your input to the first likely candidate.  To confirm
-   your choice, use =RET=.  If done fast enough, no completions will be
-   shown (depending on your minimum input threshold and the live-update
-   delay).  If you made a mistake, just use ~undo~.  If the candidates
-   meet the ~completion-cycle-threshold~ hit =TAB= again to switch between
-   them.
+   =modus-themes.el= buffer.  To complete the candidate follow up =mod= with
+   the =TAB= key (~minibuffer-complete~).  If the match is unique, the text
+   will be expanded.  Otherwise the =*Completions*= buffer will appear.
+   This does not exit the minibuffer, meaning that it does not confirm
+   your choice.  To confirm your choice, use =RET=.  If you ever make a
+   mistake and expand the wrong candidate, just use ~undo~.  Lastly note
+   that if the candidates meet the ~completion-cycle-threshold~ hitting
+   =TAB= again will switch between them.
 
    #+findex: mct-choose-completion-exit
 2. While cycling through the completions' buffer, type =RET= to select and

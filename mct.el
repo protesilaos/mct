@@ -991,7 +991,6 @@ region.")
 (defvar mct-minibuffer-local-completion-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-j") #'exit-minibuffer)
-    (define-key map (kbd "<tab>") #'minibuffer-force-complete)
     (define-key map [remap goto-line] #'mct-choose-completion-number)
     (define-key map (kbd "M-e") #'mct-edit-completion)
     (define-key map (kbd "<C-return>") #'mct-complete-and-exit)
