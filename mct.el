@@ -1016,7 +1016,7 @@ region.")
                          (current-local-map))))
 
 (defun mct--setup-keymap ()
-  "Setup minibuffer keymaps."
+  "Set up minibuffer keymaps."
   (use-local-map
    (make-composed-keymap mct-minibuffer-local-completion-map
                          (current-local-map)))
