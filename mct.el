@@ -356,17 +356,16 @@ Apply APP by first setting up the minibuffer to work with Mct."
             (forward-line 1)
           (user-error (goto-char (point-max))))
         (unless (eobp)
-          (let ((pt (point))
-                (overlay))
+          (let ((pt (point)))
             (condition-case nil
                 (forward-line 1)
               (user-error (goto-char (point-max))))
             ;; We set the overlay this way and give it a low priority so
             ;; that `mct--highlight-overlay' and/or the active region
             ;; can override it.
-            (setq overlay (make-overlay pt (point)))
-            (overlay-put overlay 'face 'mct-stripe)
-            (overlay-put overlay 'priority -100)))))))
+            (let ((stripe (make-overlay pt (point))))
+              (overlay-put stripe 'priority -100)
+              (overlay-put stripe 'face 'mct-stripe))))))))
 
 ;;;; Commands and helper functions
 
