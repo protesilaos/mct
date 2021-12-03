@@ -555,6 +555,27 @@ these exceptionally well-crafted extras:
   patterns (regexp, flex, initialism, etc.) regardless of the order they
   appear in.
 
++ [[https://github.com/iyefrat/all-the-icons-completion][all-the-icons-completion]] by Itai Y. Efrat :: Glue code that adds icons
+  from the =all-the-icons= package to the =*Completions*= buffer.  It can
+  make things prettier and/or more informative, while it can also be
+  combined with Marginalia.
+
+MCT does not support the use-case of ~completion-in-region~.  This is the
+kind of completion session that does not involve the minibuffer and is
+instead about in-buffer text expansion.  Consider these packages:
+
++ [[https://github.com/minad/corfu/][Corfu]] by Daniel Mendler :: An interface for the ~completion-in-region~
+  which uses a child frame (basically a pop-up) at the position of the
+  cursor to display candidates.  As with all of Daniel's packages, Corfu
+  aims for a clean implementation that does the right thing by being
+  consistent with core Emacs mechanisms.
+
++ [[https://github.com/minad/cape][Cape]] also by Daniel :: Additional ~completion-at-point-functions~
+  (CAPFs) that extend those of core Emacs.  These backends can be used
+  by Corfu, though their modular nature makes them suitable for use by
+  other compliant packages (e.g. a potential minimalist package that is
+  cleanly designed like Corfu but has a different interface).
+
 ** Enable Consult previews
 :PROPERTIES:
 :CUSTOM_ID: h:85268cb1-9d49-452c-ba5f-c9215d4b8b62
