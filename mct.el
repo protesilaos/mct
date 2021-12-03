@@ -301,18 +301,11 @@ Meant to be added to `after-change-functions'."
               (buf (window-buffer win)))
       (buffer-local-value 'mct--active buf)))
 
-;; FIXME 2021-12-03: The `completion-in-region-mode' is not sufficient.
-;; We should also be testing if the user has opted in to using mct for
-;; such a purpose.  Maybe adapting `mct--active-p' is in order.
-(defun mct--region-or-minibuffer-active-p ()
-  "Test is mct is active for the current completion method."
-  (or completion-in-region-mode (mct--active-p)))
-
 (defun mct--display-completion-list-advice (&rest app)
   "Prepare advice around `display-completion-list'.
 Apply APP by first let binding the `completions-format' to
-`mct-completions-format', when appropriate."
-  (if (mct--region-or-minibuffer-active-p)
+`mct-completions-format'."
+  (if (mct--active-p)
       (let ((completions-format mct-completions-format))
         (apply app))
     (apply app)))
@@ -419,12 +412,7 @@ Apply APP by first setting up the minibuffer to work with Mct."
   (let ((display-buffer-alist
          (cons (cons mct-completion-windows-regexp mct-display-buffer-action)
                display-buffer-alist)))
-    (save-excursion
-      ;; FIXME 2021-12-03: same principle as what I wrote above
-      ;; `mct--region-or-minibuffer-active-p'.
-      (if completion-in-region-mode
-          (completion-help-at-point)
-        (minibuffer-completion-help))))
+    (save-excursion (minibuffer-completion-help)))
   (mct--fit-completions-window))
 
 ;;;###autoload
@@ -562,7 +550,7 @@ a `one-column' value."
 (defun mct--bottom-of-completions-p (arg)
   "Test if point is at the notional bottom of the Completions.
 ARG is a numeric argument for `next-completion', as described in
-`mct-next-completion-or-switch'."
+`mct-next-completion-or-mini'."
   (or (eobp)
       (mct--completions-line-boundary (mct--last-completion-point))
       (= (save-excursion (next-completion arg) (point)) (point-max))
@@ -574,17 +562,7 @@ ARG is a numeric argument for `next-completion', as described in
 	         (save-match-data
 	           (looking-at "[\s\t]*$"))))))
 
-(defun mct--focus-buf-or-mini ()
-  "Switch away from the Completions to the right destination."
-  (cond
-   ;; FIXME 2021-12-03: same principle as what I wrote above
-   ;; `mct--region-or-minibuffer-active-p'.
-   (mct--region-current-buffer
-    (mct-focus-marker-buffer))
-   ((mct--active-p)
-    (mct-focus-minibuffer))))
-
-(defun mct-next-completion-or-switch (&optional arg)
+(defun mct-next-completion-or-mini (&optional arg)
   "Move to the next completion or switch to the minibuffer.
 This performs a regular motion for optional ARG lines, but when
 point can no longer move in that direction it switches to the
@@ -592,7 +570,7 @@ minibuffer."
   (interactive "p" mct-mode)
   (cond
    ((mct--bottom-of-completions-p (or arg 1))
-    (mct--focus-buf-or-mini))
+    (mct-focus-minibuffer))
    (t
     (if (not (mct--one-column-p))
         ;; Retaining the column number ensures that things work
@@ -617,12 +595,12 @@ minibuffer."
 (defun mct--top-of-completions-p (arg)
   "Test if point is at the notional top of the Completions.
 ARG is a numeric argument for `previous-completion', as described in
-`mct-previous-completion-or-switch'."
+`mct-previous-completion-or-mini'."
   (or (bobp)
       (mct--completions-line-boundary (mct--first-completion-point))
       (= (save-excursion (previous-completion arg) (point)) (point-min))))
 
-(defun mct-previous-completion-or-switch (&optional arg)
+(defun mct-previous-completion-or-mini (&optional arg)
   "Move to the next completion or switch to the minibuffer.
 This performs a regular motion for optional ARG lines, but when
 point can no longer move in that direction it switches to the
@@ -630,7 +608,7 @@ minibuffer."
   (interactive "p" mct-mode)
   (cond
    ((mct--top-of-completions-p (if (natnump arg) arg 1))
-    (mct--focus-buf-or-mini))
+    (mct-focus-minibuffer))
    ((if (not (mct--one-column-p))
         ;; Retaining the column number ensures that things work
         ;; intuitively in a grid view.
@@ -688,11 +666,11 @@ If ARG is supplied, move that many completion groups at a time."
 (defun mct-choose-completion-exit ()
   "Run `choose-completion' in the Completions buffer and exit."
   (interactive nil mct-mode)
-  (when-let* ((window (mct--get-completion-window))
-              (buffer (window-buffer)))
-    (with-current-buffer buffer
-      (choose-completion))
-    (when (active-minibuffer-window)
+  (when (active-minibuffer-window)
+    (when-let* ((window (mct--get-completion-window))
+                (buffer (window-buffer)))
+      (with-current-buffer buffer
+        (choose-completion))
       (minibuffer-force-complete-and-exit))))
 
 (defun mct-choose-completion-no-exit ()
@@ -858,13 +836,6 @@ If in a completions' buffer and unless the region is active, run
 If the region is active, deactivate it.  A second invocation of
 this command is then required to abort the session."
   (interactive nil mct-mode)
-  ;; TODO 2021-12-03: We want a "now doing completion in region"
-  ;; predicate that would yield the right result while we are inside the
-  ;; Completions.  When t we want to `bury-buffer' the Completions.
-  ;;
-  ;; The use-case for this is that you enter completion-in-region, cycle
-  ;; to the completions and then realise you made a mistake for C-g
-  ;; should do the right thing and take you back to the prior state.
   (when (derived-mode-p 'completion-list-mode)
     (if (use-region-p)
         (keyboard-quit)
@@ -1003,12 +974,12 @@ region.")
     (define-key map (kbd "M-v") #'scroll-down-command)
     (define-key map [remap keyboard-quit] #'mct-keyboard-quit-dwim)
     (define-key map [remap goto-line] #'mct-choose-completion-number)
-    (define-key map [remap next-line] #'mct-next-completion-or-switch)
-    (define-key map (kbd "n") #'mct-next-completion-or-switch)
-    (define-key map [remap previous-line] #'mct-previous-completion-or-switch)
-    (define-key map (kbd "p") #'mct-previous-completion-or-switch)
+    (define-key map [remap next-line] #'mct-next-completion-or-mini)
+    (define-key map (kbd "n") #'mct-next-completion-or-mini)
+    (define-key map [remap previous-line] #'mct-previous-completion-or-mini)
     (define-key map (kbd "M-p") #'mct-previous-completion-group)
     (define-key map (kbd "M-n") #'mct-next-completion-group)
+    (define-key map (kbd "p") #'mct-previous-completion-or-mini)
     (define-key map (kbd "M-e") #'mct-edit-completion)
     (define-key map (kbd "<tab>") #'mct-choose-completion-no-exit)
     (define-key map (kbd "<return>") #'mct-choose-completion-exit)
@@ -1054,8 +1025,8 @@ region.")
                            (current-local-map)))))
 
 (defun mct--setup-completion-list ()
-  "Set up Mct for the completion-list."
-  (when (mct--region-or-minibuffer-active-p)
+  "Set up the completion-list for Mct."
+  (when (mct--active-p)
     (setq-local completion-show-help nil)
     (mct--setup-clean-completions)
     (mct--setup-appearance)
@@ -1070,11 +1041,11 @@ region.")
 (declare-function minibuf-eldef-setup-minibuffer "minibuf-eldef")
 
 ;;;###autoload
-(define-minor-mode mct-minibuffer-mode
-  "Set up interactivity over the default minibuffer completion."
+(define-minor-mode mct-mode
+  "Set up opinionated default completion UI."
   :global t
   :group 'mct
-  (if mct-minibuffer-mode
+  (if mct-mode
       (progn
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
         (dolist (fn '(exit-minibuffer
@@ -1102,92 +1073,6 @@ region.")
     (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
     (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)
     (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily)))
-
-(define-obsolete-function-alias 'mct-mode 'mct-minibuffer-mode "0.4.0")
-
-;;;;; mct-region-mode declaration
-
-;; NOTE 2021-12-03: Do not use this.  It is broken and remains highly
-;; experimental.  Search this document for FIXME and TODO keywords.
-
-;;;;;; Live completions
-
-(defvar mct--region-current-buffer nil
-  "Buffer of current Mct session.")
-
-(defun mct--region-marker-buffer ()
-  "Set `mct--region-current-buffer', if any."
-  (if-let ((data completion-in-region--data))
-      (setq mct--region-current-buffer (marker-buffer (nth 0 data)))
-    (setq mct--region-current-buffer nil)))
-
-(defun mct-focus-marker-buffer ()
-  "Focus the buffer where `completion-in-region' is active."
-  (interactive nil mct-region-mode)
-  (when-let ((buf mct--region-current-buffer))
-    (select-window (get-buffer-window buf))))
-
-(defun mct--region-live-completions (&rest _)
-  "Update the *Completions* buffer.
-Meant to be added to `after-change-functions'."
-  (let ((while-no-input-ignore-events '(selection-request)))
-    (while-no-input
-      (condition-case nil
-          (save-match-data
-            (mct--show-completions))
-        (quit (keyboard-quit))))))
-
-(defun mct--region-live-update ()
-  "Hook up `mct--region-live-completions'."
-  (add-hook 'after-change-functions #'mct--region-live-completions nil t))
-
-;;;;;; Minor mode specification
-
-;; FIXME 2021-12-03: We need a predicate here for when we are active.
-;; It cannot be `completion-in-region-mode'.
-(defun mct--region-setup-completion-in-region ()
-  "Set up Mct for `completion-in-region'."
-  (mct--region-marker-buffer)
-  (mct--region-live-update))
-
-;; FIXME 2021-12-03: We cannot use Orderless.  Neither the
-;; space-separated approach, nor the style dispatchers.
-
-;; FIXME 2021-12-03: When using a flex style followed by tab, the
-;; completion-in-region seems to remain active as the echo area has a
-;; message about "sole completion", "no completion", and the like.
-
-;; FIXME 2021-12-03: Again with the flex style, trigger completion while
-;; at "def" and type "dermode": it first expands into
-;; "define-derived-dermode" with the cursor before "dermode" and then
-;; pauses for a short while before becoming "define-derived-mode".  This
-;; looks broken.
-
-;; FIXME 2021-12-03: If you type "defa" you will get a list of
-;; candidates that have a common prefix.  One of them is differentiated
-;; by an extra "l" (the defalias).  If you type that character, the
-;; Completions becomes empty instead of showing the single candidate.
-;; Tab-expansion still works...
-
-;;;###autoload
-(define-minor-mode mct-region-mode
-  "Set up interactivity over the default `completion-in-region'."
-  :global t
-  (if mct-region-mode
-      (progn
-        (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-        (add-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
-        (advice-add #'display-completion-list :around #'mct--display-completion-list-advice)
-        ;; TODO 2021-12-03: Set up a keymap after we are sure things work.
-        (let ((map completion-in-region-mode-map))
-          (define-key map (kbd "C-n") #'mct-switch-to-completions-top)
-          (define-key map (kbd "C-p") #'mct-switch-to-completions-bottom)))
-    (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-    (remove-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
-    (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
-    (let ((map completion-in-region-mode-map))
-      (define-key map (kbd "C-n") nil)
-      (define-key map (kbd "C-p") nil))))
 
 (provide 'mct)
 ;;; mct.el ends here
