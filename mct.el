@@ -578,8 +578,8 @@ ARG is a numeric argument for `next-completion', as described in
   (cond
    ;; FIXME 2021-12-03: same principle as what I wrote above
    ;; `mct--region-or-minibuffer-active-p'.
-   (mct--region-current-buffer
-    (mct-focus-marker-buffer))
+   ((mct--region-current-buffer)
+    (mct--focus-current-buffer))
    ((mct--active-p)
     (mct-focus-minibuffer))))
 
@@ -1111,19 +1111,14 @@ region.")
 
 ;;;;;; Live completions
 
-(defvar mct--region-current-buffer nil
-  "Buffer of current Mct session.")
+(defun mct--region-current-buffer ()
+  "Return current buffer of completion in region."
+  (and completion-in-region--data (marker-buffer (nth 0 data))))
 
-(defun mct--region-marker-buffer ()
-  "Set `mct--region-current-buffer', if any."
-  (if-let ((data completion-in-region--data))
-      (setq mct--region-current-buffer (marker-buffer (nth 0 data)))
-    (setq mct--region-current-buffer nil)))
-
-(defun mct-focus-marker-buffer ()
+(defun mct--focus-current-buffer ()
   "Focus the buffer where `completion-in-region' is active."
   (interactive nil mct-region-mode)
-  (when-let ((buf mct--region-current-buffer))
+  (when-let ((buf (mct--region-current-buffer)))
     (select-window (get-buffer-window buf))))
 
 (defun mct--region-live-completions (&rest _)
@@ -1145,7 +1140,6 @@ Meant to be added to `after-change-functions'."
 ;; It cannot be `completion-in-region-mode'.
 (defun mct--region-setup-completion-in-region ()
   "Set up Mct for `completion-in-region'."
-  (mct--region-marker-buffer)
   (mct--region-live-update))
 
 ;; FIXME 2021-12-03: We cannot use Orderless.  Neither the
