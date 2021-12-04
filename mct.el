@@ -1140,15 +1140,17 @@ Meant to be added to `after-change-functions'."
 
 ;;;;;; Minor mode specification
 
-;; FIXME 2021-12-03: We need a predicate here for when we are active.
-;; It cannot be `completion-in-region-mode'.
 (defun mct--region-setup-completion-in-region ()
   "Set up Mct for `completion-in-region'."
-  ;; NOTE: Ignore the predicate in order to support orderless style.
-  ;; TODO: This override should be guarded by a customizable variable,
-  ;; since it is intrusive. See also `corfu-quit-at-boundary'.
-  (setq completion-in-region-mode--predicate (lambda () t))
-  (mct--region-live-update))
+  (if completion-in-region-mode
+      (progn
+        ;; NOTE: Ignore the predicate in order to support orderless style.
+        ;; TODO: This override should be guarded by a customizable variable,
+        ;; since it is intrusive. See also `corfu-quit-at-boundary'.
+        (setq completion-in-region-mode--predicate (lambda () t))
+        (mct--region-live-update))
+    ;; Teardown
+    (remove-hook 'after-change-functions #'mct--region-live-completions t)))
 
 ;; FIXME 2021-12-03: When using a flex style followed by tab, the
 ;; completion-in-region seems to remain active as the echo area has a
@@ -1178,6 +1180,7 @@ Meant to be added to `after-change-functions'."
   :global t
   (if mct-region-mode
       (progn
+        (advice-add #'completion--done :around #'mct--region-completion-done)
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
         (add-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
         (advice-add #'display-completion-list :around #'mct--display-completion-list-advice)
@@ -1185,12 +1188,17 @@ Meant to be added to `after-change-functions'."
         (let ((map completion-in-region-mode-map))
           (define-key map (kbd "C-n") #'mct-switch-to-completions-top)
           (define-key map (kbd "C-p") #'mct-switch-to-completions-bottom)))
+    (advice-remove #'completion--done #'mct--region-completion-done)
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
     (remove-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
     (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
     (let ((map completion-in-region-mode-map))
       (define-key map (kbd "C-n") nil)
       (define-key map (kbd "C-p") nil))))
+
+(defun mct--completion-done (&rest app)
+  (apply app)
+  (completion-in-region-mode -1))
 
 (provide 'mct)
 ;;; mct.el ends here
