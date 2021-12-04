@@ -1169,6 +1169,12 @@ Meant to be added to `after-change-functions'."
 ;;;###autoload
 (define-minor-mode mct-region-mode
   "Set up interactivity over the default `completion-in-region'."
+  ;; TODO the mct-region-mode should be buffer-local. One may want to use
+  ;; different completion-in-region UIs depending on the major mode/buffer. Of
+  ;; course it is only my preference to make this configurabe, but in principle
+  ;; nothing is hindering us from offering mct-region-mode as a local mode. In
+  ;; contrast, for mct-minibuffer-mode, offering a buffer-local mode does not
+  ;; make sense.
   :global t
   (if mct-region-mode
       (progn
