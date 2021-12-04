@@ -421,9 +421,13 @@ Apply APP by first setting up the minibuffer to work with Mct."
     (save-excursion
       ;; FIXME 2021-12-03: same principle as what I wrote above
       ;; `mct--region-or-minibuffer-active-p'.
-      (if completion-in-region-mode
-          (completion-help-at-point)
-        (minibuffer-completion-help))))
+      (pcase (and completion-in-region-mode completion-in-region--data)
+        (`(,start ,end ,collection . ,plist)
+         (let ((minibuffer-completion-table collection)
+               (minibuffer-completion-predicate (plist-get plist :predicate))
+               (completion-extra-properties plist))
+           (minibuffer-completion-help start end)))
+        (_ (minibuffer-completion-help)))))
   (mct--fit-completions-window))
 
 ;;;###autoload
@@ -1140,10 +1144,11 @@ Meant to be added to `after-change-functions'."
 ;; It cannot be `completion-in-region-mode'.
 (defun mct--region-setup-completion-in-region ()
   "Set up Mct for `completion-in-region'."
+  ;; NOTE: Ignore the predicate in order to support orderless style.
+  ;; TODO: This override should be guarded by a customizable variable,
+  ;; since it is intrusive. See also `corfu-quit-at-boundary'.
+  (setq completion-in-region-mode--predicate (lambda () t))
   (mct--region-live-update))
-
-;; FIXME 2021-12-03: We cannot use Orderless.  Neither the
-;; space-separated approach, nor the style dispatchers.
 
 ;; FIXME 2021-12-03: When using a flex style followed by tab, the
 ;; completion-in-region seems to remain active as the echo area has a
