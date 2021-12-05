@@ -1196,7 +1196,7 @@ Meant to be added to `after-change-functions'."
       (define-key map (kbd "C-n") nil)
       (define-key map (kbd "C-p") nil))))
 
-(defun mct--completion-done (&rest app)
+(defun mct--region-completion-done (&rest app)
   (apply app)
   (completion-in-region-mode -1))
 
