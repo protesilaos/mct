@@ -1115,9 +1115,14 @@ region.")
 
 ;;;;;; Live completions
 
+;; FIXME 2021-12-05: This seems to be called at the wrong time?  It
+;; never captures the buffer that started the completion-in-region.  We
+;; need to get this right for cycling to work between the buffer and the
+;; Completions.
 (defun mct--region-current-buffer ()
   "Return current buffer of completion in region."
-  (and completion-in-region--data (marker-buffer (nth 0 data))))
+  (and completion-in-region--data
+       (marker-buffer (nth 0 completion-in-region--data))))
 
 (defun mct--focus-current-buffer ()
   "Focus the buffer where `completion-in-region' is active."
@@ -1144,29 +1149,51 @@ Meant to be added to `after-change-functions'."
   "Set up Mct for `completion-in-region'."
   (if completion-in-region-mode
       (progn
-        ;; NOTE: Ignore the predicate in order to support orderless style.
-        ;; TODO: This override should be guarded by a customizable variable,
-        ;; since it is intrusive. See also `corfu-quit-at-boundary'.
-        (setq completion-in-region-mode--predicate (lambda () t))
+        ;; FIXME 2021-12-05: This does not work as intended.  If you
+        ;; type "(def TAB SPC mode ea TAB" the list of completions only
+        ;; includes those with the "ea" prefix.
+        ;;
+        ;; ;; NOTE: Ignore the predicate in order to support orderless style.
+        ;; ;; TODO: This override should be guarded by a customizable variable,
+        ;; ;; since it is intrusive. See also `corfu-quit-at-boundary'.
+        ;; (setq completion-in-region-mode--predicate (lambda () t))
         (mct--region-live-update))
     ;; Teardown
     (remove-hook 'after-change-functions #'mct--region-live-completions t)))
 
-;; FIXME 2021-12-03: When using a flex style followed by tab, the
-;; completion-in-region seems to remain active as the echo area has a
-;; message about "sole completion", "no completion", and the like.
+;; UPDATE 2021-12-05: The first of the following two seems to have been
+;; fixed.  But flex completion is still wonky.  Type "(defglmino TAB".
+;; It will eventually expand into "(define-global-minor-mode", but first
+;; it will show "define-globalminor-mode|glmino" where "|" is the
+;; cursor.
 
-;; FIXME 2021-12-03: Again with the flex style, trigger completion while
-;; at "def" and type "dermode": it first expands into
-;; "define-derived-dermode" with the cursor before "dermode" and then
-;; pauses for a short while before becoming "define-derived-mode".  This
-;; looks broken.
+    ;; FIXME 2021-12-03: When using a flex style followed by tab, the
+    ;; completion-in-region seems to remain active as the echo area has a
+    ;; message about "sole completion", "no completion", and the like.
 
-;; FIXME 2021-12-03: If you type "defa" you will get a list of
-;; candidates that have a common prefix.  One of them is differentiated
-;; by an extra "l" (the defalias).  If you type that character, the
-;; Completions becomes empty instead of showing the single candidate.
-;; Tab-expansion still works...
+    ;; FIXME 2021-12-03: Again with the flex style, trigger completion while
+    ;; at "def" and type "dermode": it first expands into
+    ;; "define-derived-dermode" with the cursor before "dermode" and then
+    ;; pauses for a short while before becoming "define-derived-mode".  This
+    ;; looks broken.
+
+;; UPDATE 2021-12-05: The below seems to have been fixed.  But the
+;; completion is still broken.  Every time you mistype a text expansion
+;; it gets appended to the list of possible candidates.  So after a few
+;; tests I have gotten candidates such as "defalias-" and totally bogus
+;; ones like "defalias-fset-function".
+
+    ;; FIXME 2021-12-03: If you type "defa" you will get a list of
+    ;; candidates that have a common prefix.  One of them is differentiated
+    ;; by an extra "l" (the defalias).  If you type that character, the
+    ;; Completions becomes empty instead of showing the single candidate.
+    ;; Tab-expansion still works...
+
+;; FIXME 2021-12-05: Something affects performance.  In a clean
+;; *scratch* buffer, type "def TAB" and select "defalias".  It expands
+;; right away.  Try the same in a larger elisp file like this one and
+;; the text expansion is considerably slower.  Try it on modus-themes.el
+;; and you might as well prepare dinner while waiting.
 
 ;;;###autoload
 (define-minor-mode mct-region-mode
