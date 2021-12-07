@@ -1211,6 +1211,7 @@ Meant to be added to `after-change-functions'."
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
         (add-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
         (advice-add #'display-completion-list :around #'mct--display-completion-list-advice)
+        (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)
         ;; TODO 2021-12-03: Set up a keymap after we are sure things work.
         (let ((map completion-in-region-mode-map))
           (define-key map (kbd "C-n") #'mct-switch-to-completions-top)
@@ -1219,6 +1220,7 @@ Meant to be added to `after-change-functions'."
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
     (remove-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
     (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
+    (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)
     (let ((map completion-in-region-mode-map))
       (define-key map (kbd "C-n") nil)
       (define-key map (kbd "C-p") nil))))
