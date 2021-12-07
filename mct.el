@@ -1149,6 +1149,11 @@ Meant to be added to `after-change-functions'."
   "Set up Mct for `completion-in-region'."
   (if completion-in-region-mode
       (progn
+        ;; TODO 2021-12-07: Find built-in command or write new one for
+        ;; TAB to only expand the current input.  That should fix the
+        ;; following problem and probably all the others mentioned below
+        ;; where TAB is involved.
+
         ;; FIXME 2021-12-05: This does not work as intended.  If you
         ;; type "(def TAB SPC mode ea TAB" the list of completions only
         ;; includes those with the "ea" prefix.
