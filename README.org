@@ -275,6 +275,14 @@ There are several ways to select a completion candidate.
    completion candidate, so it retains its behaviour (as explained right
    above).
 
+   #+findex: mct-focus-minibuffer
+   Sometimes there is a need to switch to the minibuffer without
+   selecting the candidate at point, such as to retype some part of the
+   input.  In those cases, type =e= in the completions' buffer to move to
+   the minibuffer.  The command is called ~mct-focus-minibuffer~, which
+   can also be assigned to the global keymap, though MCT leaves such a
+   decision up to the user.
+
    #+findex: mct-choose-completion-number
 5. Select a candidate by its line number by typing =M-g M-g= in either the
    minibuffer or the =*Completions*= buffer.  This calls the command
