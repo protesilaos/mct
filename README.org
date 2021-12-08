@@ -281,7 +281,7 @@ There are several ways to select a completion candidate.
    input.  In those cases, type =e= in the completions' buffer to move to
    the minibuffer.  The command is called ~mct-focus-minibuffer~, which
    can also be assigned to the global keymap, though MCT leaves such a
-   decision up to the user.
+   decision up to the user (same for ~mct-focus-mini-or-completions~).
 
    #+findex: mct-choose-completion-number
 5. Select a candidate by its line number by typing =M-g M-g= in either the
