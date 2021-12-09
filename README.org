@@ -695,9 +695,9 @@ MCT is meant to be a collective effort.  Every bit of help matters.
 + Contributions to code or documentation :: Daniel Mendler, James Norman
   Vladimir Cash, José Antonio Ortega Ruiz, Philip Kaludercic.
 
-+ Ideas and user feedback :: Case Duckworth, Jonathan Irving, José
-  Antonio Ortega Ruiz, Kostadin Ninev, Manuel Uberti, Philip Kaludercic,
-  Theodor Thornhill.
++ Ideas and user feedback :: Benjamin (@zealotrush), Case Duckworth,
+  Jonathan Irving, José Antonio Ortega Ruiz, Kostadin Ninev, Manuel
+  Uberti, Philip Kaludercic, Theodor Thornhill.
 
 + Inspiration for certain features :: =icomplete.el= (built-in---multiple
   authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
