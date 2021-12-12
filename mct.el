@@ -231,7 +231,7 @@ See `completions-format' for possible values."
                                (goto-char prev))))))
       (put-text-property (point-min) (point) 'invisible t))))
 
-(defun mct--fit-completions-window ()
+(defun mct--fit-completions-window (&rest _args)
   "Fit Completions' buffer to its window."
   (when-let ((window (mct--get-completion-window)))
     (with-current-buffer (window-buffer window)
