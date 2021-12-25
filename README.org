@@ -538,6 +538,84 @@ If you want to edit any key bindings, do it in these keymaps, not in
 those they extend and override (the names of the original ones are the
 same as above, minus the =mct-= prefix).
 
+* User-level tweaks or custom code
+:PROPERTIES:
+:CUSTOM_ID: h:2630a7a3-1b11-4e9d-8282-0ea3bf9e2a5b
+:END:
+#+cindex: Custom tweaks or extensions
+
+In this section we cover custom code that builds on what MCT offers.
+
+** MCT in the current or the other window
+:PROPERTIES:
+:CUSTOM_ID: h:891c7841-9cdc-42df-bba9-45f7409b807c
+:END:
+
+Over at the [[https://git.sr.ht/~abcdw/rde][rde project]], Andrew Tropin configures MCT to display the
+Completions' buffer in either of two places:
+
++ Current window ::  This is the default behaviour.  It means that
+  completions are presented where the user is already focused on,
+  instead of the bottom of the display or some side window.
+
++ Other window :: The least recently used window when the command that
+  performs completion matches certain categories whose candidates are
+  best shown next to the current window/context.  For example, Imenu
+  (and extensions like ~consult-imenu~) creates a dynamically generated
+  index of "points of interest" in the current buffer, so it is useful
+  to have this displayed in the other window.
+
+Implementation details and particular preferences aside, this is a great
+example of using the various ~display-buffer~ functions to control the
+placement of the =*Completions*= buffer.
+
+#+begin_src emacs-lisp
+(defvar rde-completion-categories-other-window
+  '(imenu)
+  "Completion categories that has to be in other window than
+current, otherwise preview functionallity will fail the party.")
+
+(defvar rde-completion-categories-not-show-candidates-on-setup
+  '(command variable function)
+  "Completion categories that has to be in other window than
+current, otherwise preview functionallity will fail the party.")
+
+(defun rde-display-mct-buffer-pop-up-if-apropriate (buffer alist)
+  "Call `display-buffer-pop-up-window' if the completion category
+one of `rde-completion-categories-other-window', it will make
+sure that we don't use same window for completions, which should
+be in separate window."
+  (if (memq (mct--completion-category)
+            rde-completion-categories-other-window)
+      (display-buffer-pop-up-window buffer alist)
+    nil))
+
+(defun rde-display-mct-buffer-apropriate-window (buffer alist)
+  "Displays completion buffer in the same window, where completion
+was initiated (most recent one), but in case, when compeltion
+buffer should be displayed in other window use least recent one."
+  (let* ((window (if (memq (mct--completion-category)
+                           rde-completion-categories-other-window)
+                     (get-lru-window (selected-frame) nil nil)
+                   (get-mru-window (selected-frame) nil nil))))
+    (window--display-buffer buffer window 'reuse alist)))
+
+(setq mct-display-buffer-action
+      (quote ((display-buffer-reuse-window
+               rde-display-mct-buffer-pop-up-if-apropriate
+               rde-display-mct-buffer-apropriate-window))))
+
+(defun rde-mct-show-completions ()
+  "Instantly shows completion candidates for categories listed in
+`rde-completion-categories-show-candidates-on-setup'."
+  (unless (memq (mct--completion-category)
+                rde-completion-categories-not-show-candidates-on-setup)
+    (setq-local mct-minimum-input 0)
+    (mct--live-completions)))
+
+(add-hook 'minibuffer-setup-hook 'rde-mct-show-completions)
+#+end_src
+
 * Extensions
 :PROPERTIES:
 :CUSTOM_ID: h:03227254-d467-4147-b8cf-2fe05a2e279b
