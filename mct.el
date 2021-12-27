@@ -304,6 +304,14 @@ Meant to be added to `after-change-functions'."
               (buf (window-buffer win)))
       (buffer-local-value 'mct--active buf)))
 
+;; TODO 2021-12-27: If we want to make a buffer-local variant, then we
+;; need to behave like `mct--active-p', because checking for
+;; `completion-in-region-mode' will always fail while in the
+;; Completions' buffer.
+(defun mct--region-p ()
+  "Return non-nil if Mct is completing in region."
+  (bound-and-true-p mct-region-mode))
+
 (defun mct--display-completion-list-advice (&rest app)
   "Prepare advice around `display-completion-list'.
 Apply APP by first let binding the `completions-format' to
