@@ -633,7 +633,9 @@ ARG is a numeric argument for `previous-completion', as described in
 `mct-previous-completion-or-mini'."
   (or (bobp)
       (mct--completions-line-boundary (mct--first-completion-point))
-      (= (save-excursion (previous-completion arg) (point)) (point-min))))
+      (= (save-excursion (previous-completion arg) (point)) (point-min))
+      ;; FIXME 2021-12-27: Why do we need this now?  Regression upstream?
+      (eq (line-number-at-pos) 1)))
 
 (defun mct--previous-completion (arg)
   "Routine to move to the previous ARGth completion candidate."
