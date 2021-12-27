@@ -1233,16 +1233,60 @@ current completion session."
   (when (mct--region-p)
     (mct--completions-choose-completion)))
 
+(defun mct--quit-completion-in-region ()
+  "Bury the Completions and terminate completion in region."
+  (quit-window nil (mct--get-completion-window))
+  ;; FIXME 2021-12-27: Ensure that we have exited the
+  ;; completion-in-region.
+  (keyboard-quit))
+
+(defun mct-next-completion-or-quit (&optional arg)
+  "Move to next completion or bury the Completions' buffer.
+
+This performs a regular motion for optional ARG candidates, but
+when point can no longer move in that direction it buries the
+Completions' buffer.
+
+This is a counterpart of `mct-next-completion-or-mini' that is
+meant for the case of completion in region (i.e. not in the
+minibuffer)."
+  (interactive nil mct-region-mode)
+  (let ((count (or arg 1)))
+    (cond
+     ((mct--bottom-of-completions-p count)
+      (mct--quit-completion-in-region))
+     (t
+      (mct--next-completion count)))))
+
+(defun mct-previous-completion-or-quit (&optional arg)
+  "Move to previous completion or bury the Completions' buffer.
+
+This performs a regular motion for optional ARG candidates, but
+when point can no longer move in that direction it buries the
+Completions' buffer.
+
+This is a counterpart of `mct-previous-completion-or-mini' that
+is meant for the case of completion in region (i.e. not in the
+minibuffer)."
+  (interactive nil mct-region-mode)
+  (let ((count (if (natnump arg) arg 1)))
+    (when (mct--region-p)
+      (cond
+       ((mct--top-of-completions-p count)
+        (mct--quit-completion-in-region))
+       (t
+        (mct--previous-completion count))))))
+
 (defvar mct-region-completion-list-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "M-v") #'scroll-down-command)
     (define-key map [remap goto-line] #'mct-choose-completion-number)
-    ;; (define-key map [remap next-line] #'mct-next-completion-or-mini)
-    ;; (define-key map (kbd "n") #'mct-next-completion-or-mini)
-    ;; (define-key map [remap previous-line] #'mct-previous-completion-or-mini)
+    (define-key map [remap next-line] #'mct-next-completion-or-quit)
+    (define-key map (kbd "n") #'mct-next-completion-or-quit)
+    (define-key map [remap previous-line] #'mct-previous-completion-or-quit)
     (define-key map (kbd "M-p") #'mct-previous-completion-group)
     (define-key map (kbd "M-n") #'mct-next-completion-group)
-    ;; (define-key map (kbd "p") #'mct-previous-completion-or-mini)
+    (define-key map (kbd "p") #'mct-previous-completion-or-quit)
     (define-key map (kbd "<tab>") #'mct-choose-completion-in-region)
     (define-key map (kbd "<return>") #'mct-choose-completion-in-region)
     (define-key map [remap beginning-of-buffer] #'mct-beginning-of-buffer)
