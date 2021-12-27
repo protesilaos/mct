@@ -1211,6 +1211,14 @@ Meant to be added to `after-change-functions'."
 ;; the text expansion is considerably slower.  Try it on modus-themes.el
 ;; and you might as well prepare dinner while waiting.
 
+(defun mct-choose-completion-in-region ()
+  "Choose candidate at point and quit completion in region.
+This is the counterpart of `mct-choose-completion-exit' when the
+minibuffer is not active or relevant for the purposes of the
+current completion session."
+  (interactive nil mct-region-mode)
+  (when (mct--region-p)
+    (mct--completions-choose-completion)))
 ;;;###autoload
 (define-minor-mode mct-region-mode
   "Set up interactivity over the default `completion-in-region'."
