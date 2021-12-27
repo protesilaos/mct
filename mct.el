@@ -1078,11 +1078,11 @@ region.")
 (declare-function minibuf-eldef-setup-minibuffer "minibuf-eldef")
 
 ;;;###autoload
-(define-minor-mode mct-mode
+(define-minor-mode mct-minibuffer-mode
   "Set up opinionated default completion UI."
   :global t
   :group 'mct
-  (if mct-mode
+  (if mct-minibuffer-mode
       (progn
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
         (dolist (fn '(exit-minibuffer
