@@ -1241,6 +1241,19 @@ current completion session."
   (use-local-map
    (make-composed-keymap mct-region-completion-list-mode-map
                          (current-local-map))))
+
+(defun mct--region-setup-completion-list ()
+  "Set up the completion-list for Mct."
+  (when (mct--region-p)
+    (setq-local completion-show-help nil)
+    (mct--setup-clean-completions)
+    (mct--setup-appearance)
+    (mct--region-setup-completion-list-keymap)
+    (mct--setup-silent-line-truncation)
+    (mct--setup-highlighting)
+    (mct--setup-line-numbers)
+    (cursor-sensor-mode)))
+
 ;;;###autoload
 (define-minor-mode mct-region-mode
   "Set up interactivity over the default `completion-in-region'."
@@ -1254,7 +1267,7 @@ current completion session."
   (if mct-region-mode
       (progn
         (advice-add #'completion--done :around #'mct--region-completion-done)
-        (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
+        (add-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
         (add-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
         (advice-add #'display-completion-list :around #'mct--display-completion-list-advice)
         (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)
@@ -1263,7 +1276,7 @@ current completion session."
           (define-key map (kbd "C-n") #'mct-switch-to-completions-top)
           (define-key map (kbd "C-p") #'mct-switch-to-completions-bottom)))
     (advice-remove #'completion--done #'mct--region-completion-done)
-    (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
+    (remove-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
     (remove-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
     (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
     (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)
