@@ -1219,6 +1219,28 @@ current completion session."
   (interactive nil mct-region-mode)
   (when (mct--region-p)
     (mct--completions-choose-completion)))
+
+(defvar mct-region-completion-list-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "M-v") #'scroll-down-command)
+    (define-key map [remap goto-line] #'mct-choose-completion-number)
+    ;; (define-key map [remap next-line] #'mct-next-completion-or-mini)
+    ;; (define-key map (kbd "n") #'mct-next-completion-or-mini)
+    ;; (define-key map [remap previous-line] #'mct-previous-completion-or-mini)
+    (define-key map (kbd "M-p") #'mct-previous-completion-group)
+    (define-key map (kbd "M-n") #'mct-next-completion-group)
+    ;; (define-key map (kbd "p") #'mct-previous-completion-or-mini)
+    (define-key map (kbd "<tab>") #'mct-choose-completion-in-region)
+    (define-key map (kbd "<return>") #'mct-choose-completion-in-region)
+    (define-key map [remap beginning-of-buffer] #'mct-beginning-of-buffer)
+    map)
+  "Derivative of `completion-list-mode-map'.")
+
+(defun mct--region-setup-completion-list-keymap ()
+  "Set up completion list keymap."
+  (use-local-map
+   (make-composed-keymap mct-region-completion-list-mode-map
+                         (current-local-map))))
 ;;;###autoload
 (define-minor-mode mct-region-mode
   "Set up interactivity over the default `completion-in-region'."
