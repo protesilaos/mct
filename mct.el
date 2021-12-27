@@ -592,7 +592,7 @@ ARG is a numeric argument for `next-completion', as described in
    ((mct--active-p)
     (mct-focus-minibuffer))))
 
-(defun mct-next-completion-or-switch (&optional arg)
+(defun mct-next-completion-or-mini (&optional arg)
   "Move to the next completion or switch to the minibuffer.
 This performs a regular motion for optional ARG lines, but when
 point can no longer move in that direction it switches to the
