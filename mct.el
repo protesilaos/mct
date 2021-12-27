@@ -693,15 +693,21 @@ If ARG is supplied, move that many completion groups at a time."
 
 ;;;;; Candidate selection
 
+;; We need this helper for completion-in-region.  See
+;; `mct-choose-completion-in-region'.
+(defun mct--completions-choose-completion ()
+  "Choose candidate from the Completions' buffer."
+  (when-let* ((window (mct--get-completion-window))
+              (buffer (window-buffer)))
+    (with-current-buffer buffer
+      (choose-completion))))
+
 (defun mct-choose-completion-exit ()
   "Run `choose-completion' in the Completions buffer and exit."
   (interactive nil mct-mode)
   (when (active-minibuffer-window)
-    (when-let* ((window (mct--get-completion-window))
-                (buffer (window-buffer)))
-      (with-current-buffer buffer
-        (choose-completion))
-      (minibuffer-force-complete-and-exit))))
+    (mct--completions-choose-completion)
+    (minibuffer-force-complete-and-exit)))
 
 (defun mct-choose-completion-no-exit ()
   "Run `choose-completion' in the Completions without exiting."
