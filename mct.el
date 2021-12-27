@@ -316,7 +316,7 @@ Meant to be added to `after-change-functions'."
   "Prepare advice around `display-completion-list'.
 Apply APP by first let binding the `completions-format' to
 `mct-completions-format'."
-  (if (mct--active-p)
+  (if (or (mct--active-p) (mct--region-p))
       (let ((completions-format mct-completions-format))
         (apply app))
     (apply app)))
