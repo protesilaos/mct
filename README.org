@@ -275,6 +275,14 @@ There are several ways to select a completion candidate.
    completion candidate, so it retains its behaviour (as explained right
    above).
 
+   #+findex: mct-focus-minibuffer
+   Sometimes there is a need to switch to the minibuffer without
+   selecting the candidate at point, such as to retype some part of the
+   input.  In those cases, type =e= in the completions' buffer to move to
+   the minibuffer.  The command is called ~mct-focus-minibuffer~, which
+   can also be assigned to the global keymap, though MCT leaves such a
+   decision up to the user (same for ~mct-focus-mini-or-completions~).
+
    #+findex: mct-choose-completion-number
 5. Select a candidate by its line number by typing =M-g M-g= in either the
    minibuffer or the =*Completions*= buffer.  This calls the command
@@ -530,6 +538,84 @@ If you want to edit any key bindings, do it in these keymaps, not in
 those they extend and override (the names of the original ones are the
 same as above, minus the =mct-= prefix).
 
+* User-level tweaks or custom code
+:PROPERTIES:
+:CUSTOM_ID: h:2630a7a3-1b11-4e9d-8282-0ea3bf9e2a5b
+:END:
+#+cindex: Custom tweaks or extensions
+
+In this section we cover custom code that builds on what MCT offers.
+
+** MCT in the current or the other window
+:PROPERTIES:
+:CUSTOM_ID: h:891c7841-9cdc-42df-bba9-45f7409b807c
+:END:
+
+Over at the [[https://git.sr.ht/~abcdw/rde][rde project]], Andrew Tropin configures MCT to display the
+Completions' buffer in either of two places:
+
++ Current window ::  This is the default behaviour.  It means that
+  completions are presented where the user is already focused on,
+  instead of the bottom of the display or some side window.
+
++ Other window :: The least recently used window when the command that
+  performs completion matches certain categories whose candidates are
+  best shown next to the current window/context.  For example, Imenu
+  (and extensions like ~consult-imenu~) creates a dynamically generated
+  index of "points of interest" in the current buffer, so it is useful
+  to have this displayed in the other window.
+
+Implementation details and particular preferences aside, this is a great
+example of using the various ~display-buffer~ functions to control the
+placement of the =*Completions*= buffer.
+
+#+begin_src emacs-lisp
+(defvar rde-completion-categories-other-window
+  '(imenu)
+  "Completion categories that has to be in other window than
+current, otherwise preview functionallity will fail the party.")
+
+(defvar rde-completion-categories-not-show-candidates-on-setup
+  '(command variable function)
+  "Completion categories that has to be in other window than
+current, otherwise preview functionallity will fail the party.")
+
+(defun rde-display-mct-buffer-pop-up-if-apropriate (buffer alist)
+  "Call `display-buffer-pop-up-window' if the completion category
+one of `rde-completion-categories-other-window', it will make
+sure that we don't use same window for completions, which should
+be in separate window."
+  (if (memq (mct--completion-category)
+            rde-completion-categories-other-window)
+      (display-buffer-pop-up-window buffer alist)
+    nil))
+
+(defun rde-display-mct-buffer-apropriate-window (buffer alist)
+  "Displays completion buffer in the same window, where completion
+was initiated (most recent one), but in case, when compeltion
+buffer should be displayed in other window use least recent one."
+  (let* ((window (if (memq (mct--completion-category)
+                           rde-completion-categories-other-window)
+                     (get-lru-window (selected-frame) nil nil)
+                   (get-mru-window (selected-frame) nil nil))))
+    (window--display-buffer buffer window 'reuse alist)))
+
+(setq mct-display-buffer-action
+      (quote ((display-buffer-reuse-window
+               rde-display-mct-buffer-pop-up-if-apropriate
+               rde-display-mct-buffer-apropriate-window))))
+
+(defun rde-mct-show-completions ()
+  "Instantly shows completion candidates for categories listed in
+`rde-completion-categories-show-candidates-on-setup'."
+  (unless (memq (mct--completion-category)
+                rde-completion-categories-not-show-candidates-on-setup)
+    (setq-local mct-minimum-input 0)
+    (mct--live-completions)))
+
+(add-hook 'minibuffer-setup-hook 'rde-mct-show-completions)
+#+end_src
+
 * Extensions
 :PROPERTIES:
 :CUSTOM_ID: h:03227254-d467-4147-b8cf-2fe05a2e279b
@@ -554,6 +640,27 @@ these exceptionally well-crafted extras:
 + [[https://github.com/oantolin/orderless/][Orderless]] by Omar :: A completion style that matches a variety of
   patterns (regexp, flex, initialism, etc.) regardless of the order they
   appear in.
+
++ [[https://github.com/iyefrat/all-the-icons-completion][all-the-icons-completion]] by Itai Y. Efrat :: Glue code that adds icons
+  from the =all-the-icons= package to the =*Completions*= buffer.  It can
+  make things prettier and/or more informative, while it can also be
+  combined with Marginalia.
+
+MCT does not support the use-case of ~completion-in-region~.  This is the
+kind of completion session that does not involve the minibuffer and is
+instead about in-buffer text expansion.  Consider these packages:
+
++ [[https://github.com/minad/corfu/][Corfu]] by Daniel Mendler :: An interface for the ~completion-in-region~
+  which uses a child frame (basically a pop-up) at the position of the
+  cursor to display candidates.  As with all of Daniel's packages, Corfu
+  aims for a clean implementation that does the right thing by being
+  consistent with core Emacs mechanisms.
+
++ [[https://github.com/minad/cape][Cape]] also by Daniel :: Additional ~completion-at-point-functions~
+  (CAPFs) that extend those of core Emacs.  These backends can be used
+  by Corfu, though their modular nature makes them suitable for use by
+  other compliant packages (e.g. a potential minimalist package that is
+  cleanly designed like Corfu but has a different interface).
 
 ** Enable Consult previews
 :PROPERTIES:
@@ -664,11 +771,12 @@ MCT is meant to be a collective effort.  Every bit of help matters.
 + Author/maintainer :: Protesilaos Stavrou.
 
 + Contributions to code or documentation :: Daniel Mendler, James Norman
-  Vladimir Cash, José Antonio Ortega Ruiz, Philip Kaludercic.
+  Vladimir Cash, José Antonio Ortega Ruiz, Juri Linkov, Philip
+  Kaludercic.
 
-+ Ideas and user feedback :: Case Duckworth, Jonathan Irving, José
-  Antonio Ortega Ruiz, Kostadin Ninev, Manuel Uberti, Philip Kaludercic,
-  Theodor Thornhill.
++ Ideas and user feedback :: Benjamin (@zealotrush), Case Duckworth,
+  Jonathan Irving, José Antonio Ortega Ruiz, Kostadin Ninev, Manuel
+  Uberti, Philip Kaludercic, Theodor Thornhill.
 
 + Inspiration for certain features :: =icomplete.el= (built-in---multiple
   authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
