@@ -592,35 +592,40 @@ ARG is a numeric argument for `next-completion', as described in
    ((mct--active-p)
     (mct-focus-minibuffer))))
 
+(defun mct--next-completion (arg)
+  "Routine to move to the next ARGth completion candidate."
+  (if (not (mct--one-column-p))
+      ;; Retaining the column number ensures that things work
+      ;; intuitively in a grid view.
+      (let ((col (current-column)))
+        ;; The `when' is meant to skip past lines that do not
+        ;; contain completion candidates, such as those with
+        ;; `completions-group-format'.
+        (when (mct--completions-no-completion-line-p (or arg 1))
+          (if arg
+              (setq arg 2)
+            (setq arg (1+ arg))))
+        (vertical-motion (or arg 1))
+        (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
+          (line-move-to-column col))
+        (when (or (> (current-column) col)
+                  (not (mct--completions-completion-p)))
+          (next-completion -1)))
+    (next-completion (or arg 1))))
+
 (defun mct-next-completion-or-mini (&optional arg)
   "Move to the next completion or switch to the minibuffer.
 This performs a regular motion for optional ARG lines, but when
 point can no longer move in that direction it switches to the
 minibuffer."
   (interactive "p" mct-mode)
-  (cond
-   ((mct--bottom-of-completions-p (or arg 1))
-    (mct-focus-minibuffer))
-   (t
-    (if (not (mct--one-column-p))
-        ;; Retaining the column number ensures that things work
-        ;; intuitively in a grid view.
-        (let ((col (current-column)))
-          ;; The `when' is meant to skip past lines that do not
-          ;; contain completion candidates, such as those with
-          ;; `completions-group-format'.
-          (when (mct--completions-no-completion-line-p (or arg 1))
-            (if arg
-                (setq arg 2)
-              (setq arg (1+ arg))))
-          (vertical-motion (or arg 1))
-          (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
-            (line-move-to-column col))
-          (when (or (> (current-column) col)
-                    (not (mct--completions-completion-p)))
-            (next-completion -1)))
-      (next-completion (or arg 1))))
-   (setq this-command 'next-line)))
+  (let ((count (or arg 1)))
+    (cond
+     ((mct--bottom-of-completions-p count)
+      (mct-focus-minibuffer))
+     (t
+      (mct--next-completion count))
+     (setq this-command 'next-line))))
 
 (defun mct--top-of-completions-p (arg)
   "Test if point is at the notional top of the Completions.
@@ -630,33 +635,39 @@ ARG is a numeric argument for `previous-completion', as described in
       (mct--completions-line-boundary (mct--first-completion-point))
       (= (save-excursion (previous-completion arg) (point)) (point-min))))
 
+(defun mct--previous-completion (arg)
+  "Routine to move to the previous ARGth completion candidate."
+  (if (not (mct--one-column-p))
+      ;; Retaining the column number ensures that things work
+      ;; intuitively in a grid view.
+      (let ((col (current-column)))
+        ;; The `when' is meant to skip past lines that do not
+        ;; contain completion candidates, such as those with
+        ;; `completions-group-format'.
+        (when (mct--completions-no-completion-line-p (or (- arg) -1))
+          (if arg
+              (setq arg 2)
+            (setq arg (1+ arg))))
+        (vertical-motion (or (- arg) -1))
+        (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
+          (line-move-to-column col))
+        (when (or (> (current-column) col)
+                  (not (mct--completions-completion-p)))
+          (next-completion -1)))
+    (previous-completion (if (natnump arg) arg 1))))
+
 (defun mct-previous-completion-or-mini (&optional arg)
   "Move to the next completion or switch to the minibuffer.
 This performs a regular motion for optional ARG lines, but when
 point can no longer move in that direction it switches to the
 minibuffer."
   (interactive "p" mct-mode)
-  (cond
-   ((mct--top-of-completions-p (if (natnump arg) arg 1))
-    (mct-focus-minibuffer))
-   ((if (not (mct--one-column-p))
-        ;; Retaining the column number ensures that things work
-        ;; intuitively in a grid view.
-        (let ((col (current-column)))
-          ;; The `when' is meant to skip past lines that do not
-          ;; contain completion candidates, such as those with
-          ;; `completions-group-format'.
-          (when (mct--completions-no-completion-line-p (or (- arg) -1))
-            (if arg
-                (setq arg 2)
-              (setq arg (1+ arg))))
-          (vertical-motion (or (- arg) -1))
-          (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
-            (line-move-to-column col))
-          (when (or (> (current-column) col)
-                    (not (mct--completions-completion-p)))
-            (next-completion -1)))
-      (previous-completion (if (natnump arg) arg 1))))))
+  (let ((count (if (natnump arg) arg 1)))
+    (cond
+     ((mct--top-of-completions-p count)
+      (mct-focus-minibuffer))
+     (t
+      (mct--previous-completion count)))))
 
 (defun mct-next-completion-group (&optional arg)
   "Move to the next completion group.
