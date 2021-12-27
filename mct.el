@@ -615,9 +615,9 @@ ARG is a numeric argument for `next-completion', as described in
 
 (defun mct-next-completion-or-mini (&optional arg)
   "Move to the next completion or switch to the minibuffer.
-This performs a regular motion for optional ARG lines, but when
-point can no longer move in that direction it switches to the
-minibuffer."
+This performs a regular motion for optional ARG candidates, but
+when point can no longer move in that direction it switches to
+the minibuffer."
   (interactive "p" mct-mode)
   (let ((count (or arg 1)))
     (cond
@@ -659,10 +659,10 @@ ARG is a numeric argument for `previous-completion', as described in
     (previous-completion (if (natnump arg) arg 1))))
 
 (defun mct-previous-completion-or-mini (&optional arg)
-  "Move to the next completion or switch to the minibuffer.
-This performs a regular motion for optional ARG lines, but when
-point can no longer move in that direction it switches to the
-minibuffer."
+  "Move to the previous completion or switch to the minibuffer.
+This performs a regular motion for optional ARG candidates, but
+when point can no longer move in that direction it switches to
+the minibuffer."
   (interactive "p" mct-mode)
   (let ((count (if (natnump arg) arg 1)))
     (cond
