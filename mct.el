@@ -886,11 +886,6 @@ Apply APP while inhibiting modification hooks."
       (mct--add-stripes)
     (mct--remove-stripes)))
 
-(defun mct--setup-silent-line-truncation ()
-  "Toggle line truncation without printing messages."
-  (let ((inhibit-message t))
-    (toggle-truncate-lines t)))
-
 ;;;;; Shadowed path
 
 ;; Adapted from icomplete.el
@@ -1032,11 +1027,11 @@ region.")
 (defun mct--setup-completion-list ()
   "Set up the completion-list for Mct."
   (when (mct--active-p)
-    (setq-local completion-show-help nil)
+    (setq-local completion-show-help nil
+                truncate-lines t)
     (mct--setup-clean-completions)
     (mct--setup-appearance)
     (mct--setup-completion-list-keymap)
-    (mct--setup-silent-line-truncation)
     (mct--setup-highlighting)
     (mct--setup-line-numbers)
     (cursor-sensor-mode)))
