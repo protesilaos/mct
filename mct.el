@@ -804,7 +804,7 @@ A candidate is recognised for as long as point is not past its
 last character."
   (interactive nil mct-mode)
   (when-let ((window (mct--get-completion-window))
-             (_mini (active-minibuffer-window)))
+             ((active-minibuffer-window)))
     (with-selected-window window
       (when-let* ((old-point (window-old-point window))
                   (pos (if (= old-point (point-min))
