@@ -251,22 +251,21 @@ See `mct-minimum-input'."
   "Update the *Completions* buffer.
 Meant to be added to `after-change-functions'."
   (when (minibufferp) ; skip if we've exited already
-    (let ((while-no-input-ignore-events '(selection-request)))
-      (while-no-input
-        (if (or (mct--minimum-input)
-                (eq mct-live-completion 'visible))
-            (condition-case nil
-                (save-match-data
-                  (save-excursion
-                    (goto-char (point-max))
-                    (let ((inhibit-message t)
-                          (message-log-max nil)
-                          ;; don't ring the bell in `minibuffer-completion-help'
-                          ;; when <= 1 completion exists.
-                          (ring-bell-function #'ignore))
-                      (mct--show-completions))))
-              (quit (abort-recursive-edit)))
-          (minibuffer-hide-completions))))))
+    (while-no-input
+      (if (or (mct--minimum-input)
+              (eq mct-live-completion 'visible))
+          (condition-case nil
+              (save-match-data
+                (save-excursion
+                  (goto-char (point-max))
+                  (let ((inhibit-message t)
+                        (message-log-max nil)
+                        ;; don't ring the bell in `minibuffer-completion-help'
+                        ;; when <= 1 completion exists.
+                        (ring-bell-function #'ignore))
+                    (mct--show-completions))))
+            (quit (abort-recursive-edit)))
+        (minibuffer-hide-completions)))))
 
 (defun mct--live-completions-timer (&rest _)
   "Update Completions with `mct-live-update-delay'."
