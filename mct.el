@@ -429,8 +429,7 @@ Apply APP by first setting up the minibuffer to work with Mct."
                (minibuffer-completion-predicate (plist-get plist :predicate))
                (completion-extra-properties plist))
            (minibuffer-completion-help start end)))
-        (_ (minibuffer-completion-help)))))
-  (mct--fit-completions-window))
+        (_ (minibuffer-completion-help))))))
 
 ;;;###autoload
 (defun mct-focus-mini-or-completions ()
