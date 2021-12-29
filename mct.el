@@ -258,12 +258,7 @@ Meant to be added to `after-change-functions'."
               (save-match-data
                 (save-excursion
                   (goto-char (point-max))
-                  (let ((inhibit-message t)
-                        (message-log-max nil)
-                        ;; don't ring the bell in `minibuffer-completion-help'
-                        ;; when <= 1 completion exists.
-                        (ring-bell-function #'ignore))
-                    (mct--show-completions))))
+                  (mct--show-completions)))
             (quit (abort-recursive-edit)))
         (minibuffer-hide-completions)))))
 
@@ -421,7 +416,12 @@ Apply APP by first setting up the minibuffer to work with Mct."
   "Show the completions' buffer."
   (let ((display-buffer-alist
          (cons (cons mct-completion-windows-regexp mct-display-buffer-action)
-               display-buffer-alist)))
+               display-buffer-alist))
+        ;; don't ring the bell in `minibuffer-completion-help'
+        ;; when <= 1 completion exists.
+        (ring-bell-function #'ignore)
+        (message-log-max nil)
+        (inhibit-message t))
     (save-excursion
       (pcase (and completion-in-region-mode completion-in-region--data)
         (`(,start ,end ,collection . ,plist)
