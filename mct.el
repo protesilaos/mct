@@ -1080,7 +1080,7 @@ region.")
     (mct--setup-line-numbers)
     (cursor-sensor-mode)))
 
-;;;;; mct-mode declaration
+;;;;; mct-minibuffer-mode declaration
 
 (declare-function minibuf-eldef-setup-minibuffer "minibuf-eldef")
 
