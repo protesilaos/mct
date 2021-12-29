@@ -1104,12 +1104,15 @@ region.")
     (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)
     (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily)))
 
+;; TODO 2021-12-29: Do not use mct-mode in the interactive specification of the commands
 (define-obsolete-function-alias 'mct-mode 'mct-minibuffer-mode "0.4.0")
 
 ;;;;; mct-region-mode declaration
 
 ;;;;;; Live completions
 
+;; TODO: Why do we need this variable?
+;; Can we not always call `mct--region-current-buffer'?
 (defvar mct--region-buf nil
   "Current buffer where Mct performs completion in region.")
 
@@ -1238,11 +1241,11 @@ minibuffer)."
 (defun mct--region-setup-completion-list ()
   "Set up the completion-list for Mct."
   (when (mct--region-p)
-    (setq-local completion-show-help nil)
+    (setq-local completion-show-help nil
+                truncate-lines t)
     (mct--setup-clean-completions)
     (mct--setup-appearance)
     (mct--region-setup-completion-list-keymap)
-    (mct--setup-silent-line-truncation)
     (mct--setup-highlighting)
     (mct--setup-line-numbers)
     (cursor-sensor-mode)))
