@@ -1157,19 +1157,10 @@ Meant to be added to `after-change-functions'."
   (if completion-in-region-mode
       (progn
         (mct--region-current-buffer)
-        ;; TODO 2021-12-07: Find built-in command or write new one for
-        ;; TAB to only expand the current input.  That should fix the
-        ;; following problem and probably all the others mentioned below
-        ;; where TAB is involved.
-
-        ;; FIXME 2021-12-05: This does not work as intended.  If you
-        ;; type "(def TAB SPC mode ea TAB" the list of completions only
-        ;; includes those with the "ea" prefix.
-        ;;
-        ;; ;; NOTE: Ignore the predicate in order to support orderless style.
-        ;; ;; TODO: This override should be guarded by a customizable variable,
-        ;; ;; since it is intrusive. See also `corfu-quit-at-boundary'.
-        ;; (setq completion-in-region-mode--predicate (lambda () t))
+        ;; NOTE: Ignore the predicate in order to support orderless style.
+        ;; TODO: This override should be guarded by a customizable variable,
+        ;; since it is intrusive. See also `corfu-quit-at-boundary'.
+        (setq completion-in-region-mode--predicate (lambda () t))
         (mct--region-live-update))
     ;; Teardown
     (remove-hook 'after-change-functions #'mct--region-live-completions t)))
