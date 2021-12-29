@@ -1175,12 +1175,11 @@ is meant for the case of completion in region (i.e. not in the
 minibuffer)."
   (interactive nil mct-region-mode)
   (let ((count (if (natnump arg) arg 1)))
-    (when (mct--region-p)
-      (cond
-       ((mct--top-of-completions-p count)
-        (minibuffer-hide-completions))
-       (t
-        (mct--previous-completion count))))))
+    (cond
+     ((mct--top-of-completions-p count)
+      (minibuffer-hide-completions))
+     (t
+      (mct--previous-completion count)))))
 
 (defvar mct-region-completion-list-mode-map
   (let ((map (make-sparse-keymap)))
