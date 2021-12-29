@@ -210,6 +210,11 @@ See `completions-format' for possible values."
              mct-show-completion-line-numbers)
     (display-line-numbers-mode 1)))
 
+(defun mct--first-line-completion-p ()
+  "Return non-nil if first line contains completion candidates."
+  (eq (line-number-at-pos (point-min))
+      (line-number-at-pos (mct--first-completion-point))))
+
 ;; Thanks to Omar Antolín Camarena for recommending the use of
 ;; `cursor-sensor-functions' and the concomitant hook with
 ;; `cursor-censor-mode' instead of the dirty hacks I had before to
@@ -220,8 +225,8 @@ See `completions-format' for possible values."
 (defun mct--setup-clean-completions ()
   "Keep only completion candidates in the Completions."
   (with-current-buffer standard-output
-    (goto-char (point-min))
-    (unless (mct--completions-completion-p)
+    (unless (mct--first-line-completion-p)
+      (goto-char (point-min))
       (let ((inhibit-read-only t))
         (delete-region (point-at-bol) (1+ (point-at-eol)))
         (insert (propertize " "
