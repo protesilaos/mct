@@ -1151,15 +1151,6 @@ Meant to be added to `after-change-functions'."
     ;; Teardown
     (remove-hook 'after-change-functions #'mct--region-live-completions t)))
 
-(defun mct-choose-completion-in-region ()
-  "Choose candidate at point and quit completion in region.
-This is the counterpart of `mct-choose-completion-exit' when the
-minibuffer is not active or relevant for the purposes of the
-current completion session."
-  (interactive nil mct-region-mode)
-  (when (mct--region-p)
-    (mct--completions-choose-completion)))
-
 (defun mct-next-completion-or-quit (&optional arg)
   "Move to next completion or bury the Completions' buffer.
 
@@ -1207,8 +1198,8 @@ minibuffer)."
     (define-key map (kbd "M-p") #'mct-previous-completion-group)
     (define-key map (kbd "M-n") #'mct-next-completion-group)
     (define-key map (kbd "p") #'mct-previous-completion-or-quit)
-    (define-key map (kbd "<tab>") #'mct-choose-completion-in-region)
-    (define-key map (kbd "<return>") #'mct-choose-completion-in-region)
+    (define-key map (kbd "TAB") #'choose-completion)
+    (define-key map (kbd "RET") #'choose-completion)
     (define-key map [remap beginning-of-buffer] #'mct-beginning-of-buffer)
     map)
   "Derivative of `completion-list-mode-map'.")
