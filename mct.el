@@ -1109,9 +1109,6 @@ region.")
 
 ;;;;; mct-region-mode declaration
 
-;; NOTE 2021-12-03: Do not use this.  It is broken and remains highly
-;; experimental.  Search this document for FIXME and TODO keywords.
-
 ;;;;;; Live completions
 
 (defvar mct--region-buf nil
