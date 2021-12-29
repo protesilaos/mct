@@ -304,13 +304,11 @@ Meant to be added to `after-change-functions'."
               (buf (window-buffer win)))
       (buffer-local-value 'mct--active buf)))
 
-;; TODO 2021-12-27: If we want to make a buffer-local variant, then we
-;; need to behave like `mct--active-p', because checking for
-;; `completion-in-region-mode' will always fail while in the
-;; Completions' buffer.
+;; TODO 2021-12-29: If we want to make a buffer-local variant, then we
+;; need to review this.
 (defun mct--region-p ()
   "Return non-nil if Mct is completing in region."
-  (bound-and-true-p mct-region-mode))
+  (and (bound-and-true-p mct-region-mode) mct--region-buf))
 
 (defun mct--display-completion-list-advice (&rest app)
   "Prepare advice around `display-completion-list'.
@@ -1117,14 +1115,13 @@ region.")
 
 ;;;;;; Live completions
 
-;; FIXME 2021-12-05: This seems to be called at the wrong time?  It
-;; never captures the buffer that started the completion-in-region.  We
-;; need to get this right for cycling to work between the buffer and the
-;; Completions.
+(defvar mct--region-buf nil
+  "Current buffer where Mct performs completion in region.")
+
 (defun mct--region-current-buffer ()
   "Return current buffer of completion in region."
-  (and completion-in-region--data
-       (marker-buffer (nth 0 completion-in-region--data))))
+  (setq mct--region-buf (and completion-in-region--data
+                             (marker-buffer (nth 0 completion-in-region--data)))))
 
 (defun mct--focus-current-buffer ()
   "Focus the buffer where `completion-in-region' is active."
@@ -1155,6 +1152,7 @@ Meant to be added to `after-change-functions'."
   "Set up Mct for `completion-in-region'."
   (if completion-in-region-mode
       (progn
+        (mct--region-current-buffer)
         ;; TODO 2021-12-07: Find built-in command or write new one for
         ;; TAB to only expand the current input.  That should fix the
         ;; following problem and probably all the others mentioned below
@@ -1218,6 +1216,7 @@ current completion session."
 (defun mct--quit-completion-in-region ()
   "Bury the Completions and terminate completion in region."
   (quit-window nil (mct--get-completion-window))
+  (mct--focus-current-buffer)
   ;; FIXME 2021-12-27: Ensure that we have exited the
   ;; completion-in-region.
   (keyboard-quit))
