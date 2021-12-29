@@ -1121,19 +1121,6 @@ region.")
   (setq mct--region-buf (and completion-in-region--data
                              (marker-buffer (nth 0 completion-in-region--data)))))
 
-(defun mct--region-terminate-completion ()
-  "Terminate completion in region."
-  (when-let ((buf mct--region-buf))
-    (with-current-buffer buf
-      (completion-in-region-mode -1)
-      (keyboard-quit))))
-
-(defun mct--region-focus-current-buffer ()
-  "Focus the buffer where `completion-in-region' is active."
-  (interactive nil mct-region-mode)
-  (when-let ((buf (mct--region-current-buffer)))
-    (select-window (get-buffer-window buf))))
-
 (defun mct--region-live-completions (&rest _)
   "Update the *Completions* buffer.
 Meant to be added to `after-change-functions'."
@@ -1173,12 +1160,6 @@ current completion session."
   (when (mct--region-p)
     (mct--completions-choose-completion)))
 
-(defun mct--quit-completion-in-region ()
-  "Bury the Completions and terminate completion in region."
-  (quit-window nil (mct--get-completion-window))
-  (mct--region-focus-current-buffer)
-  (mct--region-terminate-completion))
-
 (defun mct-next-completion-or-quit (&optional arg)
   "Move to next completion or bury the Completions' buffer.
 
@@ -1193,7 +1174,7 @@ minibuffer)."
   (let ((count (or arg 1)))
     (cond
      ((mct--bottom-of-completions-p count)
-      (mct--quit-completion-in-region))
+      (minibuffer-hide-completions))
      (t
       (mct--next-completion count)))))
 
@@ -1212,7 +1193,7 @@ minibuffer)."
     (when (mct--region-p)
       (cond
        ((mct--top-of-completions-p count)
-        (mct--quit-completion-in-region))
+        (minibuffer-hide-completions))
        (t
         (mct--previous-completion count))))))
 
