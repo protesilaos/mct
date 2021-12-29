@@ -707,17 +707,12 @@ If ARG is supplied, move that many completion groups at a time."
       (choose-completion)))
     (minibuffer-force-complete-and-exit)))
 
-;; TODO review, is this not almost the same as choose-completion?
 (defun mct-choose-completion-no-exit ()
   "Run `choose-completion' in the Completions without exiting."
   (interactive nil mct-minibuffer-mode)
-  (when-let* ((window (mct--get-completion-window))
-              (buffer (window-buffer))
-              (mini (active-minibuffer-window)))
-    ;; TODO review, are we not always in the *Completions* buffer here?
-    (with-current-buffer buffer
-      (let ((completion-no-auto-exit t))
-        (choose-completion)))
+  (when-let ((mini (active-minibuffer-window)))
+    (let ((completion-no-auto-exit t))
+      (choose-completion))
     (select-window mini nil)))
 
 (defvar display-line-numbers-mode)
