@@ -582,16 +582,6 @@ ARG is a numeric argument for `next-completion', as described in
 	         (save-match-data
 	           (looking-at "[\s\t]*$"))))))
 
-(defun mct--focus-buf-or-mini ()
-  "Switch away from the Completions to the right destination."
-  (cond
-   ;; FIXME 2021-12-03: same principle as what I wrote above
-   ;; `mct--region-or-minibuffer-active-p'.
-   ((mct--region-current-buffer)
-    (mct--focus-current-buffer))
-   ((mct--active-p)
-    (mct-focus-minibuffer))))
-
 (defun mct--next-completion (arg)
   "Routine to move to the next ARGth completion candidate."
   (if (not (mct--one-column-p))
