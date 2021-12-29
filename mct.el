@@ -692,8 +692,6 @@ If ARG is supplied, move that many completion groups at a time."
 
 ;;;;; Candidate selection
 
-;; We need this helper for completion-in-region.  See
-;; `mct-choose-completion-in-region'.
 (defun mct--completions-choose-completion ()
   "Choose candidate from the Completions' buffer."
   (when-let* ((window (mct--get-completion-window))
