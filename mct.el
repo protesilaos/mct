@@ -304,7 +304,7 @@ Meant to be added to `after-change-functions'."
 ;; need to review this.
 (defun mct--region-p ()
   "Return non-nil if Mct is completing in region."
-  (and (bound-and-true-p mct-region-mode) mct--region-buf))
+  (and (bound-and-true-p mct-region-mode) (mct--region-current-buffer)))
 
 (defun mct--display-completion-list-advice (&rest app)
   "Prepare advice around `display-completion-list'.
@@ -1111,26 +1111,20 @@ region.")
 
 ;;;;;; Live completions
 
-;; TODO: Why do we need this variable?
-;; Can we not always call `mct--region-current-buffer'?
-(defvar mct--region-buf nil
-  "Current buffer where Mct performs completion in region.")
-
 (defun mct--region-current-buffer ()
   "Return current buffer of completion in region."
-  (setq mct--region-buf (and completion-in-region--data
-                             (marker-buffer (nth 0 completion-in-region--data)))))
+  (and completion-in-region--data
+       (marker-buffer (nth 0 completion-in-region--data))))
 
 (defun mct--region-live-completions (&rest _)
   "Update the *Completions* buffer.
 Meant to be added to `after-change-functions'."
-  (let ((buf (window-buffer (mct--get-completion-window))))
-    (when (and mct--region-buf (not (eq (current-buffer) buf)))
-      (while-no-input
-        (condition-case nil
-            (save-match-data
-              (mct--show-completions))
-          (quit (keyboard-quit)))))))
+  (when (mct--region-current-buffer)
+    (while-no-input
+      (condition-case nil
+          (save-match-data
+            (mct--show-completions))
+        (quit (keyboard-quit))))))
 
 (defun mct--region-live-update ()
   "Hook up `mct--region-live-completions'."
