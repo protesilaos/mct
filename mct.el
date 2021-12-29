@@ -1144,10 +1144,6 @@ Meant to be added to `after-change-functions'."
 
 ;;;;;; Minor mode specification
 
-;; FIXME 2021-12-07: The mode does not terminate itself properly when
-;; you select an invalid match.  For example, type "(def RET" and then
-;; try C-n to notice that the completion-in-region is still active.
-
 (defun mct--region-setup-completion-in-region ()
   "Set up Mct for `completion-in-region'."
   (if completion-in-region-mode
