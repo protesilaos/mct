@@ -1138,11 +1138,13 @@ region.")
 (defun mct--region-live-completions (&rest _)
   "Update the *Completions* buffer.
 Meant to be added to `after-change-functions'."
-  (while-no-input
-    (condition-case nil
-        (save-match-data
-          (mct--show-completions))
-      (quit (keyboard-quit)))))
+  (let ((buf (window-buffer (mct--get-completion-window))))
+    (when (and mct--region-buf (not (eq (current-buffer) buf)))
+      (while-no-input
+        (condition-case nil
+            (save-match-data
+              (mct--show-completions))
+          (quit (keyboard-quit)))))))
 
 (defun mct--region-live-update ()
   "Hook up `mct--region-live-completions'."
@@ -1171,12 +1173,6 @@ Meant to be added to `after-change-functions'."
         (mct--region-live-update))
     ;; Teardown
     (remove-hook 'after-change-functions #'mct--region-live-completions t)))
-
-;; FIXME 2021-12-05: Something affects performance.  In a clean
-;; *scratch* buffer, type "def TAB" and select "defalias".  It expands
-;; right away.  Try the same in a larger elisp file like this one and
-;; the text expansion is considerably slower.  Try it on modus-themes.el
-;; and you might as well prepare dinner while waiting.
 
 (defun mct-choose-completion-in-region ()
   "Choose candidate at point and quit completion in region.
