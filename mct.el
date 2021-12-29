@@ -220,7 +220,9 @@ See `completions-format' for possible values."
 (defun mct--setup-clean-completions ()
   "Keep only completion candidates in the Completions."
   (with-current-buffer standard-output
-    (goto-char (mct--first-completion-point))
+    (if (>= emacs-major-version 29)   ; TODO 2021-12-29: maybe use 28?
+        (goto-char (mct--first-completion-point))
+      (goto-char (point-min)))
     (unless (mct--completions-completion-p)
       (let ((inhibit-read-only t))
         (delete-region (point-at-bol) (1+ (point-at-eol)))
