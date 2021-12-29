@@ -1183,14 +1183,15 @@ minibuffer)."
 
 (defvar mct-region-completion-list-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "M-v") #'scroll-down-command)
-    (define-key map [remap goto-line] #'mct-choose-completion-number)
+    ;; TODO 2021-12-29: Maybe we can make this work in this context as
+    ;; well.
+    ;; (define-key map [remap goto-line] #'mct-choose-completion-number)
     (define-key map [remap next-line] #'mct-next-completion-or-quit)
-    (define-key map (kbd "n") #'mct-next-completion-or-quit)
     (define-key map [remap previous-line] #'mct-previous-completion-or-quit)
-    (define-key map (kbd "M-p") #'mct-previous-completion-group)
-    (define-key map (kbd "M-n") #'mct-next-completion-group)
+    (define-key map (kbd "n") #'mct-next-completion-or-quit)
     (define-key map (kbd "p") #'mct-previous-completion-or-quit)
+    (define-key map (kbd "M-n") #'mct-next-completion-group)
+    (define-key map (kbd "M-p") #'mct-previous-completion-group)
     (define-key map (kbd "TAB") #'choose-completion)
     (define-key map (kbd "RET") #'choose-completion)
     (define-key map [remap beginning-of-buffer] #'mct-beginning-of-buffer)
