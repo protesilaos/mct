@@ -424,8 +424,6 @@ Apply APP by first setting up the minibuffer to work with Mct."
          (cons (cons mct-completion-windows-regexp mct-display-buffer-action)
                display-buffer-alist)))
     (save-excursion
-      ;; FIXME 2021-12-03: same principle as what I wrote above
-      ;; `mct--region-or-minibuffer-active-p'.
       (pcase (and completion-in-region-mode completion-in-region--data)
         (`(,start ,end ,collection . ,plist)
          (let ((minibuffer-completion-table collection)
