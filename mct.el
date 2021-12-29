@@ -1238,11 +1238,16 @@ minibuffer)."
    (make-composed-keymap mct-region-completion-list-mode-map
                          (current-local-map))))
 
+(defun debug-cir ()
+  (message (if completion-in-region-mode "CIR START" "CIR END")))
+
 (defun mct--region-setup-completion-list ()
   "Set up the completion-list for Mct."
   (when (mct--region-p)
     (setq-local completion-show-help nil
                 truncate-lines t)
+    ;; TODO: Remove this debugging later
+    (add-hook 'completion-in-region-mode-hook #'debug-cir)
     (mct--setup-clean-completions)
     (mct--setup-appearance)
     (mct--region-setup-completion-list-keymap)
