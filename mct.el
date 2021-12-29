@@ -1121,6 +1121,13 @@ region.")
   (setq mct--region-buf (and completion-in-region--data
                              (marker-buffer (nth 0 completion-in-region--data)))))
 
+(defun mct--region-terminate-completion ()
+  "Terminate completion in region."
+  (when-let ((buf mct--region-buf))
+    (with-current-buffer buf
+      (completion-in-region-mode -1)
+      (keyboard-quit))))
+
 (defun mct--region-focus-current-buffer ()
   "Focus the buffer where `completion-in-region' is active."
   (interactive nil mct-region-mode)
@@ -1183,9 +1190,7 @@ current completion session."
   "Bury the Completions and terminate completion in region."
   (quit-window nil (mct--get-completion-window))
   (mct--region-focus-current-buffer)
-  ;; FIXME 2021-12-27: Ensure that we have exited the
-  ;; completion-in-region.
-  (keyboard-quit))
+  (mct--region-terminate-completion))
 
 (defun mct-next-completion-or-quit (&optional arg)
   "Move to next completion or bury the Completions' buffer.
