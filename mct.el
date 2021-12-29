@@ -692,26 +692,26 @@ If ARG is supplied, move that many completion groups at a time."
 
 ;;;;; Candidate selection
 
-(defun mct--completions-choose-completion ()
-  "Choose candidate from the Completions' buffer."
-  (when-let* ((window (mct--get-completion-window))
-              (buffer (window-buffer)))
-    (with-current-buffer buffer
-      (choose-completion))))
-
+;; TODO review, is this not almost the same as choose-completion?
 (defun mct-choose-completion-exit ()
   "Run `choose-completion' in the Completions buffer and exit."
   (interactive nil mct-mode)
   (when (active-minibuffer-window)
-    (mct--completions-choose-completion)
+    (when-let* ((window (mct--get-completion-window))
+              (buffer (window-buffer)))
+    ;; TODO review, are we not always in the *Completions* buffer here?
+    (with-current-buffer buffer
+      (choose-completion)))
     (minibuffer-force-complete-and-exit)))
 
+;; TODO review, is this not almost the same as choose-completion?
 (defun mct-choose-completion-no-exit ()
   "Run `choose-completion' in the Completions without exiting."
   (interactive nil mct-mode)
   (when-let* ((window (mct--get-completion-window))
               (buffer (window-buffer))
               (mini (active-minibuffer-window)))
+    ;; TODO review, are we not always in the *Completions* buffer here?
     (with-current-buffer buffer
       (let ((completion-no-auto-exit t))
         (choose-completion)))
