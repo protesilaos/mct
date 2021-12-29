@@ -220,16 +220,17 @@ See `completions-format' for possible values."
 (defun mct--setup-clean-completions ()
   "Keep only completion candidates in the Completions."
   (with-current-buffer standard-output
-    (let ((inhibit-read-only t))
-      (goto-char (point-min))
-      (delete-region (point-at-bol) (1+ (point-at-eol)))
-      (insert (propertize " "
-                          'cursor-sensor-functions
-                          (list
-                           (lambda (_win prev dir)
-                             (when (eq dir 'entered)
-                               (goto-char prev))))))
-      (put-text-property (point-min) (point) 'invisible t))))
+    (goto-char (mct--first-completion-point))
+    (unless (mct--completions-completion-p)
+      (let ((inhibit-read-only t))
+        (delete-region (point-at-bol) (1+ (point-at-eol)))
+        (insert (propertize " "
+                            'cursor-sensor-functions
+                            (list
+                             (lambda (_win prev dir)
+                               (when (eq dir 'entered)
+                                 (goto-char prev))))))
+        (put-text-property (point-min) (point) 'invisible t)))))
 
 (defun mct--fit-completions-window (&rest _args)
   "Fit Completions' buffer to its window."
