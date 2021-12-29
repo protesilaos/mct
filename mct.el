@@ -1262,6 +1262,7 @@ minibuffer)."
         (advice-add #'completion--done :around #'mct--region-completion-done)
         (add-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
         (add-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
+        (advice-add #'minibuffer-completion-help :after #'mct--fit-completions-window)
         (advice-add #'display-completion-list :around #'mct--display-completion-list-advice)
         (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)
         ;; TODO 2021-12-03: Set up a keymap after we are sure things work.
@@ -1271,6 +1272,7 @@ minibuffer)."
     (advice-remove #'completion--done #'mct--region-completion-done)
     (remove-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
     (remove-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
+    (advice-remove #'minibuffer-completion-help #'mct--fit-completions-window)
     (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
     (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)
     (let ((map completion-in-region-mode-map))
