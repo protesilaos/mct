@@ -805,14 +805,16 @@ determined as follows:
 
 A candidate is recognised for as long as point is not past its
 last character."
-  (interactive nil mct-mode)
+  (interactive nil mct-minibuffer-mode)
   (when-let ((window (mct--get-completion-window))
              ((active-minibuffer-window)))
-    (with-selected-window window
-      (when-let* ((old-point (window-old-point window))
-                  (pos (if (= old-point (point-min))
-                           (mct--first-completion-point)
-                         old-point)))
+    (with-current-buffer (window-buffer window)
+      (let* ((old-point (save-excursion
+                          (select-window window)
+                          (window-old-point)))
+             (pos (if (= old-point (point-min))
+                      (mct--first-completion-point)
+                    old-point)))
         (goto-char pos)
         (mct-choose-completion-no-exit)))))
 
