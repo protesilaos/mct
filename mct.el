@@ -215,7 +215,7 @@ See `completions-format' for possible values."
     (display-line-numbers-mode 1)))
 
 (defun mct--first-line-completion-p ()
-  "Return non-nil if first line contains completion candidates."
+  "Return non-nil if first line has completion candidates."
   (eq (line-number-at-pos (point-min))
       (line-number-at-pos (mct--first-completion-point))))
 
