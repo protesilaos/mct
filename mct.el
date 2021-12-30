@@ -698,25 +698,21 @@ If ARG is supplied, move that many completion groups at a time."
 
 ;;;;; Candidate selection
 
-;; TODO review, is this not almost the same as choose-completion?
+;; The difference between this and choose-completion is that it will
+;; exit even if a directory is selected in find-file, whereas
+;; choose-completion expands the directory and continues the session.
 (defun mct-choose-completion-exit ()
   "Run `choose-completion' in the Completions buffer and exit."
   (interactive nil mct-minibuffer-mode)
+  (choose-completion)
   (when (active-minibuffer-window)
-    (when-let* ((window (mct--get-completion-window))
-              (buffer (window-buffer)))
-    ;; TODO review, are we not always in the *Completions* buffer here?
-    (with-current-buffer buffer
-      (choose-completion)))
     (minibuffer-force-complete-and-exit)))
 
 (defun mct-choose-completion-no-exit ()
   "Run `choose-completion' in the Completions without exiting."
   (interactive nil mct-minibuffer-mode)
-  (when-let ((mini (active-minibuffer-window)))
-    (let ((completion-no-auto-exit t))
-      (choose-completion))
-    (select-window mini nil)))
+  (let ((completion-no-auto-exit t))
+    (choose-completion)))
 
 (defvar display-line-numbers-mode)
 
@@ -834,11 +830,13 @@ last character."
   (interactive nil mct-minibuffer-mode)
   (when-let ((window (mct--get-completion-window))
              ((active-minibuffer-window)))
-    (with-selected-window window
-      (when-let* ((old-point (window-old-point window))
-                  (pos (if (= old-point (point-min))
-                           (mct--first-completion-point)
-                         old-point)))
+    (with-current-buffer (window-buffer window)
+      (let* ((old-point (save-excursion
+                          (select-window window)
+                          (window-old-point)))
+             (pos (if (= old-point (point-min))
+                      (mct--first-completion-point)
+                    old-point)))
         (goto-char pos)
         (mct-choose-completion-no-exit)))))
 
