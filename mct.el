@@ -306,11 +306,10 @@ Meant to be added to `after-change-functions'."
               (buf (window-buffer win)))
       (buffer-local-value 'mct--active buf)))
 
-;; TODO 2021-12-29: If we want to make a buffer-local variant, then we
-;; need to review this.
 (defun mct--region-p ()
   "Return non-nil if Mct is completing in region."
-  (and (bound-and-true-p mct-region-mode) (mct--region-current-buffer)))
+  (with-current-buffer (mct--region-current-buffer)
+    (bound-and-true-p mct-region-mode)))
 
 (defun mct--display-completion-list-advice (&rest app)
   "Prepare advice around `display-completion-list'.
@@ -1219,9 +1218,6 @@ minibuffer)."
 
 (defun mct--region-setup-completion-list ()
   "Set up the completion-list for Mct."
-  ;; TODO 2021-12-30: If we are to make mct-region-mode local, we need
-  ;; to change how this is handled because, e.g., the Completions are
-  ;; not cleaned up and highlighting is not available.
   (when (mct--region-p)
     (setq-local completion-show-help nil
                 truncate-lines t)
@@ -1243,7 +1239,7 @@ minibuffer)."
   ;; nothing is hindering us from offering mct-region-mode as a local mode. In
   ;; contrast, for mct-minibuffer-mode, offering a buffer-local mode does not
   ;; make sense.
-  :global t
+  :global nil
   (if mct-region-mode
       (progn
         (advice-add #'completion--done :around #'mct--region-completion-done)
