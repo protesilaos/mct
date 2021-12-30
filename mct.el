@@ -308,8 +308,9 @@ Meant to be added to `after-change-functions'."
 
 (defun mct--region-p ()
   "Return non-nil if Mct is completing in region."
-  (with-current-buffer (mct--region-current-buffer)
-    (bound-and-true-p mct-region-mode)))
+  (when-let ((buf (mct--region-current-buffer)))
+    (with-current-buffer buf
+      (bound-and-true-p mct-region-mode))))
 
 (defun mct--display-completion-list-advice (&rest app)
   "Prepare advice around `display-completion-list'.
