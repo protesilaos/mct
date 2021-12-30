@@ -1219,6 +1219,9 @@ minibuffer)."
 
 (defun mct--region-setup-completion-list ()
   "Set up the completion-list for Mct."
+  ;; TODO 2021-12-30: If we are to make mct-region-mode local, we need
+  ;; to change how this is handled because, e.g., the Completions are
+  ;; not cleaned up and highlighting is not available.
   (when (mct--region-p)
     (setq-local completion-show-help nil
                 truncate-lines t)
