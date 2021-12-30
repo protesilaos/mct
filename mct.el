@@ -548,14 +548,14 @@ a `one-column' value."
 
 (defun mct-switch-to-completions-top ()
   "Switch to the top of the completions' buffer."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-minibuffer-mode mct-region-mode)
   (mct--switch-to-completions)
   (goto-char (mct--first-completion-point))
   (mct--restore-old-point-in-grid (point)))
 
 (defun mct-switch-to-completions-bottom ()
   "Switch to the bottom of the completions' buffer."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-minibuffer-mode mct-region-mode)
   (mct--switch-to-completions)
   (goto-char (point-max))
   (next-completion -1)
@@ -666,7 +666,7 @@ the minibuffer."
 (defun mct-next-completion-group (&optional arg)
   "Move to the next completion group.
 If ARG is supplied, move that many completion groups at a time."
-  (interactive "p" mct-minibuffer-mode)
+  (interactive "p" mct-minibuffer-mode mct-region-mode)
   (dotimes (_ (or arg 1))
     (when-let (group (save-excursion
                        (text-property-search-forward 'face
@@ -680,7 +680,7 @@ If ARG is supplied, move that many completion groups at a time."
 (defun mct-previous-completion-group (&optional arg)
   "Move to the previous completion group.
 If ARG is supplied, move that many completion groups at a time."
-  (interactive "p" mct-minibuffer-mode)
+  (interactive "p" mct-minibuffer-mode mct-region-mode)
   (dotimes (_ (or arg 1))
     ;; skip back, so if we're at the top of a group, we go to the previous one...
     (forward-line -1)
@@ -996,7 +996,7 @@ region.")
 
 ;;;;; Keymaps
 
-(defvar mct-completion-list-mode-map
+(defvar mct-minibuffer-completion-list-map
   (let ((map (make-sparse-keymap)))
     (define-key map [remap keyboard-quit] #'mct-keyboard-quit-dwim)
     (define-key map [remap goto-line] #'mct-choose-completion-number)
@@ -1038,7 +1038,7 @@ region.")
 (defun mct--setup-completion-list-keymap ()
   "Set up completion list keymap."
   (use-local-map
-   (make-composed-keymap mct-completion-list-mode-map
+   (make-composed-keymap mct-minibuffer-completion-list-map
                          (current-local-map))))
 
 (defun mct--setup-keymap ()
@@ -1130,10 +1130,22 @@ Meant to be added to `after-change-functions'."
 
 ;;;;;; Minor mode specification
 
+(defvar mct-region-buffer-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [remap next-line] #'mct-switch-to-completions-top)
+    (define-key map [remap previous-line] #'mct-switch-to-completions-bottom)
+    ;; TODO: Either keep the TAB=completion-at-point binding or add our own
+    ;; command which is compatible with orderless completion.
+    (define-key map (kbd "TAB") #'ignore)
+    map)
+  "Derivative of `completion-in-region-map'.")
+
 (defun mct--region-setup-completion-in-region ()
   "Set up Mct for `completion-in-region'."
   (if completion-in-region-mode
       (progn
+        (setcdr (assq #'completion-in-region-mode minor-mode-overriding-map-alist)
+                (make-composed-keymap mct-region-buffer-map completion-in-region-mode-map))
         (mct--region-current-buffer)
         ;; NOTE: Ignore the predicate in order to support orderless style.
         ;; TODO: This override should be guarded by a customizable variable,
@@ -1179,7 +1191,7 @@ minibuffer)."
      (t
       (mct--previous-completion count)))))
 
-(defvar mct-region-completion-list-mode-map
+(defvar mct-region-completion-list-map
   (let ((map (make-sparse-keymap)))
     ;; TODO 2021-12-29: Maybe we can make this work in this context as
     ;; well.
@@ -1199,7 +1211,7 @@ minibuffer)."
 (defun mct--region-setup-completion-list-keymap ()
   "Set up completion list keymap."
   (use-local-map
-   (make-composed-keymap mct-region-completion-list-mode-map
+   (make-composed-keymap mct-region-completion-list-map
                          (current-local-map))))
 
 (defun debug-cir ()
@@ -1236,20 +1248,13 @@ minibuffer)."
         (add-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
         (advice-add #'minibuffer-completion-help :after #'mct--fit-completions-window)
         (advice-add #'display-completion-list :around #'mct--display-completion-list-advice)
-        (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)
-        ;; TODO 2021-12-03: Set up a keymap after we are sure things work.
-        (let ((map completion-in-region-mode-map))
-          (define-key map (kbd "C-n") #'mct-switch-to-completions-top)
-          (define-key map (kbd "C-p") #'mct-switch-to-completions-bottom)))
+        (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message))
     (advice-remove #'completion--done #'mct--region-completion-done)
     (remove-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
     (remove-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
     (advice-remove #'minibuffer-completion-help #'mct--fit-completions-window)
     (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
-    (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)
-    (let ((map completion-in-region-mode-map))
-      (define-key map (kbd "C-n") nil)
-      (define-key map (kbd "C-p") nil))))
+    (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)))
 
 (defun mct--region-completion-done (&rest app)
   (apply app)
