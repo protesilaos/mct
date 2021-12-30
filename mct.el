@@ -671,26 +671,21 @@ If ARG is supplied, move that many completion groups at a time."
 
 ;;;;; Candidate selection
 
+;; The difference between this and choose-completion is that it will
+;; exit even if a directory is selected in find-file, whereas
+;; choose-completion expands the directory and continues the session.
 (defun mct-choose-completion-exit ()
   "Run `choose-completion' in the Completions buffer and exit."
-  (interactive nil mct-mode)
+  (interactive nil mct-minibuffer-mode)
+  (choose-completion)
   (when (active-minibuffer-window)
-    (when-let* ((window (mct--get-completion-window))
-                (buffer (window-buffer)))
-      (with-current-buffer buffer
-        (choose-completion))
-      (minibuffer-force-complete-and-exit))))
+    (minibuffer-force-complete-and-exit)))
 
 (defun mct-choose-completion-no-exit ()
   "Run `choose-completion' in the Completions without exiting."
-  (interactive nil mct-mode)
-  (when-let* ((window (mct--get-completion-window))
-              (buffer (window-buffer))
-              (mini (active-minibuffer-window)))
-    (with-current-buffer buffer
-      (let ((completion-no-auto-exit t))
-        (choose-completion)))
-    (select-window mini nil)))
+  (interactive nil mct-minibuffer-mode)
+  (let ((completion-no-auto-exit t))
+    (choose-completion)))
 
 (defvar display-line-numbers-mode)
 
