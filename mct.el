@@ -173,6 +173,10 @@ See `completions-format' for possible values."
   :type '(choice (const horizontal) (const vertical) (const one-column))
   :group 'mct)
 
+(defcustom mct-region-excluded-modes nil
+  "List of modes excluded by `mct-region-global-mode'."
+  :type '(repeat symbol))
+
 ;;;; Completion metadata
 
 (defun mct--completion-category ()
@@ -1231,15 +1235,14 @@ minibuffer)."
     (mct--setup-line-numbers)
     (cursor-sensor-mode)))
 
+(defun mct--region-completion-done (&rest app)
+  "Apply APP before disabling completion in region."
+  (apply app)
+  (completion-in-region-mode -1))
+
 ;;;###autoload
 (define-minor-mode mct-region-mode
   "Set up interactivity over the default `completion-in-region'."
-  ;; TODO the mct-region-mode should be buffer-local. One may want to use
-  ;; different completion-in-region UIs depending on the major mode/buffer. Of
-  ;; course it is only my preference to make this configurabe, but in principle
-  ;; nothing is hindering us from offering mct-region-mode as a local mode. In
-  ;; contrast, for mct-minibuffer-mode, offering a buffer-local mode does not
-  ;; make sense.
   :global nil
   (if mct-region-mode
       (progn
@@ -1256,9 +1259,19 @@ minibuffer)."
     (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
     (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)))
 
-(defun mct--region-completion-done (&rest app)
-  (apply app)
-  (completion-in-region-mode -1))
+;; The `mct-region-global-mode', `mct-region--on', and
+;; `mct-region-excluded-modes' are adapted from the corfu.el library of
+;; Daniel Mendler.
+
+;;;###autoload
+(define-globalized-minor-mode mct-region-global-mode mct-region-mode mct-region--on)
+
+(defun mct-region--on ()
+  "Turn `mct-region-mode' on."
+  (unless (or noninteractive
+              (eq (aref (buffer-name) 0) ?\s)
+              (memq major-mode mct-region-excluded-modes))
+    (mct-region-mode 1)))
 
 (provide 'mct)
 ;;; mct.el ends here
