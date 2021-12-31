@@ -156,20 +156,59 @@ Other customisations:
   white---other themes would need to add support for the faces we define
   or, at least, users must modify the ~mct-stripe~ face.
 
+** MCT in the minibuffer and in regular buffers
+:PROPERTIES:
+:CUSTOM_ID: h:8109fe09-fcce-4212-88eb-943cc72f2c75
+:END:
+
+Emacs draws a distinction between two types of completion sessions:
+
++ Completion where the minibuffer is involved (such as to switch buffers
+  or find a file).
++ Completion in a regular buffer to expand the text before point.  The
+  minibuffer is not active.  We call this "in-buffer completion" or
+  allude to the underlying function: ~completion-in-region~.
+
+The former scenario is what MCT has supported since its inception.
+Starting with version =0.4.0= it also covers the latter case, thoughly
+only experimentally (please report any bugs or point towards areas of
+possible improvement).
+
+To let users fine-tune their setup, MCT provides the ~mct-minibuffer-mode~
+(formerly ~mct-mode~) as well as local and global variants of
+~mct-region-mode~ (~mct-region-global-mode~).
+
+The decoupling between the two modes makes it possible to configure
+interchangeable components in a variety of combinations, such as MCT for
+the minibuffer and the Corfu package for completion-in-region
+([[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Extensions]]).  Or the Vertico package for the minibuffer and MCT for
+in-buffer completion ([[#h:c9ddedea-e279-4233-94dc-f8d32367a954][Alternatives]]).  Same principle for the local
+variant of MCT's in-buffer completion mode: Corfu has the same
+capability, so the two can be used as part of a single setup.
+
+We jokingly say that since the introduction of ~mct-region-mode~ the
+acronym "MCT" now stands for "Minibuffer Confines Transcended"---the
+original was "Minibuffer and Completions in Tandem".
+
 * Usage
 :PROPERTIES:
 :CUSTOM_ID: h:884d6702-8666-4d89-87a2-7d74843653f3
 :END:
 
-** Cyclic behaviour
+This section outlines the various patterns of interaction that MCT
+establishes.  Note that completion covers two distinct cases, which are
+reflected in the design of MCT: (i) in the minibuffer and (ii) for
+in-buffer completion ([[#h:8109fe09-fcce-4212-88eb-943cc72f2c75][MCT in the minibuffer and in regular buffers]]).
+
+** Cyclic behaviour in the minibuffer
 :PROPERTIES:
 :CUSTOM_ID: h:68c61a76-1d64-4f62-a77a-52e7b66a68fe
 :END:
-#+cindex: Cyclic behaviour
+#+cindex: Cyclic behaviour in the minibuffer
 
-When ~mct-mode~ is enabled, some new keymaps are activated which add
-commands for cycling between the minibuffer and the completions.
-Suppose the following standard layout:
+When ~mct-minibuffer-mode~ is enabled, some new keymaps are activated
+which add commands for cycling between the minibuffer and the
+completions.  Suppose the following standard layout:
 
 #+begin_example
 -----------------
@@ -206,10 +245,12 @@ Similarly, while inside the =*Completions*= buffer, =C-p= (or up arrow) at
 the top of the buffer switches to the minibuffer, while =C-n= (or down
 arrow) at the bottom of the buffer also goes to the minibuffer.  If
 point is anywhere else inside the buffer, those key bindings perform a
-regular line motion.  The commands are ~mct-previous-completion-or-mini~
-and ~mct-next-completion-or-mini~.  Both accept an optional numeric
-argument.  If the Nth line lies outside the boundaries of the
-completions' buffer, they move the point to the minibuffer.
+regular line motion (if the =*Completions*= are set to a grid view, then
+the left and right arrow keys perform the corresponding lateral
+motions).  The commands are ~mct-previous-completion-or-mini~ and
+~mct-next-completion-or-mini~.  Both accept an optional numeric argument.
+If the Nth line lies outside the boundaries of the completions' buffer,
+they move the point to the minibuffer.
 
 #+findex: mct-list-completions-toggle
 The display of the =*Completions*= can be toggled at any time from inside
@@ -222,13 +263,46 @@ of the frame.  Users can change its placement by configuring the
 variable ~mct-display-buffer-action~ (its doc string explains how and
 provides sample code).
 
+** Cyclic behaviour for in-buffer completion
+:PROPERTIES:
+:CUSTOM_ID: h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3
+:END:
+#+cindex: Cyclic behaviour for completion in region
+
+When ~mct-region-mode~ (or ~mct-region-global-mode~) is enabled, MCT is used
+for in-buffer completion.  In this scenario, the cyclic behaviour is
+simpler than when the minibuffer is active, so we will mostly cover the
+differences ([[#h:68c61a76-1d64-4f62-a77a-52e7b66a68fe][Cyclic behaviour in the minibuffer]]).
+
+Once ~completion-in-region~ is triggered (such as by typing =C-M-i= in Elisp
+buffers to expand the text before point), the key bindings =C-n= and =C-p=
+switch focus to the =*Completions*= buffer: =C-n= moves to the top, while
+=C-p= goes to the bottom.  This only happens while the in-buffer
+completion session is active: it becomes inactive if, say, one switches
+to another window other than the one with the completions.
+
+While inside the Completions' buffer, =C-n= and =C-p= move to the next and
+previous line, respectively.  When they reach the top/bottom boundaries
+of the Completions' buffer, they switch focus back to the buffer that
+started the completion.  However, and unlike ~mct-minibuffer-mode~, they
+do not keep the =*Completions*= window around.  This is because we cannot
+tell whether the user wanted to continue with a new completion upon
+returning to the buffer of origin or perform some other motion/command
+(in the minibuffer we can make that assumption because the minibuffer is
+purpose-specific, so for as long as it is active, the completion session
+goes on).  As such, ~completion-in-region~ must be restarted after cycling
+out of the =*Completions*=.
+
 ** Selecting candidates
 :PROPERTIES:
 :CUSTOM_ID: h:bb445062-2e39-4082-a868-2123bfb793cc
 :END:
 #+cindex: Candidate selection
 
-There are several ways to select a completion candidate.
+There are several ways to select a completion candidate.  These pertain
+to ~mct-minibuffer-mode~, as ~mct-region-mode~ only has the meaningful
+action of expanding the given candidate (with =RET= or =TAB= in the
+Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour for in-buffer completion]])).
 
 1. Suppose that you are typing =mod= with the intent to select the
    =modus-themes.el= buffer.  To complete the candidate follow up =mod= with
@@ -401,7 +475,7 @@ Minimal setup:
 
 #+begin_src emacs-lisp
 (require 'mct)
-(mct-mode 1)
+(mct-minibuffer-mode 1)
 #+end_src
 
 And with more options:
@@ -448,7 +522,11 @@ And with more options:
 ;;               (slot . 99)
 ;;               (window-width . 0.3))))
 
-(mct-mode 1)
+(mct-minibuffer-mode 1)
+
+;; Optionally add `mct-region-mode' to the major mode hooks you want it
+;; to be active in, or just use `mct-region-global-mode'.
+(mct-region-global-mode 1)
 #+end_src
 
 Other useful extras from the Emacs source code (read their doc strings):
@@ -531,6 +609,8 @@ minibuffer and the =*Completions*= buffer, respectively:
 + ~mct-completion-list-mode-map~
 + ~mct-minibuffer-local-completion-map~
 + ~mct-minibuffer-local-filename-completion-map~
++ ~mct-region-buffer-map~
++ ~mct-region-completion-list-map~
 
 You can invoke ~describe-keymap~ to learn more about them.
 
@@ -646,9 +726,9 @@ these exceptionally well-crafted extras:
   make things prettier and/or more informative, while it can also be
   combined with Marginalia.
 
-MCT does not support the use-case of ~completion-in-region~.  This is the
-kind of completion session that does not involve the minibuffer and is
-instead about in-buffer text expansion.  Consider these packages:
+MCT does support the use-case of ~completion-in-region~.  This is the kind
+of completion session that does not involve the minibuffer and is
+instead about in-buffer text expansion.  However, you may prefer:
 
 + [[https://github.com/minad/corfu/][Corfu]] by Daniel Mendler :: An interface for the ~completion-in-region~
   which uses a child frame (basically a pop-up) at the position of the
@@ -658,9 +738,7 @@ instead about in-buffer text expansion.  Consider these packages:
 
 + [[https://github.com/minad/cape][Cape]] also by Daniel :: Additional ~completion-at-point-functions~
   (CAPFs) that extend those of core Emacs.  These backends can be used
-  by Corfu, though their modular nature makes them suitable for use by
-  other compliant packages (e.g. a potential minimalist package that is
-  cleanly designed like Corfu but has a different interface).
+  by packages that visualise ~completion-in-region~ such as Corfu and MCT.
 
 ** Enable Consult previews
 :PROPERTIES:
