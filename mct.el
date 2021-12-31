@@ -1199,9 +1199,6 @@ minibuffer)."
 
 (defvar mct-region-completion-list-map
   (let ((map (make-sparse-keymap)))
-    ;; TODO 2021-12-29: Maybe we can make this work in this context as
-    ;; well.
-    ;; (define-key map [remap goto-line] #'mct-choose-completion-number)
     (define-key map [remap next-line] #'mct-next-completion-or-quit)
     (define-key map [remap previous-line] #'mct-previous-completion-or-quit)
     (define-key map (kbd "n") #'mct-next-completion-or-quit)
