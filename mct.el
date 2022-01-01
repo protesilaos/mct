@@ -1236,6 +1236,12 @@ minibuffer)."
   (apply app)
   (completion-in-region-mode -1))
 
+;; UPDATE 2022-01-01 13:12 +0200: Actually this is not related to mct.
+;; I can reproduce it in emacs -Q with just those:
+;;
+;; (electric-indent-mode 1)
+;; (setq-default tab-always-indent 'complete)
+;;
 ;; FIXME 2022-01-01: I experienced a bug which is as follows:
 ;;
 ;; + (electric-indent-mode 1)
