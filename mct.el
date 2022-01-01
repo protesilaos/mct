@@ -1236,6 +1236,19 @@ minibuffer)."
   (apply app)
   (completion-in-region-mode -1))
 
+;; FIXME 2022-01-01: I experienced a bug which is as follows:
+;;
+;; + (electric-indent-mode 1)
+;; + (setq-default tab-always-indent 'complete)
+;; + visit an Org file with an elisp src block that includes comments
+;; + go to the end of a comment's line and hit RET
+;; + the block temporarily changes background to secondary-selection
+;;   (same as when you type C-c '), seems to be trying to perform
+;;   completion, and then ultimately does what RET is supposed to do.
+;;
+;; Disabling electric-indent-mode fixes the issue, though that is beside
+;; the point.
+
 ;;;###autoload
 (define-minor-mode mct-region-mode
   "Set up interactivity over the default `completion-in-region'."
