@@ -1255,6 +1255,11 @@ minibuffer)."
 ;; Disabling electric-indent-mode fixes the issue, though that is beside
 ;; the point.
 
+;; FIXME 2022-01-03: This does not work with either M-x shell or M-x
+;; eshell.  Not on Emacs 29, not on Emacs 27.  Try to tab-complete with
+;; 'cd' and it will not be possible to switch to the Completions'
+;; buffer, even if it works the first time.
+
 ;;;###autoload
 (define-minor-mode mct-region-mode
   "Set up interactivity over the default `completion-in-region'."
