@@ -282,9 +282,9 @@ Meant to be added to `after-change-functions'."
 
 (defun mct--live-completions-timer (&rest _)
   "Update Completions with `mct-live-update-delay'."
-  (let ((delay mct-live-update-delay))
-    (when (>= delay 0)
-      (run-with-idle-timer delay nil #'mct--live-completions))))
+  (when-let* ((delay mct-live-update-delay)
+              ((>= delay 0)))
+    (run-with-idle-timer delay nil #'mct--live-completions)))
 
 (defun mct--live-completions-visible-timer (&rest _)
   "Update visible Completions' buffer."
