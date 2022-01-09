@@ -168,14 +168,19 @@ and/or the documentation string of `display-buffer'."
   :group 'mct)
 
 (defcustom mct-completions-format 'one-column
-  "The appearance and sorting used by `mct-minibuffer-mode'.
+  "The Completions' appearance used by `mct-minibuffer-mode'.
 See `completions-format' for possible values."
   :type '(choice (const horizontal) (const vertical) (const one-column))
   :group 'mct)
 
-(defcustom mct-region-excluded-modes nil
-  "List of modes excluded by `mct-region-global-mode'."
-  :type '(repeat symbol))
+(defcustom mct-region-completions-format mct-completions-format
+  "The Completions' appearance used by `mct-region-mode'.
+See `completions-format' for possible values.
+
+This is like `mct-completions-format' when performing in-buffer
+completion."
+  :type '(choice (const horizontal) (const vertical) (const one-column))
+  :group 'mct)
 
 ;;;; Completion metadata
 
@@ -316,13 +321,24 @@ Meant to be added to `after-change-functions'."
     (with-current-buffer buf
       (bound-and-true-p mct-region-mode))))
 
-(defun mct--display-completion-list-advice (&rest app)
+(defun mct--minibuffer-completion-help-advice (&rest app)
   "Prepare advice around `display-completion-list'.
 Apply APP by first let binding the `completions-format' to
 `mct-completions-format'."
-  (if (or (mct--active-p) (mct--region-p))
+  (if (mct--active-p)
       (let ((completions-format mct-completions-format))
-        (apply app))
+        (apply app)
+        (mct--fit-completions-window))
+    (apply app)))
+
+(defun mct--region-completion-help-advice (&rest app)
+  "Prepare advice around `display-completion-list'.
+Apply APP by first let binding the `completions-format' to
+`mct-completions-format'."
+  (if (mct--region-p)
+      (let ((completions-format mct-region-completions-format))
+        (apply app)
+        (mct--fit-completions-window))
     (apply app)))
 
 (defun mct--completing-read-advice (&rest app)
@@ -909,6 +925,27 @@ Apply APP while inhibiting modification hooks."
   (let ((inhibit-modification-hooks t))
     (apply app)))
 
+(defun mct--setup-messageless-shared ()
+  "Silence the minibuffer and the Completions."
+  (if (or mct-region-mode mct-minibuffer-mode)
+      (progn
+        ;; NOTE 2022-01-09: Only `choose-completion' is relevant for
+        ;; completion-in-region.
+        (dolist (fn '(exit-minibuffer
+                      choose-completion
+                      minibuffer-force-complete
+                      minibuffer-complete-and-exit
+                      minibuffer-force-complete-and-exit))
+          (advice-add fn :around #'mct--messageless))
+        (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message))
+    (dolist (fn '(exit-minibuffer
+                  choose-completion
+                  minibuffer-force-complete
+                  minibuffer-complete-and-exit
+                  minibuffer-force-complete-and-exit))
+      (advice-add fn :around #'mct--messageless))
+    (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)))
+
 (defun mct--setup-appearance ()
   "Set up variables for the appearance of the Completions' buffer."
   (when mct-hide-completion-mode-line
@@ -1081,32 +1118,18 @@ region.")
   (if mct-minibuffer-mode
       (progn
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-        (dolist (fn '(exit-minibuffer
-                      choose-completion
-                      minibuffer-force-complete
-                      minibuffer-complete-and-exit
-                      minibuffer-force-complete-and-exit))
-          (advice-add fn :around #'mct--messageless))
+        (mct--setup-messageless-shared)
         (advice-add #'completing-read-default :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
+        (advice-add #'minibuffer-completion-help :around #'mct--minibuffer-completion-help-advice)
         (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator)
-        (advice-add #'display-completion-list :around #'mct--display-completion-list-advice)
-        (advice-add #'minibuffer-completion-help :after #'mct--fit-completions-window)
-        (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-    (dolist (fn '(exit-minibuffer
-                  choose-completion
-                  minibuffer-force-complete
-                  minibuffer-complete-and-exit
-                  minibuffer-force-complete-and-exit))
-      (advice-remove fn #'mct--messageless))
+    (mct--setup-messageless-shared)
     (advice-remove #'completing-read-default #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
+    (advice-remove #'minibuffer-completion-help #'mct--minibuffer-completion-help-advice)
     (advice-remove #'completing-read-multiple #'mct--crm-indicator)
-    (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
-    (advice-remove #'minibuffer-completion-help #'mct--fit-completions-window)
-    (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)
     (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily)))
 
 (define-obsolete-function-alias 'mct-mode 'mct-minibuffer-mode "0.4.0")
@@ -1263,35 +1286,21 @@ minibuffer)."
 ;;;###autoload
 (define-minor-mode mct-region-mode
   "Set up interactivity over the default `completion-in-region'."
-  :global nil
+  :global t
   (if mct-region-mode
       (progn
         (advice-add #'completion--done :around #'mct--region-completion-done)
+        (advice-add #'minibuffer-completion-help :around #'mct--region-completion-help-advice)
         (add-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
         (add-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
-        (advice-add #'minibuffer-completion-help :after #'mct--fit-completions-window)
-        (advice-add #'display-completion-list :around #'mct--display-completion-list-advice)
+        (mct--setup-messageless-shared)
         (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message))
     (advice-remove #'completion--done #'mct--region-completion-done)
+    (advice-remove #'minibuffer-completion-help #'mct--region-completion-help-advice)
     (remove-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
     (remove-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
-    (advice-remove #'minibuffer-completion-help #'mct--fit-completions-window)
-    (advice-remove #'display-completion-list #'mct--display-completion-list-advice)
+    (mct--setup-messageless-shared)
     (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)))
-
-;; The `mct-region-global-mode', `mct-region--on', and
-;; `mct-region-excluded-modes' are adapted from the corfu.el library of
-;; Daniel Mendler.
-
-;;;###autoload
-(define-globalized-minor-mode mct-region-global-mode mct-region-mode mct-region--on)
-
-(defun mct-region--on ()
-  "Turn `mct-region-mode' on."
-  (unless (or noninteractive
-              (eq (aref (buffer-name) 0) ?\s)
-              (memq major-mode mct-region-excluded-modes))
-    (mct-region-mode 1)))
 
 (provide 'mct)
 ;;; mct.el ends here
