@@ -904,25 +904,19 @@ this command is then required to abort the session."
   (let ((minibuffer-message-timeout 0))
     (apply app)))
 
-;; Copied from Daniel Mendler's `vertico' library:
-;; <https://github.com/minad/vertico>.
-(defun mct--crm-indicator (args)
-  "Add prompt indicator to `completing-read-multiple' filter ARGS."
-  (cons (concat "[CRM] " (car args)) (cdr args)))
-
-;; Adapted from Omar Antolín Camarena's live-completions library:
-;; <https://github.com/oantolin/live-completions>.
-(defun mct--honor-inhibit-message (&rest app)
-  "Honor `inhibit-message' while applying APP."
-  (unless inhibit-message
-    (apply app)))
-
 ;; Note that this solves bug#45686:
 ;; <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=45686>
 (defun mct--stealthily (&rest app)
   "Prevent minibuffer default from counting as a modification.
 Apply APP while inhibiting modification hooks."
   (let ((inhibit-modification-hooks t))
+    (apply app)))
+
+;; Adapted from Omar Antolín Camarena's live-completions library:
+;; <https://github.com/oantolin/live-completions>.
+(defun mct--honor-inhibit-message (&rest app)
+  "Honor `inhibit-message' while applying APP."
+  (unless inhibit-message
     (apply app)))
 
 (defun mct--setup-messageless-shared ()
@@ -953,6 +947,12 @@ Apply APP while inhibiting modification hooks."
   (if mct-apply-completion-stripes
       (mct--add-stripes)
     (mct--remove-stripes)))
+
+;; Copied from Daniel Mendler's `vertico' library:
+;; <https://github.com/minad/vertico>.
+(defun mct--crm-indicator (args)
+  "Add prompt indicator to `completing-read-multiple' filter ARGS."
+  (cons (concat "[CRM] " (car args)) (cdr args)))
 
 ;;;;; Shadowed path
 
