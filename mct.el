@@ -312,7 +312,7 @@ Meant to be added to `after-change-functions'."
 (defvar-local mct--active nil
   "Minibuffer local variable, t if Mct is active.")
 
-(defun mct--active-p ()
+(defun mct--minibuffer-p ()
   "Return t if Mct is active."
   (when-let* ((win (active-minibuffer-window))
               (buf (window-buffer win)))
@@ -328,7 +328,7 @@ Meant to be added to `after-change-functions'."
   "Prepare advice around `display-completion-list'.
 Apply APP by first let binding the `completions-format' to
 `mct-completions-format'."
-  (if (mct--active-p)
+  (if (mct--minibuffer-p)
       (let ((completions-format mct-completions-format))
         (apply app)
         (mct--fit-completions-window))
@@ -1099,7 +1099,7 @@ region.")
 
 (defun mct--setup-completion-list ()
   "Set up the completion-list for Mct."
-  (when (mct--active-p)
+  (when (mct--minibuffer-p)
     (setq-local completion-show-help nil
                 truncate-lines t)
     (mct--setup-clean-completions)
