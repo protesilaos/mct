@@ -179,7 +179,10 @@ See `completions-format' for possible values.
 
 This is like `mct-completions-format' when performing in-buffer
 completion."
-  :type '(choice (const horizontal) (const vertical) (const one-column))
+  :type '(choice (variable :tag "Inherit value of `mct-completions-format'" mct-completions-format)
+                 (const horizontal)
+                 (const vertical)
+                 (const one-column))
   :group 'mct)
 
 ;;;; Completion metadata
