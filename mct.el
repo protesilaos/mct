@@ -866,7 +866,7 @@ last character."
 (defun mct-complete-and-exit ()
   "Complete current input and exit.
 
-This is the same as with
+This has the same effect as with
 \\<mct-minibuffer-local-completion-map>\\[mct-edit-completion],
 followed by exiting the minibuffer with that candidate."
   (interactive nil mct-minibuffer-mode)
