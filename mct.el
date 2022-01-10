@@ -321,8 +321,7 @@ Meant to be added to `after-change-functions'."
 (defun mct--region-p ()
   "Return non-nil if Mct is completing in region."
   (when-let ((buf (mct--region-current-buffer)))
-    (with-current-buffer buf
-      (bound-and-true-p mct-region-mode))))
+    (buffer-local-value 'mct-region-mode buf)))
 
 (defun mct--minibuffer-completion-help-advice (&rest app)
   "Prepare advice around `display-completion-list'.
@@ -900,48 +899,14 @@ this command is then required to abort the session."
 
 ;;;;; Stylistic tweaks and refinements
 
-;; Thanks to Omar Antolín Camarena for providing the messageless and
-;; stealthily.  Source: <https://github.com/oantolin/emacs-config>.
-(defun mct--messageless (&rest app)
-  "Set `minibuffer-message-timeout' to 0 while applying APP."
-  (let ((minibuffer-message-timeout 0))
-    (apply app)))
-
 ;; Note that this solves bug#45686:
 ;; <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=45686>
+;; TODO review that stealthily does not affect the region mode, it seems intrusive.
 (defun mct--stealthily (&rest app)
   "Prevent minibuffer default from counting as a modification.
 Apply APP while inhibiting modification hooks."
   (let ((inhibit-modification-hooks t))
     (apply app)))
-
-;; Adapted from Omar Antolín Camarena's live-completions library:
-;; <https://github.com/oantolin/live-completions>.
-(defun mct--honor-inhibit-message (&rest app)
-  "Honor `inhibit-message' while applying APP."
-  (unless inhibit-message
-    (apply app)))
-
-(defun mct--setup-messageless-shared ()
-  "Silence the minibuffer and the Completions."
-  (if (or mct-region-mode mct-minibuffer-mode)
-      (progn
-        ;; NOTE 2022-01-09: Only `choose-completion' is relevant for
-        ;; completion-in-region.
-        (dolist (fn '(exit-minibuffer
-                      choose-completion
-                      minibuffer-force-complete
-                      minibuffer-complete-and-exit
-                      minibuffer-force-complete-and-exit))
-          (advice-add fn :around #'mct--messageless))
-        (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message))
-    (dolist (fn '(exit-minibuffer
-                  choose-completion
-                  minibuffer-force-complete
-                  minibuffer-complete-and-exit
-                  minibuffer-force-complete-and-exit))
-      (advice-add fn :around #'mct--messageless))
-    (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message)))
 
 (defun mct--setup-appearance ()
   "Set up variables for the appearance of the Completions' buffer."
@@ -1121,19 +1086,18 @@ region.")
   (if mct-minibuffer-mode
       (progn
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-        (mct--setup-messageless-shared)
         (advice-add #'completing-read-default :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
         (advice-add #'minibuffer-completion-help :around #'mct--minibuffer-completion-help-advice)
         (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-    (mct--setup-messageless-shared)
     (advice-remove #'completing-read-default #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
     (advice-remove #'minibuffer-completion-help #'mct--minibuffer-completion-help-advice)
     (advice-remove #'completing-read-multiple #'mct--crm-indicator)
-    (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily)))
+    (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily))
+  (mct--setup-shared))
 
 (define-obsolete-function-alias 'mct-mode 'mct-minibuffer-mode "0.4.0")
 
@@ -1295,15 +1259,49 @@ minibuffer)."
         (advice-add #'completion--done :around #'mct--region-completion-done)
         (advice-add #'minibuffer-completion-help :around #'mct--region-completion-help-advice)
         (add-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
-        (add-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
-        (mct--setup-messageless-shared)
-        (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message))
+        (add-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region))
     (advice-remove #'completion--done #'mct--region-completion-done)
     (advice-remove #'minibuffer-completion-help #'mct--region-completion-help-advice)
     (remove-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
-    (remove-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region)
-    (mct--setup-messageless-shared)
-    (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)))
+    (remove-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region))
+  (mct--setup-shared))
+
+;; Adapted from Omar Antolín Camarena's live-completions library:
+;; <https://github.com/oantolin/live-completions>.
+(defun mct--shared-honor-inhibit-message (&rest app)
+  "Honor `inhibit-message' while applying APP."
+  (unless (and (or (mct--region-p) (mct--minibuffer-p)) inhibit-message)
+    (apply app)))
+
+;; Thanks to Omar Antolín Camarena for providing the messageless and
+;; stealthily.  Source: <https://github.com/oantolin/emacs-config>.
+(defun mct--shared-messageless (&rest app)
+  "Set `minibuffer-message-timeout' to 0 while applying APP."
+  (if (or (mct--region-p) (mct--minibuffer-p))
+      (let ((minibuffer-message-timeout 0))
+        (apply app))
+    (apply app)))
+
+(defun mct--setup-shared ()
+  "Silence the minibuffer and the Completions."
+  (if (or mct-region-mode mct-minibuffer-mode)
+      (progn
+        ;; NOTE 2022-01-09: Only `choose-completion' is relevant for
+        ;; completion-in-region.
+        (dolist (fn '(exit-minibuffer
+                      choose-completion
+                      minibuffer-force-complete
+                      minibuffer-complete-and-exit
+                      minibuffer-force-complete-and-exit))
+          (advice-add fn :around #'mct--shared-messageless))
+        (advice-add #'minibuffer-message :around #'mct--shared-honor-inhibit-message))
+    (dolist (fn '(exit-minibuffer
+                  choose-completion
+                  minibuffer-force-complete
+                  minibuffer-complete-and-exit
+                  minibuffer-force-complete-and-exit))
+      (advice-add fn :around #'mct--shared-messageless))
+    (advice-add #'minibuffer-message :around #'mct--shared-honor-inhibit-message)))
 
 (provide 'mct)
 ;;; mct.el ends here
