@@ -1113,12 +1113,15 @@ region.")
 (defun mct--region-live-completions (&rest _)
   "Update the *Completions* buffer.
 Meant to be added to `after-change-functions'."
-  (when (mct--region-current-buffer)
-    (while-no-input
-      (condition-case nil
-          (save-match-data
-            (mct--show-completions))
-        (quit (keyboard-quit))))))
+  (when-let (buf (mct--region-current-buffer))
+    ;; TODO 2022-01-18: Do the same for company-mode, but we need to
+    ;; test it as well.
+    (when (null (buffer-local-value 'corfu-mode buf))
+      (while-no-input
+        (condition-case nil
+            (save-match-data
+              (mct--show-completions))
+          (quit (keyboard-quit)))))))
 
 (defun mct--region-live-update ()
   "Hook up `mct--region-live-completions'."
