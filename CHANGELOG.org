@@ -10,6 +10,62 @@ tagged commit on the project's main git repository:
 The newest release is at the top.  For further details, please consult
 the manual: <https://protesilaos.com/emacs/mct>.
 
+* Version 0.4.0 on 2022-01-19
+:PROPERTIES:
+:CUSTOM_ID: h:1f8fc960-4e4b-4bb1-a1c4-5083f287a28c
+:END:
+
+This entry outlines the changes to the "Minibuffer and Completions in
+Tandem" (=mct= package) since the release of [[#h:902574cf-edf0-4182-9d34-5e8e28730193][version 0.3.0 on 2021-11-19]].
+There have been more than 120 commits in the meantime.
+
+For further details, please consult the manual online:
+<https://protesilaos.com/emacs/mct>.  Or evaluate the following
+expression if you already have =mct= installed:
+
+#+begin_src emacs-lisp
+(info "(mct) Top")
+#+end_src
+
+As most changes pertain to optimisations in the code base, we limit this
+log to what is of interest to the end-user.
+
+** Minibuffer Confines Transcended (aka mct-region-mode)
+
+Emacs distinguishes between two types of completion: one that involves
+the minibuffer and another for text expansion inside regular buffers.
+MCT has supported the former case since its inception, as hinted by its
+original name ("Minibuffer and Completions in Tandem"), but would not
+work as intended for in-buffer completion.
+
+This changes with the introduction of a new global minor mode:
+~mct-region-mode~.  What once was ~mct-mode~ is now defined as
+~mct-minibuffer-mode~ to better denote the scope of the given
+functionality.
+
+With ~mct-region-mode~ enabled, users get a simplified subset of the
+familiar MCT functionality when typing =TAB= or =C-M-i= to complete the
+text-at-point in any major-mode that supports
+~completion-at-point-functions~ (e.g. programming modes or Org).
+
+~mct-region-mode~ is considered experimental and unstable.  Users are
+encouraged to report any bugs as well as recommend ways to improve its
+functionality or interaction model.  The manual has been updated to
+cover all the relevant details.
+
+Daniel Mendler, who is the developer of the =vertico= and =corfu= packages
+(alternatives to ~mct-minibuffer-mode~ and ~mct-region-mode~, respectively),
+was intstrumental in making ~mct-region-mode~ happen.  Daniel's patches
+helped with everything from (i) the proper functioning of
+~mct-region-mode~, (ii) the separation between ~mct-minibuffer-mode~ and
+~mct-region-mode~, (iii) the overall setup of the minor modes, and (iv)
+lots of other crucial details of the overall design of MCT.  In short:
+there would be no ~mct-region-mode~ without Daniel's contributions.  Any
+remaining errors or omissions are my own.
+
+Given this new functionality, we can now joke that "MCT" stands for
+"Minibuffer Confines Transcended".
+
 * Version 0.3.0 on 2021-11-19
 :PROPERTIES:
 :CUSTOM_ID: h:902574cf-edf0-4182-9d34-5e8e28730193
