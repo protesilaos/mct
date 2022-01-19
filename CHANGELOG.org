@@ -31,6 +31,9 @@ than anticipated so that users could get a stable package on GNU ELPA).
 Here is a brief description of what has been achieved in =0.3.0=.
 
 ** MCT on Emacs 27
+:PROPERTIES:
+:CUSTOM_ID: h:c05100f7-a525-4d76-8f88-8de4cfe69e67
+:END:
 
 + MCT now works on Emacs 27.  This was not possible in the past because
   ~mct-mode~ was originally designed to operate with the =one-column= style
@@ -67,6 +70,9 @@ Here is a brief description of what has been achieved in =0.3.0=.
   testing in issue 1: <https://gitlab.com/protesilaos/mct/-/issues/1>.
 
 ** Miscellaneous changes
+:PROPERTIES:
+:CUSTOM_ID: h:db448e8b-5416-4561-993a-4f5f3a8ad7e4
+:END:
 
 + There is a new command that is active in the minibuffer which allows
   to complete and exit immediately: =C-RET= (~mct-complete-and-exit~).  This
@@ -215,6 +221,9 @@ M-x package-install RET mct
   functionality of MCT.
 
 ** Group motions
+:PROPERTIES:
+:CUSTOM_ID: h:5f9027f9-fad0-4c03-8269-60eb670d0b38
+:END:
 
 + Emacs 28 provides infrastructure for commands to group candidates
   based on their contents.  These groups can have their own heading in
@@ -227,6 +236,9 @@ M-x package-install RET mct
   <https://gitlab.com/protesilaos/mct/-/merge_requests/2>.
 
 ** Miscellaneous changes
+:PROPERTIES:
+:CUSTOM_ID: h:ed67abef-dad3-4620-bc70-1c3dc268db59
+:END:
 
 + The =TAB= key in the Completions' buffer never exits the minibuffer (the
   command is ~mct-choose-completion-no-exit~).  Instead, it expands the
@@ -262,6 +274,9 @@ M-x package-install RET mct
 + Made several improvements to doc strings and various snippets of code.
 
 ** Updates to the manual
+:PROPERTIES:
+:CUSTOM_ID: h:19c69838-c480-4b98-80e3-da25642a2c23
+:END:
 
 + All of the aforementioned were documented, where appropriate.
 + A Makefile is now on offer, which is used to generate the mct.info and
