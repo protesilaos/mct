@@ -420,8 +420,14 @@ Apply APP by first setting up the minibuffer to work with Mct."
 ;; We need this to make things work on Emacs 27.
 (defun mct--one-column-p ()
   "Test if we have a one-column view available."
-  (and (eq mct-completions-format 'one-column)
-       (>= emacs-major-version 28)))
+  (cond
+   ;; FIXME 2022-01-19: Avoid duplication?
+   ((mct--region-p) 
+    (and (eq mct-region-completions-format 'one-column)
+         (>= emacs-major-version 28)))
+   ((mct--minibuffer-p) 
+    (and (eq mct-completions-format 'one-column)
+         (>= emacs-major-version 28)))))
 
 ;;;;; Focus minibuffer and/or show completions
 
