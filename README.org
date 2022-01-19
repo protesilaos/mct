@@ -26,8 +26,8 @@
 #+texinfo: @insertcopying
 
 This manual, written by Protesilaos Stavrou, describes the customization
-options for =mct.el=, and provides every other piece of information
-pertinent to it.
+options for =mct= (or =mct.el= and variants), and provides every other piece
+of information pertinent to it.
 
 The documentation furnished herein corresponds to stable version
 {{{stable-version}}}, released on {{{release-date}}}.  Any reference to a newer
@@ -84,7 +84,7 @@ input threshold as well as a slight delay before it pops up the
 
 #+vindex: mct-minimum-input
 #+vindex: mct-live-update-delay
-Customisation options control the input threshold (~mct-minimum-input~)
+Customization options control the input threshold (~mct-minimum-input~)
 and the delay between live updates (~mct-live-update-delay~).  Similarly,
 a blocklist and a passlist for commands are on offer:
 
@@ -113,9 +113,9 @@ the Completions' buffer:
   live update the visible completions, regardless of input length.
 
 + When non-nil (the default), the Completions' buffer is automatically
-  displayed once the ~mct-minimum-input~ is met and is hidden once the
-  input drops below that threshold.  While visible, the buffer is
-  updated live to match the user input.
+  displayed once the ~mct-minimum-input~ is met and is hidden if the input
+  drops below that threshold.  While visible, the buffer is updated live
+  to match the user's input.
 
 + Note that every function in the ~mct-completion-passlist~ ignores this
   option altogether.  This means that every such command will always
@@ -124,7 +124,7 @@ the Completions' buffer:
   ~mct-completion-blocklist~, which will always disable both the automatic
   display and live updating of the Completions' buffer.
 
-Other customisations:
+Other customizations:
 
   #+vindex: mct-hide-completion-mode-line
 + ~mct-hide-completion-mode-line~ to hide the mode line of the
@@ -138,7 +138,7 @@ Other customisations:
   file paths (such as ~find-file~) when you start in, say, =~/Git/mct.el=
   and type =~/= the previous file path is removed and only the new one is
   inserted.  Whereas the default is to keep the original file name
-  visible yet "shadowed" by a different colour.
+  visible yet "shadowed" by a different color.
 
   #+findex: mct-choose-completion-number
 + ~mct-show-completion-line-numbers~ to always display line numbers in the
@@ -150,7 +150,7 @@ Other customisations:
 
   #+vindex: mct-apply-completion-stripes
   #+vindex: mct-stripe
-+ ~mct-apply-completion-stripes~ applies alternative background colours in
++ ~mct-apply-completion-stripes~ applies alternating background colors in
   the Completions' buffer.  This is only tested with the =modus-themes=
   and will only work nicely if the main background is pure black or
   white---other themes would need to add support for the faces we define
@@ -779,12 +779,12 @@ They all make for a natural complement to the standard Emacs experience
 + [[https://github.com/minad/vertico][Vertico]] by Daniel Mendler :: this is a more mature and feature-rich
   package with a large user base and a highly competent maintainer.
 
-  Vertico has some performance optimisations on how candidates are
+  Vertico has some performance optimizations on how candidates are
   sorted and presented, which means that it displays results right away
   without any noticeable performance penalty.  Whereas MCT does not
   change the underlying behaviour of how candidates are displayed.  As
   such, MCT will be slower in scenaria where there are lots of
-  candidates because core Emacs lacks those optimisations.  One such
+  candidates because core Emacs lacks those optimizations.  One such
   case is with the ~describe-symbol~ (=C-h o=) prompt.  If the user asks for
   the completions' buffer without inputting any character (so without
   narrowing the list), there will be a noticeable delay before the
