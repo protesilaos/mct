@@ -1122,7 +1122,8 @@ Meant to be added to `after-change-functions'."
   (when-let (buf (mct--region-current-buffer))
     ;; TODO 2022-01-18: Do the same for company-mode, but we need to
     ;; test it as well.
-    (when (null (buffer-local-value 'corfu-mode buf))
+    (when (and (bound-and-true-p corfu-mode)
+               (null (buffer-local-value 'corfu-mode buf)))
       (while-no-input
         (condition-case nil
             (save-match-data
