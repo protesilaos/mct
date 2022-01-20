@@ -1076,6 +1076,7 @@ region.")
   "Set up the completion-list for Mct."
   (when (mct--minibuffer-p)
     (setq-local completion-show-help nil
+                completion-wrap-movement nil ; Emacs 29
                 truncate-lines t)
     (mct--setup-clean-completions)
     (mct--setup-appearance)
@@ -1227,6 +1228,7 @@ minibuffer)."
   "Set up the completion-list for Mct."
   (when (mct--region-p)
     (setq-local completion-show-help nil
+                completion-wrap-movement nil ; Emacs 29
                 truncate-lines t)
     (mct--setup-clean-completions)
     (mct--setup-appearance)
