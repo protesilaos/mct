@@ -682,7 +682,7 @@ ARG is a numeric argument for `previous-completion', as described in
         (when (or (> (current-column) col)
                   (not (mct--completions-completion-p)))
           (next-completion -1)))
-    (previous-completion (if (natnump arg) arg 1))))
+    (previous-completion (or (abs arg) 1))))
 
 (defun mct-previous-completion-or-mini (&optional arg)
   "Move to the previous completion or switch to the minibuffer.
@@ -1196,7 +1196,7 @@ This is a counterpart of `mct-previous-completion-or-mini' that
 is meant for the case of completion in region (i.e. not in the
 minibuffer)."
   (interactive nil mct-region-mode)
-  (let ((count (if (natnump arg) arg 1)))
+  (let ((count (or (abs arg) 1)))
     (cond
      ((mct--top-of-completions-p count)
       (minibuffer-hide-completions))
