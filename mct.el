@@ -280,7 +280,9 @@ Meant to be added to `after-change-functions'."
             (quit (abort-recursive-edit)))
         (minibuffer-hide-completions)))))
 
-(defvar mct--timer nil)
+(defvar mct--timer nil
+  "Latest timer object for live completions.")
+
 (defun mct--live-completions-timer (&rest _)
   "Update Completions with `mct-live-update-delay'."
   (when-let* ((delay mct-live-update-delay)
