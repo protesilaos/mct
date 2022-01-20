@@ -280,11 +280,15 @@ Meant to be added to `after-change-functions'."
             (quit (abort-recursive-edit)))
         (minibuffer-hide-completions)))))
 
+(defvar mct--timer nil)
 (defun mct--live-completions-timer (&rest _)
   "Update Completions with `mct-live-update-delay'."
   (when-let* ((delay mct-live-update-delay)
               ((>= delay 0)))
-    (run-with-idle-timer delay nil #'mct--live-completions)))
+    (when mct--timer
+      (cancel-timer mct--timer)
+      (setq mct--timer nil))
+    (setq mct--timer (run-with-idle-timer delay nil #'mct--live-completions))))
 
 (defun mct--live-completions-visible-timer (&rest _)
   "Update visible Completions' buffer."
