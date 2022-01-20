@@ -167,6 +167,11 @@ and/or the documentation string of `display-buffer'."
                alist)
   :group 'mct)
 
+(defcustom mct-resize-completions t
+  "When non-nil, fit the Completions buffer to its window."
+  :type 'boolean
+  :group 'mct)
+
 (defcustom mct-completions-format 'one-column
   "The Completions' appearance used by `mct-minibuffer-mode'.
 See `completions-format' for possible values."
@@ -330,7 +335,8 @@ Apply APP by first let binding the `completions-format' to
   (if (mct--minibuffer-p)
       (let ((completions-format mct-completions-format))
         (apply app)
-        (mct--fit-completions-window))
+        (when mct-resize-completions
+          (mct--fit-completions-window)))
     (apply app)))
 
 (defun mct--region-completion-help-advice (&rest app)
@@ -340,7 +346,8 @@ Apply APP by first let binding the `completions-format' to
   (if (mct--region-p)
       (let ((completions-format mct-region-completions-format))
         (apply app)
-        (mct--fit-completions-window))
+        (when mct-resize-completions
+          (mct--fit-completions-window)))
     (apply app)))
 
 (defun mct--completing-read-advice (&rest app)
