@@ -560,7 +560,7 @@ a `one-column' value."
   "Check if ARGth line has a completion candidate."
   (save-excursion
     (vertical-motion arg)
-    (eq 'completions-group-separator (get-text-property (point) 'face))))
+    (null (mct--completions-completion-p))))
 
 (defun mct--switch-to-completions ()
   "Subroutine for switching to the completions' buffer."
