@@ -808,6 +808,28 @@ preview the candidate at point.  All we need to enable it in the
 (add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode)
 #+end_src
 
+** Avoid conflict between MCT and Corfu
+:PROPERTIES:
+:CUSTOM_ID: h:9b19911c-1dd7-4d4c-b513-feb77237e156
+:END:
+
+Daniel Mendler's =corfu= package provides an alternative to the
+~mct-region-mode~ ([[#h:8109fe09-fcce-4212-88eb-943cc72f2c75][MCT in the minibuffer and in regular buffers]]).  Given
+that MCT's implementation is a global minor-mode, chances are that users
+of both will run into weird issues with conflicting functionality.  The
+following snippet from Corfu's README can be added to user configuration
+files to avoid any potential trouble when using commands such as
+~eval-expression~ (bound to =M-:= by default):
+
+#+begin_src emacs-lisp
+(defun corfu-in-minibuffer ()
+  "Enable Corfu in the minibuffer only if Mct/Vertico are not active."
+  (unless (or (mct--minibuffer-p) vertico--input)
+    (corfu-mode 1)))
+
+(add-hook 'minibuffer-setup-hook #'corfu-in-minibuffer 1)
+#+end_src
+
 * Alternatives
 :PROPERTIES:
 :CUSTOM_ID: h:c9ddedea-e279-4233-94dc-f8d32367a954
