@@ -426,10 +426,10 @@ Apply APP by first setting up the minibuffer to work with Mct."
   "Test if we have a one-column view available."
   (cond
    ;; FIXME 2022-01-19: Avoid duplication?
-   ((mct--region-p) 
+   ((mct--region-p)
     (and (eq mct-region-completions-format 'one-column)
          (>= emacs-major-version 28)))
-   ((mct--minibuffer-p) 
+   ((mct--minibuffer-p)
     (and (eq mct-completions-format 'one-column)
          (>= emacs-major-version 28)))))
 
