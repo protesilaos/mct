@@ -1120,8 +1120,8 @@ region.")
   "Update the *Completions* buffer.
 Meant to be added to `after-change-functions'."
   (when-let (buf (mct--region-current-buffer))
-    ;; TODO 2022-01-18: Do the same for company-mode, but we need to
-    ;; test it as well.
+    ;; TODO 2022-01-20: I don't think we need to check for corfu-mode
+    ;; any more.  Consider removing it.
     (when (and (bound-and-true-p corfu-mode)
                (null (buffer-local-value 'corfu-mode buf)))
       (while-no-input
