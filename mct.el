@@ -653,13 +653,19 @@ the minibuffer."
       (mct--next-completion count))
      (setq this-command 'next-line))))
 
+(defun mct--motion-below-point-min-p (arg)
+  "Return non-nil if backward ARG motion exceeds `point-min'."
+  (let ((line (- (line-number-at-pos) arg)))
+    (or (< line 1)
+        (= (save-excursion (previous-completion arg) (point)) (point-min)))))
+
 (defun mct--top-of-completions-p (arg)
   "Test if point is at the notional top of the Completions.
 ARG is a numeric argument for `previous-completion', as described in
 `mct-previous-completion-or-mini'."
   (or (bobp)
       (mct--completions-line-boundary (mct--first-completion-point))
-      (= (save-excursion (previous-completion arg) (point)) (point-min))
+      (mct--motion-below-point-min-p arg)
       ;; FIXME 2021-12-27: Why do we need this now?  Regression upstream?
       (eq (line-number-at-pos) 1)))
 
