@@ -690,12 +690,10 @@ This performs a regular motion for optional ARG candidates, but
 when point can no longer move in that direction it switches to
 the minibuffer."
   (interactive "p" mct-minibuffer-mode)
-  (let ((count (if (natnump arg) arg 1)))
-    (cond
-     ((mct--top-of-completions-p count)
-      (mct-focus-minibuffer))
-     (t
-      (mct--previous-completion count)))))
+  (let ((count (or (abs arg) 1)))
+    (if (mct--top-of-completions-p count)
+        (mct-focus-minibuffer)
+      (mct--previous-completion count))))
 
 (defun mct-next-completion-group (&optional arg)
   "Move to the next completion group.
