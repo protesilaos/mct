@@ -949,7 +949,7 @@ MCT is meant to be a collective effort.  Every bit of help matters.
 
 + Ideas and user feedback :: Andrew Tropin, Benjamin (@zealotrush), Case
   Duckworth, Jonathan Irving, José Antonio Ortega Ruiz, Kostadin Ninev,
-  Manuel Uberti, Philip Kaludercic, Theodor Thornhill.
+  Manuel Uberti, Philip Kaludercic, Theodor Thornhill, Z.Du.
 
 + Inspiration for certain features :: =icomplete.el= (built-in---multiple
   authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
