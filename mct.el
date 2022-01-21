@@ -699,7 +699,7 @@ This performs a regular motion for optional ARG candidates, but
 when point can no longer move in that direction it switches to
 the minibuffer."
   (interactive "p" mct-minibuffer-mode)
-  (let ((count (or (abs arg) 1)))
+  (let ((count (if (natnump arg) arg 1)))
     (if (mct--top-of-completions-p count)
         (mct-focus-minibuffer)
       (mct--previous-completion count))))
@@ -1204,7 +1204,7 @@ This is a counterpart of `mct-previous-completion-or-mini' that
 is meant for the case of completion in region (i.e. not in the
 minibuffer)."
   (interactive nil mct-region-mode)
-  (let ((count (or (abs arg) 1)))
+  (let ((count (if (natnump arg) arg 1)))
     (cond
      ((mct--top-of-completions-p count)
       (minibuffer-hide-completions))
