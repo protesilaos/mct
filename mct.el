@@ -265,9 +265,8 @@ See `mct-minimum-input'."
 
 ;; Adapted from Omar Antolín Camarena's live-completions library:
 ;; <https://github.com/oantolin/live-completions>.
-(defun mct--live-completions (&rest _)
-  "Update the *Completions* buffer.
-Meant to be added to `after-change-functions'."
+(defun mct--live-completions-refresh-immediately ()
+  "Update the *Completions* buffer immediately."
   (when (minibufferp) ; skip if we've exited already
     (while-no-input
       (if (or (mct--minimum-input)
@@ -283,19 +282,25 @@ Meant to be added to `after-change-functions'."
 (defvar mct--timer nil
   "Latest timer object for live completions.")
 
-(defun mct--live-completions-timer (&rest _)
-  "Update Completions with `mct-live-update-delay'."
-  (when-let* ((delay mct-live-update-delay)
-              ((>= delay 0)))
+(defun mct--live-completions-refresh (&rest _)
+  "Update the *Completions* buffer with a delay.
+Meant to be added to `after-change-functions'."
+  (when (and
+         ;; Check that live completions are enabled by looking at
+         ;; after-change-functions. This check is needed for Consult
+         ;; integration, which refreshes the display asynchronously.
+         (memq #'mct--live-completions-refresh after-change-functions)
+         ;; Update only visible completion windows?
+         (or (not (eq mct-live-completion 'visible))
+             (window-live-p (mct--get-completion-window))))
     (when mct--timer
       (cancel-timer mct--timer)
       (setq mct--timer nil))
-    (setq mct--timer (run-with-idle-timer delay nil #'mct--live-completions))))
-
-(defun mct--live-completions-visible-timer (&rest _)
-  "Update visible Completions' buffer."
-  (when (window-live-p (mct--get-completion-window))
-    (mct--live-completions-timer)))
+    (if (> mct-live-update-delay 0)
+        (setq mct--timer (run-with-idle-timer
+                          mct-live-update-delay
+                          nil #'mct--live-completions-refresh-immediately))
+      (mct--live-completions-refresh-immediately))))
 
 (defun mct--this-command ()
   "Return this command."
@@ -304,16 +309,14 @@ Meant to be added to `after-change-functions'."
 (defun mct--setup-live-completions ()
   "Set up the completions' buffer."
   (cond
+   ((null mct-live-completion))
    ((memq (mct--this-command) mct-completion-passlist)
     (setq-local mct-minimum-input 0)
     (setq-local mct-live-update-delay 0)
     (mct--show-completions)
-    (add-hook 'after-change-functions #'mct--live-completions nil t))
-   ((null mct-live-completion))
+    (add-hook 'after-change-functions #'mct--live-completions-refresh nil t))
    ((not (memq (mct--this-command) mct-completion-blocklist))
-    (if (eq mct-live-completion 'visible)
-        (add-hook 'after-change-functions #'mct--live-completions-visible-timer nil t)
-      (add-hook 'after-change-functions #'mct--live-completions-timer nil t)))))
+    (add-hook 'after-change-functions #'mct--live-completions-refresh nil t))))
 
 (defvar-local mct--active nil
   "Minibuffer local variable, t if Mct is active.")
