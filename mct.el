@@ -426,17 +426,20 @@ Apply APP by first setting up the minibuffer to work with Mct."
 ;; (declare-function prop-match-beginning "text-property-search" (cl-x))
 ;; (declare-function prop-match-end "text-property-search" (cl-x))
 
+
+
+;; FIXME 2022-01-21: The line highlight does not :extend for
+;; mct-region-mode when using the one-column style.
+
 ;; We need this to make things work on Emacs 27.
 (defun mct--one-column-p ()
   "Test if we have a one-column view available."
-  (cond
-   ;; FIXME 2022-01-19: Avoid duplication?
-   ((mct--region-p)
-    (and (eq mct-region-completions-format 'one-column)
-         (>= emacs-major-version 28)))
-   ((mct--minibuffer-p)
-    (and (eq mct-completions-format 'one-column)
-         (>= emacs-major-version 28)))))
+  (when (>= emacs-major-version 28)
+    (cond
+     ((mct--region-p)
+      (eq mct-region-completions-format 'one-column))
+     ((mct--minibuffer-p)
+      (eq mct-completions-format 'one-column)))))
 
 ;;;;; Focus minibuffer and/or show completions
 
