@@ -764,7 +764,7 @@ If ARG is supplied, move that many completion groups at a time."
   "Select completion on Nth line."
   (with-current-buffer (window-buffer (mct--get-completion-window))
     (goto-char (point-min))
-    (next-completion (1- n))
+    (next-completion n)
     (mct-choose-completion-exit)))
 
 (defun mct--line-bounds (n)
