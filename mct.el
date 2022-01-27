@@ -174,17 +174,7 @@ See `completions-format' for possible values."
   :type '(choice (const horizontal) (const vertical) (const one-column))
   :group 'mct)
 
-(defcustom mct-region-completions-format mct-completions-format
-  "The Completions' appearance used by `mct-region-mode'.
-See `completions-format' for possible values.
-
-This is like `mct-completions-format' when performing in-buffer
-completion."
-  :type '(choice (variable :tag "Inherit value of `mct-completions-format'" mct-completions-format)
-                 (const horizontal)
-                 (const vertical)
-                 (const one-column))
-  :group 'mct)
+(make-obsolete 'mct-region-completions-format 'mct-completions-format "0.5.0")
 
 ;;;; Completion metadata
 
@@ -348,7 +338,7 @@ Apply APP by first let binding the `completions-format' to
 Apply APP by first let binding the `completions-format' to
 `mct-completions-format'."
   (if (mct--region-p)
-      (let ((completions-format mct-region-completions-format))
+      (let ((completions-format mct-completions-format))
         (apply app)
         (mct--fit-completions-window))
     (apply app)))
@@ -435,12 +425,8 @@ Apply APP by first setting up the minibuffer to work with Mct."
 ;; We need this to make things work on Emacs 27.
 (defun mct--one-column-p ()
   "Test if we have a one-column view available."
-  (when (>= emacs-major-version 28)
-    (cond
-     ((mct--region-p)
-      (eq mct-region-completions-format 'one-column))
-     ((mct--minibuffer-p)
-      (eq mct-completions-format 'one-column)))))
+  (and (eq mct-completions-format 'one-column)
+       (> emacs-major-version 28)))
 
 ;;;;; Focus minibuffer and/or show completions
 

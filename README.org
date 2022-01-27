@@ -457,15 +457,6 @@ out of the =*Completions*=.
 To cancel in-buffer completion, type =C-g= either before switching to the
 Completions' buffer or while inside of it.
 
-#+vindex: mct-region-completions-format
-The only customization option for ~mct-region-mode~ pertains to the
-presentation of the =*Completions*=: ~mct-region-completions-format~.  By
-default, it uses the same style as ~mct-completions-format~, though it can
-be configured to, for example, display candidates in a grid with either
-of the =horizontal= or =vertical= values (on Emacs 27, candidates are always
-displayed in a grid, as the =one-column= layout was introduced in Emacs
-28).
-
 * Installation
 :PROPERTIES:
 :CUSTOM_ID: h:1b501ed4-f16c-4118-9a4a-7a5e29143077
