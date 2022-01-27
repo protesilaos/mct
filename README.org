@@ -657,6 +657,8 @@ Other useful extras from the Emacs source code (read their doc strings):
 #+vindex: mct-completion-list-mode-map
 #+vindex: mct-minibuffer-local-completion-map
 #+vindex: mct-minibuffer-local-filename-completion-map
+#+vindex: mct-region-buffer-map
+#+vindex: mct-region-completion-list-map
 
 MCT defines its own keymaps, which extend those that are active in the
 minibuffer and the =*Completions*= buffer, respectively:
