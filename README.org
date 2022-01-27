@@ -665,8 +665,8 @@ MCT uses its own overlay to highlight the candidate at point.  To ensure
 that it does not interfere with the optional stripes (provided by the
 user option ~mct-apply-completion-stripes~) the highlight's priority is
 set to a custom value.  This, in turn, means that when the user enables
-~global-hl-line-mode~, its highlighted line will take precedence over the
-MCT highlight.  The solution to this conflict is to disable the hl-line
+~global-hl-line-mode~, its highlighted line takes precedence over the MCT
+highlight.  The solution to this conflict is to disable the hl-line
 locally for the =*Completions*= buffer like this:
 
 #+begin_src emacs-lisp
