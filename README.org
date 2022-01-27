@@ -675,6 +675,69 @@ If you want to edit any key bindings, do it in these keymaps, not in
 those they extend and override (the names of the original ones are the
 same as above, minus the =mct-= prefix).
 
+** The use of remap for key bindings
+:PROPERTIES:
+:CUSTOM_ID: h:de19a74f-e305-4311-a9fe-2905bc5e06a0
+:END:
+#+cindex: Remap key bindings
+
+MCT tries not to hardcode key bindings in order to respect user
+configurations.  To this end, Emacs provides the ~remap~ mechanism which
+effectively intercepts the key binding of the original command and
+applies it to the one specified.  Think of it like redirecting from the
+old to the new one.
+
+The code looks like this:
+
+#+begin_src emacs-lisp
+(defvar mct-minibuffer-local-completion-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-j") #'exit-minibuffer)
+    (define-key map [remap goto-line] #'mct-choose-completion-number)
+    (define-key map [remap next-line] #'mct-switch-to-completions-top)
+    (define-key map [remap next-line-or-history-element] #'mct-switch-to-completions-top)
+    (define-key map [remap previous-line] #'mct-switch-to-completions-bottom)
+    (define-key map [remap previous-line-or-history-element] #'mct-switch-to-completions-bottom)
+    (define-key map (kbd "M-e") #'mct-edit-completion)
+    (define-key map (kbd "C-<return>") #'mct-complete-and-exit)
+    (define-key map (kbd "C-l") #'mct-list-completions-toggle)
+    map)
+  "Derivative of `minibuffer-local-completion-map'.")
+#+end_src
+
+The ~remap~ might cause unwanted behaviour in cases where a user
+maintaints their own remappings which conflict with those of the
+package.  Consider, for example, this scenario:
+
+#+begin_src emacs-lisp
+(require 'mct)
+
+;; Here goes the MCT setup
+
+;; More code...
+
+;; The user remaps `goto-line' to `my-goto-line-replacement' in the
+;; `global-map'.
+(define-key global-map [remap goto-line] #'my-goto-line-replacement)
+#+end_src
+
+If a user loads MCT first and later in their configuration defines a
+remap for ~goto-line~, then that will take precedence over what MCT wants
+to do.  The solution is for the user to update their code to specify an
+explicit key binding:
+
+#+begin_src emacs-lisp
+(require 'mct)
+
+;; Here goes the MCT setup
+
+;; More code...
+
+;; The user specifies an explicit key binding for
+;; `my-goto-line-replacement' in the `global-map'.
+(define-key global-map (kbd "M-g M-g") #'my-goto-line-replacement)
+#+end_src
+
 * User-level tweaks or custom code
 :PROPERTIES:
 :CUSTOM_ID: h:2630a7a3-1b11-4e9d-8282-0ea3bf9e2a5b
