@@ -900,9 +900,11 @@ If the region is active, deactivate it.  A second invocation of
 this command is then required to abort the session."
   (interactive nil mct-minibuffer-mode)
   (when (derived-mode-p 'completion-list-mode)
-    (if (use-region-p)
-        (keyboard-quit)
-      (abort-recursive-edit))))
+    (cond
+     ((null (active-minibuffer-window))
+      (minibuffer-hide-completions))
+     ((use-region-p) (keyboard-quit))
+     (t (abort-recursive-edit)))))
 
 ;;;; Global minor mode setup
 
