@@ -115,8 +115,9 @@ number of candidates that are being computed."
 
 (defcustom mct-live-update-delay 0.3
   "Delay in seconds before updating the Completions' buffer.
+Set this to 0 to disable the delay.
 
-Set this to 0 to disable the delay."
+This applies in all cases covered by `mct-live-completion'."
   :type 'number
   :group 'mct)
 
