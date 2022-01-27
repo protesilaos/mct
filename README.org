@@ -649,6 +649,30 @@ Other useful extras from the Emacs source code (read their doc strings):
       '((file (styles . (basic partial-completion orderless)))))
 #+end_src
 
+* Known issues and workarounds
+:PROPERTIES:
+:CUSTOM_ID: h:acfb63f4-c2ae-46ff-a840-9c9a6350e567
+:END:
+
+This section documents known issues and how to address them.
+
+** Avoid global-hl-line-mode in the Completions
+:PROPERTIES:
+:CUSTOM_ID: h:ee6aa793-3129-4cf0-8138-1224b6052546
+:END:
+
+MCT uses its own overlay to highlight the candidate at point.  To ensure
+that it does not interfere with the optional stripes (provided by the
+user option ~mct-apply-completion-stripes~) the highlight's priority is
+set to a custom value.  This, in turn, means that when the user enables
+~global-hl-line-mode~, its highlighted line will take precedence over the
+MCT highlight.  The solution to this conflict is to disable the hl-line
+locally for the =*Completions*= buffer like this:
+
+#+begin_src emacs-lisp
+(add-hook 'completion-list-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
+#+end_src
+
 * Keymaps
 :PROPERTIES:
 :CUSTOM_ID: h:b3178edd-f340-444c-8426-fe84f23ac9ea
@@ -1014,7 +1038,8 @@ MCT is meant to be a collective effort.  Every bit of help matters.
 
 + Ideas and user feedback :: Andrew Tropin, Benjamin (@zealotrush), Case
   Duckworth, Jonathan Irving, José Antonio Ortega Ruiz, Kostadin Ninev,
-  Manuel Uberti, Philip Kaludercic, Theodor Thornhill, Z.Du.
+  Manuel Uberti, Philip Kaludercic, Theodor Thornhill, Tomasz
+  Hołubowicz, Z.Du.
 
 + Inspiration for certain features :: =icomplete.el= (built-in---multiple
   authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
