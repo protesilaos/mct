@@ -524,6 +524,12 @@ by `mct-completion-windows-regexp'."
     (or (get-text-property point 'completion--string)
         (get-text-property point 'mouse-face))))
 
+(defun mct--arg-completion-point-p (arg)
+  "Return non-nil if ARGth next completion exists."
+  (save-excursion
+    (mct--next-completion arg)
+    (mct--completions-completion-p)))
+
 (defun mct--first-completion-point ()
   "Return the `point' of the first completion."
   (save-excursion
@@ -596,6 +602,16 @@ a `one-column' value."
            (truncate (/ (window-body-height) 4.0))))
    t))
 
+(defun mct--empty-line-p (arg)
+  "Return non-nil if ARGth line is empty."
+  (unless (mct--arg-completion-point-p arg)
+    (save-excursion
+      (goto-char (point-at-bol))
+      (and (not (bobp))
+	       (or (beginning-of-line (1+ arg)) t)
+	       (save-match-data
+	         (looking-at "[\s\t]*$"))))))
+
 (defun mct--bottom-of-completions-p (arg)
   "Test if point is at the notional bottom of the Completions.
 ARG is a numeric argument for `next-completion', as described in
@@ -603,13 +619,9 @@ ARG is a numeric argument for `next-completion', as described in
   (or (eobp)
       (mct--completions-line-boundary (mct--last-completion-point))
       (= (save-excursion (next-completion arg) (point)) (point-max))
-      ;; The empty final line case...
-      (save-excursion
-        (goto-char (point-at-bol))
-        (and (not (bobp))
-	         (or (beginning-of-line (1+ arg)) t)
-	         (save-match-data
-	           (looking-at "[\s\t]*$"))))))
+      ;; The empty final line case which should avoid candidates with
+      ;; spaces or line breaks...
+      (mct--empty-line-p arg))))
 
 (defun mct--next-completion (arg)
   "Routine to move to the next ARGth completion candidate."
