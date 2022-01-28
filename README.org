@@ -86,16 +86,21 @@ input threshold as well as a slight delay before it pops up the
 #+vindex: mct-live-update-delay
 Customization options control the input threshold (~mct-minimum-input~)
 and the delay between live updates (~mct-live-update-delay~).  Similarly,
-a blocklist and a passlist for commands are on offer:
+a blocklist and a passlist for commands and/or completion categories are
+on offer:
 
   #+vindex: mct-completion-blocklist
 + The blocklist (~mct-completion-blocklist~) disables the live-updating
-  functionality for the functions specified therein.
+  functionality for the symbols specified therein.
 
   #+vindex: mct-completion-passlist
 + The passlist (~mct-completion-passlist~) always shows the Completions'
-  buffer for the designated function without accounting for the minimum
+  buffer for the designated symbol without accounting for the minimum
   input threshold.
+
+Both lists must consist of symbols.  Those specify commands like
+~find-file~ or completion categories such as ~file~, ~buffer~, or what other
+packages define like Consult's ~consult-location~ category.
 
 #+vindex: mct-live-completion
 The user option ~mct-live-completion~ controls the overall behaviour of
@@ -117,12 +122,13 @@ the Completions' buffer:
   drops below that threshold.  While visible, the buffer is updated live
   to match the user's input.
 
-+ Note that every function in the ~mct-completion-passlist~ ignores this
-  option altogether.  This means that every such command will always
-  show the Completions' buffer automatically and will always update its
-  contents live.  Same principle for every function declared in the
-  ~mct-completion-blocklist~, which will always disable both the automatic
-  display and live updating of the Completions' buffer.
++ Note that every command or completion category in the
+  ~mct-completion-passlist~ ignores this option altogether.  This means
+  that every such symbol will always show the Completions' buffer
+  automatically and will always update its contents live.  Same
+  principle for the ~mct-completion-blocklist~, which will always disable
+  both the automatic display and live updating of the Completions'
+  buffer.
 
 Other customizations:
 
@@ -533,26 +539,25 @@ And with more options:
 (setq mct-live-update-delay 0.6)
 (setq mct-completions-format 'one-column)
 
-;; NOTE: `mct-completion-blocklist' can be used for commands with lots
-;; of candidates, depending also on how low `mct-minimum-input' is.
-;; With the settings shown here this is not required, otherwise I would
-;; use something like this:
-;;
-;; (setq mct-completion-blocklist
-;;       '( describe-symbol describe-function describe-variable
-;;          execute-extended-command insert-char))
-(setq mct-completion-blocklist nil)
-
-;; This is for commands that should always pop up the completions'
-;; buffer.  It circumvents the default method of waiting for some user
-;; input (see `mct-minimum-input') before displaying and updating the
-;; completions' buffer.
+;; This is for commands or completion categories that should always pop
+;; up the completions' buffer.  It circumvents the default method of
+;; waiting for some user input (see `mct-minimum-input') before
+;; displaying and updating the completions' buffer.
 (setq mct-completion-passlist
-      '(imenu
+      '(;; Some commands
+        imenu
         Info-goto-node
         Info-index
         Info-menu
-        vc-retrieve-tag))
+        vc-retrieve-tag
+        ;; Some completion categories
+        file
+        buffer
+        consult-location))
+
+;; The blocklist follows the same principle as the passlist, except it
+;; disables live completions altogether.
+(setq mct-completion-blocklist nil)
 
 ;; You can place the Completions' buffer wherever you want, by following
 ;; the syntax of `display-buffer'.  For example, try this:

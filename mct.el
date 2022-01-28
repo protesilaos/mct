@@ -92,11 +92,11 @@ automatically displayed once the `mct-minimum-input' is met and
 is hidden if the input drops below that threshold.  While
 visible, the buffer is updated live to match the user's input.
 
-Note that every function in the `mct-completion-passlist' ignores
-this option altogether.  This means that every such command will
-always show the Completions' buffer automatically and will always
-update its contents live.  Same principle for every function
-declared in the `mct-completion-blocklist', which will always
+Note that every command or completion category in the
+`mct-completion-passlist' ignores this option altogether.  This
+means that every such symbol will always show the Completions'
+buffer automatically and will always update its contents live.
+Same principle for `mct-completion-blocklist', which will always
 disable both the automatic display and live updating of the
 Completions' buffer."
   :type '(choice
@@ -122,7 +122,8 @@ This applies in all cases covered by `mct-live-completion'."
   :group 'mct)
 
 (defcustom mct-completion-blocklist nil
-  "Functions that disable live completions.
+  "List of symbols where live completions are outright disabled.
+
 This means that they ignore `mct-live-completion'.  They do not
 automatically display the Completions' buffer, nor do they update
 it to match user input.
@@ -131,16 +132,27 @@ The Completions' buffer can still be accessed with commands that
 place it in a window (such as `mct-list-completions-toggle',
 `mct-switch-to-completions-top').
 
-A less drastic measure is to set `mct-minimum-input' to an
-appropriate value."
+The value of this user option is a list of symbols.  Those can
+refer to commands like `find-file' or completion categories such
+as `file', `buffer', or what other packages define like Consult's
+`consult-location' category.
+
+Perhaps a less drastic measure is to set `mct-minimum-input' to
+an appropriate value."
   :type '(repeat symbol)
   :group 'mct)
 
 (defcustom mct-completion-passlist nil
-  "Functions that do live updating of completions from the start.
+  "List of symbols where live completions are always enabled.
+
 This means that they ignore the value of `mct-live-completion'
 and the `mct-minimum-input'.  They also bypass any possible delay
-introduced by `mct-live-update-delay'."
+introduced by `mct-live-update-delay'.
+
+The value of this user option is a list of symbols.  Those can
+refer to commands like `find-file' or completion categories such
+as `file', `buffer', or what other packages define like Consult's
+`consult-location' category."
   :type '(repeat symbol)
   :group 'mct)
 
@@ -178,6 +190,10 @@ See `completions-format' for possible values."
 
 ;;;; Completion metadata
 
+(defun mct--this-command ()
+  "Return this command."
+  (or (bound-and-true-p current-minibuffer-command) this-command))
+
 (defun mct--completion-category ()
   "Return completion category."
   (when-let ((window (active-minibuffer-window)))
@@ -189,6 +205,11 @@ See `completions-format' for possible values."
                             minibuffer-completion-table
                             minibuffer-completion-predicate)
        'category))))
+
+(defun mct--symbol-in-list (list)
+  "Test if symbol of command or category is in LIST."
+  (or (memq (mct--this-command) list)
+      (memq (mct--completion-category) list)))
 
 ;;;; Basics of intersection between minibuffer and Completions' buffer
 
@@ -288,20 +309,16 @@ Meant to be added to `after-change-functions'."
                           nil #'mct--live-completions-refresh-immediately))
       (mct--live-completions-refresh-immediately))))
 
-(defun mct--this-command ()
-  "Return this command."
-  (or (bound-and-true-p current-minibuffer-command) this-command))
-
 (defun mct--setup-live-completions ()
   "Set up the completions' buffer."
   (cond
    ((null mct-live-completion))
-   ((memq (mct--this-command) mct-completion-passlist)
+   ((mct--symbol-in-list mct-completion-passlist)
     (setq-local mct-minimum-input 0)
     (setq-local mct-live-update-delay 0)
     (mct--show-completions)
     (add-hook 'after-change-functions #'mct--live-completions-refresh nil t))
-   ((not (memq (mct--this-command) mct-completion-blocklist))
+   ((not (mct--symbol-in-list mct-completion-blocklist))
     (add-hook 'after-change-functions #'mct--live-completions-refresh nil t))))
 
 (defvar-local mct--active nil
