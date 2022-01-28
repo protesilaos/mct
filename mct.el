@@ -196,12 +196,7 @@ See `completions-format' for possible values."
   'mct-hl-line 'mct-highlight-candidate "0.3.0")
 
 (defface mct-highlight-candidate
-  '((default :extend t)
-    (((class color) (min-colors 88) (background light))
-     :background "#b0d8ff" :foreground "#000000")
-    (((class color) (min-colors 88) (background dark))
-     :background "#103265" :foreground "#ffffff")
-    (t :inherit highlight))
+  '((t :inherit highlight :extend t))
   "Face for current candidate in the completions' buffer."
   :group 'mct)
 
