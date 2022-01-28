@@ -38,12 +38,7 @@
   "Extensions for the minibuffer."
   :group 'minibuffer)
 
-(defcustom mct-completion-windows-regexp
-  "\\`\\*Completions.*\\*\\'"
-  "Regexp to match window names with completion candidates.
-Used by `mct--get-completion-window'."
-  :type 'string
-  :group 'mct)
+(make-obsolete 'mct-completion-windows-regexp 'mct--completions-window-name "0.5.0")
 
 (defcustom mct-completion-window-size (cons #'mct--frame-height-fraction 1)
   "Set the maximum and minimum height of the Completions' buffer.
@@ -309,6 +304,9 @@ See `mct-minimum-input'."
 
 ;;;;; Live-updating Completions' buffer
 
+(defvar mct--completions-window-name "\\`\\*Completions.*\\*\\'"
+  "Regexp to match window names with completion candidates.")
+
 ;; Adapted from Omar Antolín Camarena's live-completions library:
 ;; <https://github.com/oantolin/live-completions>.
 (defun mct--live-completions-refresh-immediately ()
@@ -493,13 +491,13 @@ Apply APP by first setting up the minibuffer to work with Mct."
   (get-window-with-predicate
    (lambda (window)
      (string-match-p
-      mct-completion-windows-regexp
+      mct--completions-window-name
       (buffer-name (window-buffer window))))))
 
 (defun mct--show-completions ()
   "Show the completions' buffer."
   (let ((display-buffer-alist
-         (cons (cons mct-completion-windows-regexp mct-display-buffer-action)
+         (cons (cons mct--completions-window-name mct-display-buffer-action)
                display-buffer-alist))
         ;; don't ring the bell in `minibuffer-completion-help'
         ;; when <= 1 completion exists.
@@ -528,7 +526,7 @@ The continuous switch is essentially the same as running
 succession.
 
 What constitutes a completions' window is ultimately determined
-by `mct-completion-windows-regexp'."
+by `mct--completions-window-name'."
   (interactive nil mct-minibuffer-mode)
   (let* ((mini (active-minibuffer-window))
          (completions (mct--get-completion-window)))
