@@ -519,7 +519,7 @@ by `mct-completion-windows-regexp'."
 (defun mct--completions-completion-p ()
   "Return non-nil if there is a completion at point."
   (let ((point (point)))
-    ;; The `or' is for Emacs 27 where there were no completion--string
+    ;; The `or' is for Emacs 27 where there are no completion--string
     ;; properties.
     (or (get-text-property point 'completion--string)
         (get-text-property point 'mouse-face))))
