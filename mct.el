@@ -45,6 +45,27 @@ Used by `mct--get-completion-window'."
   :type 'string
   :group 'mct)
 
+(defcustom mct-completion-window-size (cons #'mct--frame-height-fraction 1)
+  "Set the maximum and minimum height of the Completions' buffer.
+
+The value is a cons cell in the form of (max-height . min-height)
+where each value is either a natural number or a function which
+returns such a number.
+
+The default maximum height of the window is calculated by the
+function `mct--frame-height-fraction', which finds the closest
+round number to 1/3 of the frame's height.  While the default
+minimum height is 1.  This means that during live completions the
+Completions' window will shrink or grow to show candidates within
+the specified boundaries.  To disable this bouncing effect, set
+both max-height and min-height to the same number."
+  :type '(cons
+          (choice (function :tag "Function to determine maximum height")
+                  (natnum :tag "Maximum height in number of lines"))
+          (choice (function :tag "Function to determine minimum height")
+                  (natnum :tag "Minimum height in number of lines")))
+  :group 'mct)
+
 (defcustom mct-remove-shadowed-file-names nil
   "Delete shadowed parts of file names.
 
@@ -256,12 +277,30 @@ See `completions-format' for possible values."
                                  (goto-char prev))))))
         (put-text-property (point-min) (point) 'invisible t)))))
 
+(defun mct--frame-height-fraction ()
+  "Return round number of 1/3 of `frame-height'.
+Can be used in `mct-completion-window-size'."
+  (floor (frame-height) 3))
+
+(defun mct--height (param)
+  "Return height of PARAM in number of lines."
+  (cond
+   ((natnump param) param)
+   ((functionp param) (funcall param))
+   ;; There is no compelling reason to fall back to 5.  It just feels
+   ;; like a reasonable small value...
+   (t 5)))
+
 (defun mct--fit-completions-window (&rest _args)
   "Fit Completions' buffer to its window."
   (when-let ((window (mct--get-completion-window)))
-    (with-current-buffer (window-buffer window)
-      (setq-local window-resize-pixelwise t))
-    (fit-window-to-buffer window (floor (frame-height) 2) 1)))
+    ;; TODO 2022-01-28: Do we need the pixelwise adjustment?
+    ;; (with-current-buffer (window-buffer window)
+    ;;   (setq-local window-resize-pixelwise t))
+    (let* ((size mct-completion-window-size)
+           (max (car size))
+           (min (cdr size)))
+      (fit-window-to-buffer window (mct--height max) (mct--height min)))))
 
 (defun mct--minimum-input ()
   "Test for minimum requisite input for live completions.

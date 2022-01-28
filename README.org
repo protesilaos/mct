@@ -130,6 +130,20 @@ the Completions' buffer:
   both the automatic display and live updating of the Completions'
   buffer.
 
+#+vindex: mct-completion-window-size
+The size of the window where the =*Completions*= buffer is displayed is
+controlled by the user option ~mct-completion-window-size~.  It accepts a
+cons cell in the form of =(max-height . min-height)= where each value is
+either a natural number or a function which returns such a number.
+
+The default maximum height of the window is calculated by the function
+~mct--frame-height-fraction~, which finds the closest round number to 1/3
+of the frame's height.  While the default minimum height is 1.  This
+means that during live completions the Completions' window will shrink
+or grow to show candidates within the specified boundaries.  To disable
+this bouncing effect, set both max-height and min-height to the same
+number.
+
 Other customizations:
 
   #+vindex: mct-hide-completion-mode-line
@@ -531,6 +545,7 @@ And with more options:
 #+begin_src emacs-lisp
 (require 'mct)
 
+(setq mct-completion-window-size (cons #'mct--frame-height-fraction 1))
 (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
 (setq mct-hide-completion-mode-line t)
 (setq mct-show-completion-line-numbers nil)
