@@ -466,11 +466,6 @@ Apply APP by first setting up the minibuffer to work with Mct."
 ;; (declare-function prop-match-beginning "text-property-search" (cl-x))
 ;; (declare-function prop-match-end "text-property-search" (cl-x))
 
-
-
-;; FIXME 2022-01-21: The line highlight does not :extend for
-;; mct-region-mode when using the one-column style.
-
 ;; We need this to make things work on Emacs 27.
 (defun mct--one-column-p ()
   "Test if we have a one-column view available."
