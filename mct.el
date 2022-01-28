@@ -516,7 +516,7 @@ by `mct-completion-windows-regexp'."
 
 ;;;;; Cyclic motions between minibuffer and completions' buffer
 
-(defun mct--completions-completion-p ()
+(defun mct--completion-at-point-p ()
   "Return non-nil if there is a completion at point."
   (let ((point (point)))
     ;; The `or' is for Emacs 27 where there are no completion--string
@@ -528,7 +528,7 @@ by `mct-completion-windows-regexp'."
   "Return non-nil if ARGth next completion exists."
   (save-excursion
     (mct--next-completion arg)
-    (mct--completions-completion-p)))
+    (mct--completion-at-point-p)))
 
 (defun mct--first-completion-point ()
   "Return the `point' of the first completion."
@@ -559,7 +559,7 @@ a `one-column' value."
   "Check if ARGth line has a completion candidate."
   (save-excursion
     (vertical-motion arg)
-    (null (mct--completions-completion-p))))
+    (null (mct--completion-at-point-p))))
 
 (defun mct--switch-to-completions ()
   "Subroutine for switching to the completions' buffer."
@@ -593,7 +593,7 @@ a `one-column' value."
   (goto-char (point-max))
   (next-completion -1)
   (goto-char (point-at-bol))
-  (unless (mct--completions-completion-p)
+  (unless (mct--completion-at-point-p)
     (next-completion 1))
   (mct--restore-old-point-in-grid (point))
   (recenter
@@ -640,7 +640,7 @@ ARG is a numeric argument for `next-completion', as described in
         (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
           (line-move-to-column col))
         (when (or (> (current-column) col)
-                  (not (mct--completions-completion-p)))
+                  (not (mct--completion-at-point-p)))
           (next-completion -1)))
     (next-completion (or arg 1))))
 
@@ -691,7 +691,7 @@ ARG is a numeric argument for `previous-completion', as described in
         (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
           (line-move-to-column col))
         (when (or (> (current-column) col)
-                  (not (mct--completions-completion-p)))
+                  (not (mct--completion-at-point-p)))
           (next-completion -1)))
     (previous-completion (or (abs arg) 1))))
 
@@ -988,7 +988,7 @@ region.")
 ;; clicking on it with the mouse.
 (defun mct--completions-completion-beg ()
   "Return point of completion candidate at START and END."
-  (if-let ((string (mct--completions-completion-p)))
+  (if-let ((string (mct--completion-at-point-p)))
       (save-excursion
         (prop-match-beginning (mct--completions-text-property-search)))
     (point)))
@@ -996,7 +996,7 @@ region.")
 ;; Same as above for the `if-let'.
 (defun mct--completions-completion-end ()
   "Return end of completion candidate."
-  (if-let ((string (mct--completions-completion-p)))
+  (if-let ((string (mct--completion-at-point-p)))
       (save-excursion
         (if (mct--one-column-p)
             (1+ (point-at-eol))
