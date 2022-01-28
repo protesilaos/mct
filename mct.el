@@ -621,7 +621,7 @@ ARG is a numeric argument for `next-completion', as described in
       (= (save-excursion (next-completion arg) (point)) (point-max))
       ;; The empty final line case which should avoid candidates with
       ;; spaces or line breaks...
-      (mct--empty-line-p arg))))
+      (mct--empty-line-p arg)))
 
 (defun mct--next-completion (arg)
   "Routine to move to the next ARGth completion candidate."
