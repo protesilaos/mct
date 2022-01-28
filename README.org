@@ -87,7 +87,7 @@ input threshold as well as a slight delay before it pops up the
 Customization options control the input threshold (~mct-minimum-input~)
 and the delay between live updates (~mct-live-update-delay~).  Similarly,
 a blocklist and a passlist for commands and/or completion categories are
-on offer:
+on offer (both have been updated as part of {{{development-version}}}):
 
   #+vindex: mct-completion-blocklist
 + The blocklist (~mct-completion-blocklist~) disables the live-updating
@@ -132,9 +132,10 @@ the Completions' buffer:
 
 #+vindex: mct-completion-window-size
 The size of the window where the =*Completions*= buffer is displayed is
-controlled by the user option ~mct-completion-window-size~.  It accepts a
-cons cell in the form of =(max-height . min-height)= where each value is
-either a natural number or a function which returns such a number.
+controlled by the user option ~mct-completion-window-size~ (part of
+{{{development-version}}}).  It accepts a cons cell in the form of =(max-height
+. min-height)= where each value is either a natural number or a function
+which returns such a number.
 
 The default maximum height of the window is calculated by the function
 ~mct--frame-height-fraction~, which finds the closest round number to 1/3
