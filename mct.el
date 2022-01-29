@@ -554,7 +554,7 @@ by `mct--completions-window-name'."
       (goto-char (line-end-position)))
     (save-excursion
       (goto-char (1- (point)))
-      (when (search-backward "/" (point-min) t)
+      (when (search-backward "/" (minibuffer-prompt-end) t)
         (delete-region (1+ (point)) (point-max)))))
    (t (call-interactively 'backward-delete-char))))
 
