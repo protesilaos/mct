@@ -943,7 +943,7 @@ followed by exiting the minibuffer with that candidate."
 ;; `cursor-sensor-functions'.
 (defun mct-beginning-of-buffer ()
   "Go to the top of the Completions buffer."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-minibuffer-mode mct-region-mode)
   (goto-char (mct--first-completion-point)))
 
 (defun mct-keyboard-quit-dwim ()
@@ -954,7 +954,7 @@ If in a completions' buffer and unless the region is active, run
 
 If the region is active, deactivate it.  A second invocation of
 this command is then required to abort the session."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-minibuffer-mode mct-region-mode)
   (when (derived-mode-p 'completion-list-mode)
     (cond
      ((null (active-minibuffer-window))
