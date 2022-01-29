@@ -252,7 +252,7 @@ See `completions-format' for possible values."
 
 ;; Thanks to Omar Antolín Camarena for recommending the use of
 ;; `cursor-sensor-functions' and the concomitant hook with
-;; `cursor-censor-mode' instead of the dirty hacks I had before to
+;; `cursor-sensor-mode' instead of the dirty hacks I had before to
 ;; prevent the cursor from moving to that position where no completion
 ;; candidates could be found at point (e.g. it would break `embark-act'
 ;; as it could not read the topmost candidate when point was at the
