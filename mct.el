@@ -223,9 +223,19 @@ See `completions-format' for possible values."
        'category))))
 
 (defun mct--symbol-in-list (list)
-  "Test if symbol of command or category is in LIST."
+  "Test if command or category is in LIST."
   (or (memq (mct--this-command) list)
       (memq (mct--completion-category) list)))
+
+(defun mct--passlist-p ()
+  "Return non-nil if symbol is in the `mct-completion-passlist'."
+  (or (memq (mct--this-command) mct-completion-passlist)
+      (memq (mct--completion-category) mct-completion-passlist)))
+
+(defun mct--blocklist-p ()
+  "Return non-nil if symbol is in the `mct-completion-blocklist'."
+  (or (memq (mct--this-command) mct-completion-blocklist)
+      (memq (mct--completion-category) mct-completion-blocklist)))
 
 ;;;; Basics of intersection between minibuffer and Completions' buffer
 
@@ -350,12 +360,12 @@ Meant to be added to `after-change-functions'."
   "Set up the completions' buffer."
   (cond
    ((null mct-live-completion))
-   ((mct--symbol-in-list mct-completion-passlist)
+   ((mct--passlist-p)
     (setq-local mct-minimum-input 0)
     (setq-local mct-live-update-delay 0)
     (mct--show-completions)
     (add-hook 'after-change-functions #'mct--live-completions-refresh nil t))
-   ((not (mct--symbol-in-list mct-completion-blocklist))
+   ((not (mct--blocklist-p))
     (add-hook 'after-change-functions #'mct--live-completions-refresh nil t))))
 
 (defvar-local mct--active nil
