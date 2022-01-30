@@ -569,6 +569,7 @@ And with more options:
         ;; Some completion categories
         file
         buffer
+        kill-ring
         consult-location))
 
 ;; The blocklist follows the same principle as the passlist, except it
