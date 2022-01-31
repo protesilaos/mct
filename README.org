@@ -82,103 +82,337 @@ outright or only displaying them on demand, MCT implements a minimum
 input threshold as well as a slight delay before it pops up the
 =*Completions*= buffer and starts updating it to respond to user input.
 
-#+vindex: mct-minimum-input
-#+vindex: mct-live-update-delay
-Customization options control the input threshold (~mct-minimum-input~)
-and the delay between live updates (~mct-live-update-delay~).  Similarly,
-a blocklist and a passlist for commands and/or completion categories are
-on offer (both have been updated as part of {{{development-version}}}):
+* Customizations
+:PROPERTIES:
+:CUSTOM_ID: h:6953b019-ab0c-4a08-8fd0-252c9cdb0dc2
+:END:
 
-  #+vindex: mct-completion-blocklist
-+ The blocklist (~mct-completion-blocklist~) disables the live-updating
-  functionality for the symbols specified therein.
+MCT is highly configurable to adapt to the varying needs of users.  This
+section documents each user option.
 
-  #+vindex: mct-completion-passlist
-+ The passlist (~mct-completion-passlist~) always shows the Completions'
-  buffer for the designated symbol without accounting for the minimum
-  input threshold.
+** Format of the Completions
+:PROPERTIES:
+:CUSTOM_ID: h:2706287d-c887-4356-a6f4-f6c7f9824ffe
+:END:
+#+vindex: mct-completions-format
 
-Both lists must consist of symbols.  Those specify commands like
-~find-file~ or completion categories such as ~file~, ~buffer~, or what other
-packages define like Consult's ~consult-location~ category.
+Brief: Set the presentation of candidates in the Completions' buffer.
 
+Symbol: ~mct-completions-format~ (=choice= type)
+
+Possible values:
+
+1. ~one-column~ (default---only works on Emacs 28 or higher)
+2. ~horizontal~
+3. ~vertical~
+
+By default, MCT tries to display completion candidates in a single
+column.  This only works for Emacs version 28 or higher.  In older
+versions of Emacs, the choices are between two grid views as explained
+in the built-in user option ~completions-format~, with the fallback being
+the ~horizontal~ style.
+
+** Live completion
+:PROPERTIES:
+:CUSTOM_ID: h:1a85ed4c-f54d-482b-9915-563f60c64f15
+:END:
 #+vindex: mct-live-completion
-The user option ~mct-live-completion~ controls the overall behaviour of
-the Completions' buffer:
+
+Brief: Control auto-display and live-update of the =*Completions*= buffer.
+
+Symbol: ~mct-live-completion~ (=choice= type)
+
+Possible values:
+
+1. ~nil~
+2. ~t~ (default)
+3. ~visible~
+
+This user option governs the overall behaviour of MCT with regard to how
+it uses the Completions' buffer:
 
 + When nil, the user has to manually request completions, using the
-  regular activating commands.  The Completions' buffer is never updated
-  live to match user input.  Updating has to be handled manually.  This
-  is like the out-of-the-box minibuffer completion experience.
+  regular activating commands ([[#h:884d6702-8666-4d89-87a2-7d74843653f3][Usage]]).  The Completions' buffer is never
+  updated live to match user input.  Updating has to be handled
+  manually.  This is like the out-of-the-box minibuffer completion
+  experience.
 
-+ When set to the value =visible=, the Completions' buffer is live
-  updated only if it is visible.  The actual display of the completions
-  is still handled manually.  For this reason, the =visible= style does
-  not read the ~mct-minimum-input~, meaning that it will always try to
-  live update the visible completions, regardless of input length.
++ When set to ~visible~, the Completions' buffer is live updated only if
+  it is visible (present in a window).  The actual display of the
+  completions is still handled manually.  For this reason, the ~visible~
+  style does not read the ~mct-minimum-input~, meaning that it will always
+  try to live update the visible completions, regardless of input length
+  ([[#h:ea15357e-c9d3-4840-84fe-1374c9f36e28][Minimum input threshold]]).
 
 + When non-nil (the default), the Completions' buffer is automatically
   displayed once the ~mct-minimum-input~ is met and is hidden if the input
   drops below that threshold.  While visible, the buffer is updated live
   to match the user's input.
 
-+ Note that every command or completion category in the
-  ~mct-completion-passlist~ ignores this option altogether.  This means
-  that every such symbol will always show the Completions' buffer
-  automatically and will always update its contents live.  Same
-  principle for the ~mct-completion-blocklist~, which will always disable
-  both the automatic display and live updating of the Completions'
-  buffer.
+Note that every command or completion category that is declared in the
+~mct-completion-passlist~ ignores this option altogether.  This means that
+every such symbol will always show the Completions' buffer automatically
+and will always update its contents live to match any further user input
+([[#h:334abfc2-85ce-4519-add5-5a3775dd5e12][Passlist for commands or completion categories]]).  Same principle for
+the ~mct-completion-blocklist~, which will always disable both the
+automatic display and live updating of the Completions' buffer
+([[#h:36f56245-281a-4389-a998-66778de100db][Blocklist for commands or completion categories]]).
 
+[[#h:2fcf708f-4edf-41f3-9e29-0e750f3a80af][Size boundaries of the Completions]].
+
+** Minimum input threshold
+:PROPERTIES:
+:CUSTOM_ID: h:ea15357e-c9d3-4840-84fe-1374c9f36e28
+:END:
+#+vindex: mct-minimum-input
+
+Brief: Try to live update completions when input is >= N.
+
+Symbol: ~mct-minimum-input~ (=natnum= type)
+
+By default, MCT expects the user to type =3= characters before it tries to
+compute completion candidates, display the =*Completions*= buffer and keep
+it updated live to match any subsequent input.
+
+Setting this user option to a value greater than 1 can help reduce the
+total number of candidates that are being computed.  That is because the
+Completions can consist of thousands of items that all need to be
+rendered at once in a buffer.
+
+In terms of the user experience, the minimum input threshold can make
+sessions feel less visually demanding when the user (i) knows what they
+are looking for and (ii) types fast enough so that the =*Completions*=
+never have the time to pop up.
+
+This variable is ignored for commands or completion categories that are
+specified in the ~mct-completion-passlist~ and ~mct-completion-blocklist~.
+
+[[#h:321ef12c-0f4a-440d-b88a-96e75325f3fc][Live updates per command or completion category]].
+
+** Delay between live updates
+:PROPERTIES:
+:CUSTOM_ID: h:e342534b-db28-4f7b-9f4d-f2b65ab5189e
+:END:
+#+vindex: mct-live-update-delay
+
+Brief: Delay in seconds before updating the Completions' buffer.
+
+Symbol: ~mct-live-update-delay~ (=number= type)
+
+The delay in seconds between live updates of the Completions' buffer.
+The default value is =0.3=.
+
+This variable is ignored for commands or completion categories that are
+specified in the ~mct-completion-passlist~ and ~mct-completion-blocklist~.
+
+[[#h:321ef12c-0f4a-440d-b88a-96e75325f3fc][Live updates per command or completion category]].
+
+** Live updates per command or completion category
+:PROPERTIES:
+:CUSTOM_ID: h:321ef12c-0f4a-440d-b88a-96e75325f3fc
+:END:
+#+cindex: Passlist and blocklist of commands or completion categories
+
+By default, MCT has the same behaviour across all types of completion.
+Specifically, it respects the ~mct-live-completion~ option on whether and
+when to perform live completion, the ~mct-minimum-input~ threshold before
+doing so, and the ~mct-live-update-delay~ between changes to the
+=*Completions*= buffer.
+
+[[#h:36f56245-281a-4389-a998-66778de100db][Live completion]].
+
+[[#h:ea15357e-c9d3-4840-84fe-1374c9f36e28][Minimum input threshold]].
+
+[[#h:e342534b-db28-4f7b-9f4d-f2b65ab5189e][Delay between live updates]].
+
+A passlist and a blocklist can override those options for the commands
+or categories specified.
+
+*** Passlist for commands or completion categories
+:PROPERTIES:
+:CUSTOM_ID: h:334abfc2-85ce-4519-add5-5a3775dd5e12
+:END:
+#+vindex: mct-completion-passlist
+
+[ Updated as part of {{{development-version}}}. ]
+
+Brief: List of symbols where live completions are always enabled.
+
+Symbol: ~mct-completion-passlist~ (=repeat symbol= type)
+
+The value of this user option is a list of symbols.  Those can refer to
+commands like ~find-file~ or completion categories such as ~file~, ~buffer~,
+or what other packages define like Consult's ~consult-location~ category.
+
+Any entry in the passlist ignores the value of ~mct-live-completion~ and
+the ~mct-minimum-input~.  It also bypasses any possible delay introduced
+by ~mct-live-update-delay~.  In other words, it immediately displays the
+=*Completions*= buffer and instantly updates it to match user input.
+
+[[#h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4][Known completion categories]].
+
+*** Blocklist for commands or completion categories
+:PROPERTIES:
+:CUSTOM_ID: h:36f56245-281a-4389-a998-66778de100db
+:END:
+#+vindex: mct-completion-blocklist
+
+[ Updated as part of {{{development-version}}}. ]
+
+Brief: List of symbols where live completions are always disabled.
+
+Symbol: ~mct-completion-blocklist~ (=repeat symbol= type)
+
+The value of this user option is a list of symbols.  Those can refer to
+commands like ~find-file~ or completion categories such as ~file~, ~buffer~,
+or what other packages define like Consult's ~consult-location~ category.
+
+This means that they ignore ~mct-live-completion~.  They do not
+automatically display the Completions' buffer, nor do they update it to
+match user input.
+
+The Completions' buffer can still be accessed with commands that place
+it in a window (such as ~mct-list-completions-toggle~,
+~mct-switch-to-completions-top~).
+
+Perhaps a less drastic measure is to set ~mct-minimum-input~ to an
+appropriate value.  Or better use ~mct-completion-passlist~.
+
+[[#h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4][Known completion categories]].
+
+*** Known completion categories
+:PROPERTIES:
+:CUSTOM_ID: h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4
+:END:
+
+Below are the known completion categories that can be added to the
+~mct-completion-passlist~ and ~mct-completion-blocklist~.  This resource is
+non-exhuastive and will be updated to match available information.
+
++ ~bookmark~
++ ~buffer~
++ ~charset~
++ ~coding-system~
++ ~color~
++ ~command~ (e.g. =M-x=)
++ ~customize-group~
++ ~environment-variable~
++ ~expression~
++ ~face~
++ ~file~
++ ~function~ (the ~describe-function~ command bound to =C-h f=)
++ ~info-menu~
++ ~imenu~
++ ~input-method~
++ ~kill-ring~
++ ~library~
++ ~minor-mode~
++ ~multi-category~
++ ~package~
++ ~project-file~
++ ~symbol~ (the ~describe-symbol~ command bound to =C-h o=)
++ ~theme~
++ ~unicode-name~ (the ~insert-char~ command bound to =C-x 8 RET=)
++ ~variable~ (the ~describe-variable~ command bound to =C-h v=)
+
+From the =consult= package:
+
++ ~consult-grep~
++ ~consult-isearch~
++ ~consult-isearch~
++ ~consult-kmacro~
++ ~consult-location~
+
+From the =embark= package:
+
++ ~embark-keybinding~
+
+In general, it is best not to add symbols which include several
+thousands of candidates to the passlist.  So no ~command~, ~function~,
+~symbol~, ~unicode-name~, ~variable~.
+
+When in doubt, do not add a symbol to either the pass- or block- list.
+
+** Size boundaries of the Completions
+:PROPERTIES:
+:CUSTOM_ID: h:2fcf708f-4edf-41f3-9e29-0e750f3a80af
+:END:
 #+vindex: mct-completion-window-size
-The size of the window where the =*Completions*= buffer is displayed is
-controlled by the user option ~mct-completion-window-size~ (part of
-{{{development-version}}}).  It accepts a cons cell in the form of =(max-height
-. min-height)= where each value is either a natural number or a function
-which returns such a number.
+
+Brief: Set the maximum and minimum height of the Completions' buffer.
+
+Symbol: ~mct-completion-window-size~ (=choice= type between nil and cons cell)
+
+The value is a cons cell in the form of =(max-height . min-height)= where
+each value is either a natural number or a function which returns such a
+number.
 
 The default maximum height of the window is calculated by the function
-~mct--frame-height-fraction~, which finds the closest round number to 1/3
-of the frame's height.  While the default minimum height is 1.  This
+~mct--frame-height-fraction~, which finds the closest round number to
+1/3 of the frame's height.  While the default minimum height is 1.  This
 means that during live completions the Completions' window will shrink
 or grow to show candidates within the specified boundaries.  To disable
 this bouncing effect, set both max-height and min-height to the same
 number.
 
-If set to nil, MCT will not try to fit the Completions' buffer to its
-window.
+If nil, do not try to fit the Completions' buffer to its window.
 
-Other customizations:
+[[#h:1a85ed4c-f54d-482b-9915-563f60c64f15][Live completion]].
 
-  #+vindex: mct-hide-completion-mode-line
-+ ~mct-hide-completion-mode-line~ to hide the mode line of the
-  =*Completions*= buffer.  This removes the separation between it and the
-  minibuffer, further contributing to the idea of a unified space
-  between the two.
+** Hide the Completions mode line
+:PROPERTIES:
+:CUSTOM_ID: h:36adcbbb-f534-4595-9629-babe38a35efc
+:END:
+#+vindex: mct-hide-completion-mode-line
 
-  #+vindex: mct-remove-shadowed-file-name
-+ ~mct-remove-shadowed-file-name~ to clear shadowed file names when
-  ~file-name-shadow-mode~ is enabled.  This means that in prompts that use
-  file paths (such as ~find-file~) when you start in, say, =~/Git/mct.el=
-  and type =~/= the previous file path is removed and only the new one is
-  inserted.  Whereas the default is to keep the original file name
-  visible yet "shadowed" by a different color.
+Brief: Do not show a mode line in the Completions' buffer.
 
-  #+findex: mct-choose-completion-number
-+ ~mct-show-completion-line-numbers~ to always display line numbers in the
-  Completions' buffer.  This can be helpful to get a sense of the length
-  of the completion candidates' list.  Though note that line numbers are
-  displayed ephemerally while using the ~mct-choose-completion-number~
-  command, which is bound to =M-g M-g= in either the minibuffer or the
-  =*Completions*= buffer.
+Symbol: ~mct-hide-completion-mode-line~ (=boolean= type)
 
-  #+vindex: mct-apply-completion-stripes
-  #+vindex: mct-stripe
-+ ~mct-apply-completion-stripes~ applies alternating background colors in
-  the Completions' buffer.  This is only tested with the =modus-themes=
-  and will only work nicely if the main background is pure black or
-  white---other themes would need to add support for the faces we define
-  or, at least, users must modify the ~mct-stripe~ face.
+By default, the =*Completions*= buffer has its own mode line, just like
+every other window.  Set this user option to non-nil to remove the mode
+line.
+
+** Remove shadowed file paths
+:PROPERTIES:
+:CUSTOM_ID: h:9d637155-04a5-419e-a9c5-471258130057
+:END:
+#+vindex: mct-remove-shadowed-file-name
+
+Brief: Delete shadowed parts of file names from the minibuffer.
+
+Symbol: ~mct-remove-shadowed-file-names~ (=boolean= type)
+
+When the built-in ~file-name-shadow-mode~ is enabled and this user option
+is non-nil, MCT will delete the part of the file path that is shadowed
+(meaning that it is overriden) by the given input.
+
+For example, if the user types =~/= after a long path name, everything
+preceding the =~/= is removed so the interactive selection process starts
+again from the user's =$HOME=.
+
+** Alternating backgrounds in the Completions
+:PROPERTIES:
+:CUSTOM_ID: h:187f325e-fb48-4b7f-9508-97f34d2242e8
+:END:
+#+vindex: mct-apply-completion-stripes
+
+Brief: Use alternating backgrounds in the Completions.
+
+Symbol: ~mct-apply-completion-stripes~ (=boolean= type)
+
+By default, the =*Completions*= buffer uses the main background of the
+active theme (more specifically the =:background= attribute of the ~default~
+face).  When set to non-nil, MCT applies applies alternating background
+colors in the Completions' buffer.  These are in a shade of gray that
+contrasts with the main background.
+
+#+vindex: mct-stripe
+Due to the specific nature of this style, there is no basic face that
+can be inherited to achieve a consistent result across themes.  As such,
+it only looks as intended with the =modus-themes= (built into Emacs 28 or
+higher or available as a package).  Other themes would need to add
+support for the ~mct-stripe~ face.
 
 ** MCT in the minibuffer and in regular buffers
 :PROPERTIES:
@@ -368,7 +602,6 @@ Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour
    and always makes the completions' buffer visible.  Selection in this
    way exits the minibuffer.
 
-   #+vindex: mct-completions-format
    NOTE: This method only works when ~mct-completions-format~ is set to
    its default value of =one-column=.  The other formats show completions
    in a grid view, which makes navigation based on line numbers
@@ -555,6 +788,7 @@ And with more options:
 (setq mct-show-completion-line-numbers nil)
 (setq mct-apply-completion-stripes t)
 (setq mct-minimum-input 3)
+(setq mct-live-completion t)
 (setq mct-live-update-delay 0.6)
 (setq mct-completions-format 'one-column)
 
