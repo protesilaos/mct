@@ -55,7 +55,9 @@ Completions' window will shrink or grow to show candidates within
 the specified boundaries.  To disable this bouncing effect, set
 both max-height and min-height to the same number.
 
-If nil, do not try to fit the Completions' buffer to its window."
+If nil, do not try to fit the Completions' buffer to its window.
+
+Also see `mct-live-completion'."
   :type '(choice (const :tag "Disable size constraints" nil)
                  (cons
                   (choice (function :tag "Function to determine maximum height")
@@ -65,7 +67,7 @@ If nil, do not try to fit the Completions' buffer to its window."
   :group 'mct)
 
 (defcustom mct-remove-shadowed-file-names nil
-  "Delete shadowed parts of file names.
+  "Delete shadowed parts of file names from the minibuffer.
 
 For example, if the user types ~/ after a long path name,
 everything preceding the ~/ is removed so the interactive
@@ -76,7 +78,7 @@ Only works when variable `file-name-shadow-mode' is non-nil."
   :group 'mct)
 
 (defcustom mct-hide-completion-mode-line nil
-  "Do not show a mode line in the Completions' buffer."
+  "When non-nil, do not show the Completions' buffer mode line."
   :type 'boolean
   :group 'mct)
 
@@ -86,7 +88,7 @@ Only works when variable `file-name-shadow-mode' is non-nil."
   :group 'mct)
 
 (defcustom mct-apply-completion-stripes nil
-  "Display alternating backgrounds the Completions' buffer."
+  "When non-nil, use alternating backgrounds in the Completions."
   :type 'boolean
   :group 'mct)
 
@@ -117,7 +119,9 @@ means that every such symbol will always show the Completions'
 buffer automatically and will always update its contents live.
 Same principle for `mct-completion-blocklist', which will always
 disable both the automatic display and live updating of the
-Completions' buffer."
+Completions' buffer.
+
+Also see `mct-completion-window-size'."
   :type '(choice
           (const :tag "Disable live-updating" nil)
           (const :tag "Enable live-updating" t)
@@ -143,6 +147,11 @@ This applies in all cases covered by `mct-live-completion'."
 (defcustom mct-completion-blocklist nil
   "List of symbols where live completions are outright disabled.
 
+The value of this user option is a list of symbols.  Those can
+refer to commands like `find-file' or completion categories such
+as `file', `buffer', or what other packages define like Consult's
+`consult-location' category.
+
 This means that they ignore `mct-live-completion'.  They do not
 automatically display the Completions' buffer, nor do they update
 it to match user input.
@@ -151,27 +160,26 @@ The Completions' buffer can still be accessed with commands that
 place it in a window (such as `mct-list-completions-toggle',
 `mct-switch-to-completions-top').
 
-The value of this user option is a list of symbols.  Those can
-refer to commands like `find-file' or completion categories such
-as `file', `buffer', or what other packages define like Consult's
-`consult-location' category.
-
 Perhaps a less drastic measure is to set `mct-minimum-input' to
-an appropriate value."
+an appropriate value.  Or better use `mct-completion-passlist'.
+
+Read the manual for known completion categories."
   :type '(repeat symbol)
   :group 'mct)
 
 (defcustom mct-completion-passlist nil
   "List of symbols where live completions are always enabled.
 
+The value of this user option is a list of symbols.  Those can
+refer to commands like `find-file' or completion categories such
+as `file', `buffer', or what other packages define like Consult's
+`consult-location' category.
+
 This means that they ignore the value of `mct-live-completion'
 and the `mct-minimum-input'.  They also bypass any possible delay
 introduced by `mct-live-update-delay'.
 
-The value of this user option is a list of symbols.  Those can
-refer to commands like `find-file' or completion categories such
-as `file', `buffer', or what other packages define like Consult's
-`consult-location' category."
+Read the manual for known completion categories."
   :type '(repeat symbol)
   :group 'mct)
 
@@ -200,7 +208,7 @@ and/or the documentation string of `display-buffer'."
   :group 'mct)
 
 (defcustom mct-completions-format 'one-column
-  "The Completions' appearance used by `mct-minibuffer-mode'.
+  "Set the presentation of candidates in the Completions' buffer.
 See `completions-format' for possible values."
   :type '(choice (const horizontal) (const vertical) (const one-column))
   :group 'mct)
