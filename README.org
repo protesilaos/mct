@@ -145,6 +145,9 @@ or grow to show candidates within the specified boundaries.  To disable
 this bouncing effect, set both max-height and min-height to the same
 number.
 
+If set to nil, MCT will not try to fit the Completions' buffer to its
+window.
+
 Other customizations:
 
   #+vindex: mct-hide-completion-mode-line

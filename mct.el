@@ -53,12 +53,15 @@ round number to 1/3 of the frame's height.  While the default
 minimum height is 1.  This means that during live completions the
 Completions' window will shrink or grow to show candidates within
 the specified boundaries.  To disable this bouncing effect, set
-both max-height and min-height to the same number."
-  :type '(cons
-          (choice (function :tag "Function to determine maximum height")
-                  (natnum :tag "Maximum height in number of lines"))
-          (choice (function :tag "Function to determine minimum height")
-                  (natnum :tag "Minimum height in number of lines")))
+both max-height and min-height to the same number.
+
+If nil, do not try to fit the Completions' buffer to its window."
+  :type '(choice (const :tag "Disable size constraints" nil)
+                 (cons
+                  (choice (function :tag "Function to determine maximum height")
+                          (natnum :tag "Maximum height in number of lines"))
+                  (choice (function :tag "Function to determine minimum height")
+                          (natnum :tag "Minimum height in number of lines"))))
   :group 'mct)
 
 (defcustom mct-remove-shadowed-file-names nil
@@ -298,14 +301,11 @@ Can be used in `mct-completion-window-size'."
 
 (defun mct--fit-completions-window (&rest _args)
   "Fit Completions' buffer to its window."
-  (when-let ((window (mct--get-completion-window)))
-    ;; TODO 2022-01-28: Do we need the pixelwise adjustment?
-    ;; (with-current-buffer (window-buffer window)
-    ;;   (setq-local window-resize-pixelwise t))
-    (let* ((size mct-completion-window-size)
-           (max (car size))
-           (min (cdr size)))
-      (fit-window-to-buffer window (mct--height max) (mct--height min)))))
+  (when-let* ((window (mct--get-completion-window))
+              (size mct-completion-window-size)
+              (max (car size))
+              (min (cdr size)))
+    (fit-window-to-buffer window (mct--height max) (mct--height min))))
 
 (defun mct--minimum-input ()
   "Test for minimum requisite input for live completions.
