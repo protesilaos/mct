@@ -286,8 +286,9 @@ appropriate value.  Or better use ~mct-completion-passlist~.
 :END:
 
 Below are the known completion categories that can be added to the
-~mct-completion-passlist~ and ~mct-completion-blocklist~.  This resource is
-non-exhuastive and will be updated to match available information.
+~mct-completion-passlist~ and ~mct-completion-blocklist~ (and relevant
+custom code).  This resource is non-exhaustive and will be updated to
+match available information.
 
 + ~bookmark~
 + ~buffer~
