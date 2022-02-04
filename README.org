@@ -1078,6 +1078,41 @@ explicit key binding:
 
 In this section we cover custom code that builds on what MCT offers.
 
+** Sort completion candidates on Emacs 29
+:PROPERTIES:
+:CUSTOM_ID: h:493922c7-efdc-4b63-aa96-b31c684eb4fa
+:END:
+#+cindex: Sorting completions
+
+Starting with Emacs 29 (current development target), the user option
+~completions-sort~ controls the sorting method of candidates in the
+=*Completions*= buffer.  Beside the default of using ~string-lessp~, it
+accepts a custom function.  Consider any of the following examples:
+
+#+begin_src emacs-lisp
+(defun my-sort-by-alpha-length (elems)
+  "Sort ELEMS first alphabetically, then by length."
+  (sort elems (lambda (c1 c2)
+                (and (string-version-lessp c1 c2)
+                     (< (length c1) (length c2))))))
+
+(defun my-sort-by-history (elems)
+  "Sort ELEMS by minibuffer history.
+Use `mct-sort-sort-by-alpha-length' if no history is available."
+  (if-let ((hist (and (not (eq minibuffer-history-variable t))
+                      (symbol-value minibuffer-history-variable))))
+      (minibuffer--sort-by-position hist elems)
+    (mct-sort-sort-by-alpha-length elems)))
+
+(defun my-sort-multi-category (elems)
+  "Sort ELEMS per completion category."
+  (pcase (mct--completion-category)
+    ('nil (my-sort-by-alpha-length elems))
+    (_ (my-sort-by-history elems))))
+#+end_src
+
+[[#h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4][Known completion categories]].
+
 ** MCT in the current or the other window
 :PROPERTIES:
 :CUSTOM_ID: h:891c7841-9cdc-42df-bba9-45f7409b807c
@@ -1347,7 +1382,7 @@ MCT is meant to be a collective effort.  Every bit of help matters.
 + Ideas and user feedback :: Andrew Tropin, Benjamin (@zealotrush), Case
   Duckworth, Jonathan Irving, José Antonio Ortega Ruiz, Kostadin Ninev,
   Manuel Uberti, Philip Kaludercic, Theodor Thornhill, Tomasz
-  Hołubowicz, Z.Du.
+  Hołubowicz, Z.Du.  As well as users: danrobi11.
 
 + Inspiration for certain features :: =icomplete.el= (built-in---multiple
   authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
