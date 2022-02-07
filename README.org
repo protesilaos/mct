@@ -1103,7 +1103,7 @@ Use `mct-sort-sort-by-alpha-length' if no history is available."
   (if-let ((hist (and (not (eq minibuffer-history-variable t))
                       (symbol-value minibuffer-history-variable))))
       (minibuffer--sort-by-position hist elems)
-    (mct-sort-sort-by-alpha-length elems)))
+    (my-sort-by-alpha-length elems)))
 
 (defun my-sort-multi-category (elems)
   "Sort ELEMS per completion category."
