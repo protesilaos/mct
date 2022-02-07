@@ -1095,8 +1095,8 @@ accepts a custom function.  Consider any of the following examples:
 (defun my-sort-by-alpha-length (elems)
   "Sort ELEMS first alphabetically, then by length."
   (sort elems (lambda (c1 c2)
-                (and (string-version-lessp c1 c2)
-                     (< (length c1) (length c2))))))
+                (or (string-version-lessp c1 c2)
+                    (< (length c1) (length c2)))))))
 
 (defun my-sort-by-history (elems)
   "Sort ELEMS by minibuffer history.
@@ -1109,11 +1109,13 @@ Use `mct-sort-sort-by-alpha-length' if no history is available."
 (defun my-sort-multi-category (elems)
   "Sort ELEMS per completion category."
   (pcase (mct--completion-category)
-    ('nil (my-sort-by-alpha-length elems))
+    ('nil elems) ; no sorting
+    ('kill-ring elems)
+    ('project-file (my-sort-by-alpha-length elems))
     (_ (my-sort-by-history elems))))
 
 ;; Specify the sorting function.
-(setq completions-sort #'my-sort-by-history)
+(setq completions-sort #'my-sort-multi-category)
 #+end_src
 
 [[#h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4][Known completion categories]].
