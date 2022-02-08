@@ -863,12 +863,12 @@ And with more options:
 ;; displaying and updating the completions' buffer.
 (setq mct-completion-passlist
       '(;; Some commands
-        imenu
         Info-goto-node
         Info-index
         Info-menu
         vc-retrieve-tag
         ;; Some completion categories
+        imenu
         file
         buffer
         kill-ring
