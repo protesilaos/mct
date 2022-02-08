@@ -791,6 +791,12 @@ M-x package-refresh-contents
 M-x package-install RET mct
 #+end_src
 
+A package is also available via Guix:
+
+#+begin_src sh
+guix package -i emacs-mct
+#+end_src
+
 ** Manual installation method
 :PROPERTIES:
 :CUSTOM_ID: h:663ec536-056b-443e-9272-2a365eb28b83
@@ -1390,6 +1396,8 @@ MCT is meant to be a collective effort.  Every bit of help matters.
   Duckworth, Jonathan Irving, José Antonio Ortega Ruiz, Kostadin Ninev,
   Manuel Uberti, Philip Kaludercic, Theodor Thornhill, Tomasz
   Hołubowicz, Z.Du.  As well as users: danrobi11.
+
++ Packaging :: Andrew Tropin and Nicolas Goaziou (Guix).
 
 + Inspiration for certain features :: =icomplete.el= (built-in---multiple
   authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
