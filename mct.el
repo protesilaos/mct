@@ -25,7 +25,7 @@
 ;;; Commentary:
 ;;
 ;; MCT enhances the default Emacs completion.  It makes the minibuffer
-;; and Completions' buffer work together and look like a vertical
+;; and Completions' buffer work together as part of a singular
 ;; completion UI.
 ;;
 ;; Read the documentation for basic usage and configuration.
