@@ -234,8 +234,6 @@ or categories specified.
 :END:
 #+vindex: mct-completion-passlist
 
-[ Updated as part of {{{development-version}}}. ]
-
 Brief: List of symbols where live completions are always enabled.
 
 Symbol: ~mct-completion-passlist~ (=repeat symbol= type)
@@ -256,8 +254,6 @@ by ~mct-live-update-delay~.  In other words, it immediately displays the
 :CUSTOM_ID: h:36f56245-281a-4389-a998-66778de100db
 :END:
 #+vindex: mct-completion-blocklist
-
-[ Updated as part of {{{development-version}}}. ]
 
 Brief: List of symbols where live completions are always disabled.
 
@@ -366,8 +362,6 @@ If nil, do not try to fit the Completions' buffer to its window.
 :END:
 #+cindex: Persistent dynamic completion in the minibuffer
 #+vindex: mct-persist-dynamic-completion
-
-[ Part of {{{development-version}}}. ]
 
 Brief: Whether to keep dynamic completion live.
 
