@@ -661,16 +661,17 @@ Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour
 
    #+findex: mct-choose-completion-dwim
 6. In prompts that allow the selection of multiple candidates
-   (internally via the ~completing-read-multiple~ function) a =[CRM]= label
-   is added to the text of the prompt.  The user thus knows that
-   pressing =M-RET= (~mct-choose-completion-dwim~) in the =*Completions*= will
-   append the candidate at point to the list of selections and keep the
-   completions available so that another item may be selected.  Any of
-   the aforementioned applicable methods can confirm the final
-   selection.  If, say, you want to pick a total of three candidates, do
-   =M-RET= for the first two and =RET= (~mct-choose-completion-exit~) for the
-   last one.  In contexts that are not CRM-powered, the =M-RET= has the
-   same effect as =TAB= (~mct-choose-completion-no-exit~).
+   (internally via the ~completing-read-multiple~ function) using =M-RET=
+   (~mct-choose-completion-dwim~) in the =*Completions*= will append the
+   candidate at point to the list of selections and keep the completions
+   available so that another item may be selected.  Any of the
+   aforementioned applicable methods can confirm the final selection.
+   If, say, you want to pick a total of three candidates, do =M-RET= for
+   the first two and =RET= (~mct-choose-completion-exit~) for the last one.
+   In contexts that are not CRM-powered, the =M-RET= has the same effect
+   as =TAB= (~mct-choose-completion-no-exit~).
+
+   [[#h:162f232d-1e9d-4756-90d3-d6bf5bb4d8ef][Indicator for completing-read-multiple]].
 
    #+findex: mct-complete-and-exit
 7. When point is at the minibuffer, select the current candidate in
@@ -1107,6 +1108,29 @@ Use `mct-sort-sort-by-alpha-length' if no history is available."
 #+end_src
 
 [[#h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4][Known completion categories]].
+
+** Indicator for completing-read-multiple
+:PROPERTIES:
+:CUSTOM_ID: h:162f232d-1e9d-4756-90d3-d6bf5bb4d8ef
+:END:
+#+cindex: CRM indicator
+
+[ Part of {{{development-version}}} ]
+
+Previous versions of MCT would prepend a =[CRM]= tag to the minibuffer
+prompt of commands powered by ~completing-read-multiple~.  While this is a
+nice usability enhancement, it is not specific to MCT and thus should
+not be part of =mct.el=.  Use this in your init file instead:
+
+#+begin_src emacs-lisp
+;; Copied from Daniel Mendler's `vertico' library:
+;; <https://github.com/minad/vertico>.
+(defun my-crm-indicator (args)
+  "Add prompt indicator to `completing-read-multiple' filter ARGS."
+  (cons (concat "[CRM] " (car args)) (cdr args)))
+
+(advice-add #'completing-read-multiple :filter-args #'my-crm-indicator)
+#+end_src
 
 ** Ido-style navigation through directories
 :PROPERTIES:

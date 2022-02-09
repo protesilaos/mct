@@ -1033,12 +1033,6 @@ Apply APP while inhibiting modification hooks."
       (mct--add-stripes)
     (mct--remove-stripes)))
 
-;; Copied from Daniel Mendler's `vertico' library:
-;; <https://github.com/minad/vertico>.
-(defun mct--crm-indicator (args)
-  "Add prompt indicator to `completing-read-multiple' filter ARGS."
-  (cons (concat "[CRM] " (car args)) (cdr args)))
-
 ;;;;; Shadowed path
 
 ;; Adapted from icomplete.el
@@ -1219,13 +1213,11 @@ region.")
         (advice-add #'completing-read-default :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
         (advice-add #'minibuffer-completion-help :around #'mct--minibuffer-completion-help-advice)
-        (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
     (advice-remove #'completing-read-default #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
     (advice-remove #'minibuffer-completion-help #'mct--minibuffer-completion-help-advice)
-    (advice-remove #'completing-read-multiple #'mct--crm-indicator)
     (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily))
   (mct--setup-dynamic-completion-persist)
   (mct--setup-shared))
