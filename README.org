@@ -1146,6 +1146,45 @@ not be part of =mct.el=.  Use this in your init file instead:
 (advice-add #'completing-read-multiple :filter-args #'my-crm-indicator)
 #+end_src
 
+** Select completion with Avy
+:PROPERTIES:
+:CUSTOM_ID: h:18a2a223-8544-4294-b847-012c99003de4
+:END:
+
+The =avy= package by Oleh Krehel can be used to quickly select a candidate
+from a visible =*Completions*= buffer.  In the following example, we
+activate it with the =C-.= key.
+
+#+begin_src emacs-lisp
+;; Adapted from Omar Antolín Camarena's `avy-embark-collect.el'.
+(defun my-avy--choose (pt)
+  "Choose completion at PT."
+  (goto-char pt)
+  (mct-choose-completion-exit))
+
+(defun my-avy-completions-select ()
+  "Choose completion and exit using Avy."
+  (interactive)
+  (when (mct--get-completion-window)
+    (mct--switch-to-completions)
+    (avy-with avy-completion
+      (let ((avy-action 'my-avy--choose))
+        (avy-process
+         (save-excursion
+           (let (completions)
+             (goto-char (mct--first-completion-point))
+             (while (not (eobp))
+               (push (point) completions)
+               (next-completion 1))
+             (nreverse completions))))))))
+
+(dolist (map (list mct-minibuffer-local-completion-map
+                   mct-minibuffer-completion-list-map
+                   mct-region-completion-list-map
+                   mct-region-buffer-map))
+  (define-key map (kbd "C-.") #'my-avy-completions-select))
+#+end_src
+
 ** Ido-style navigation through directories
 :PROPERTIES:
 :CUSTOM_ID: h:9a6746dd-0be9-4e29-ac40-0af9612d05a2
