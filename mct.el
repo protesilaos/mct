@@ -470,7 +470,7 @@ Apply APP by first setting up the minibuffer to work with Mct."
                     completion-auto-help t)
         (setq mct--active t)
         (mct--setup-live-completions)
-        (mct--setup-keymap)
+        (mct--setup-minibuffer-keymap)
         (mct--setup-shadow-files))
     (apply app)))
 
@@ -1163,7 +1163,7 @@ region.")
    (make-composed-keymap mct-minibuffer-completion-list-map
                          (current-local-map))))
 
-(defun mct--setup-keymap ()
+(defun mct--setup-minibuffer-keymap ()
   "Set up minibuffer keymap."
   (use-local-map
    (make-composed-keymap mct-minibuffer-local-completion-map
