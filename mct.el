@@ -78,7 +78,7 @@ Only works when variable `file-name-shadow-mode' is non-nil."
   :group 'mct)
 
 (defcustom mct-hide-completion-mode-line nil
-  "When non-nil, do not show the Completions' buffer mode line."
+  "When non-nil, hide the Completions' buffer mode line."
   :type 'boolean
   :group 'mct)
 
