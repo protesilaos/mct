@@ -608,25 +608,6 @@ by `mct--completions-window-name'."
       (minibuffer-hide-completions)
     (mct--show-completions)))
 
-;;;;; Commands for file completion
-
-;; Adaptation of `icomplete-fido-backward-updir'.
-(defun mct-backward-updir ()
-  "Delete char before point or go up a directory."
-  (interactive nil mct-minibuffer-mode)
-  (cond
-   ((and (eq (char-before) ?/)
-         (eq (mct--completion-category) 'file))
-    (when (string-equal (minibuffer-contents) "~/")
-      (delete-minibuffer-contents)
-      (insert (expand-file-name "~/"))
-      (goto-char (line-end-position)))
-    (save-excursion
-      (goto-char (1- (point)))
-      (when (search-backward "/" (minibuffer-prompt-end) t)
-        (delete-region (1+ (point)) (point-max)))))
-   (t (call-interactively 'backward-delete-char))))
-
 ;;;;; Cyclic motions between minibuffer and completions' buffer
 
 (defun mct--completion-at-point-p ()
@@ -1176,12 +1157,6 @@ region.")
     map)
   "Derivative of `minibuffer-local-completion-map'.")
 
-(defvar mct-minibuffer-local-filename-completion-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "DEL") #'mct-backward-updir)
-    map)
-  "Derivative of `minibuffer-local-filename-completion-map'.")
-
 (defun mct--setup-completion-list-keymap ()
   "Set up completion list keymap."
   (use-local-map
@@ -1189,14 +1164,10 @@ region.")
                          (current-local-map))))
 
 (defun mct--setup-keymap ()
-  "Set up minibuffer keymaps."
+  "Set up minibuffer keymap."
   (use-local-map
    (make-composed-keymap mct-minibuffer-local-completion-map
-                         (current-local-map)))
-  (when (eq (mct--completion-category) 'file)
-    (use-local-map
-     (make-composed-keymap mct-minibuffer-local-filename-completion-map
-                           (current-local-map)))))
+                         (current-local-map))))
 
 (defun mct--setup-completion-list ()
   "Set up the completion-list for Mct."

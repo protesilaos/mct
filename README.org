@@ -679,31 +679,18 @@ Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour
    immediately exit the minibuffer with the completed candidate as the
    selected one.
 
-** Other commands for mct-minibuffer-mode
-:PROPERTIES:
-:CUSTOM_ID: h:b46a3366-6a7a-49ed-8caa-693d6ee437e9
-:END:
-#+cindex: Miscellaneous commands for minibuffer completion
-
-  #+findex: mct-next-completion-group
-  #+findex: mct-previous-completion-group
-+ Emacs 28 has the ability to group candidates inside the completions'
-  buffer under headings.  For example, the Consult package makes good
-  use of those ([[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Extensions]]).  MCT provides motions that jump between
-  such headings, placing the point at the first candidate right below
-  the heading's text.  Use =M-n= (~mct-next-completion-group~) and =M-p=
-  (~mct-previous-completion-group~) to move to the next or previous one,
-  respectively.  Both commands accept an optional numeric argument.  For
-  the sake of avoiding surprises, these commands do not cycle between
-  the completions and the minibuffer: they stop at the first or last
-  heading.
-
-  #+findex: mct-backward-updir
-+ When using completion categories that involve file paths, such as
-  ~find-file~, the backspace key (=DEL=) goes up a directory if point is
-  right after a path's directory delimiter (a forward slash).  Otherwise
-  it deletes a single character backwards.  The command's symbol is
-  ~mct-backward-updir~.
+   #+findex: mct-next-completion-group
+   #+findex: mct-previous-completion-group
+8. Emacs 28 has the ability to group candidates inside the completions'
+   buffer under headings.  For example, the Consult package makes good
+   use of those ([[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Extensions]]).  MCT provides motions that jump between
+   such headings, placing the point at the first candidate right below
+   the heading's text.  Use =M-n= (~mct-next-completion-group~) and =M-p=
+   (~mct-previous-completion-group~) to move to the next or previous one,
+   respectively.  Both commands accept an optional numeric argument.
+   For the sake of avoiding surprises, these commands do not cycle
+   between the completions and the minibuffer: they stop at the first or
+   last heading.
 
 ** Interaction model of mct-region-mode
 :PROPERTIES:
@@ -1120,6 +1107,40 @@ Use `mct-sort-sort-by-alpha-length' if no history is available."
 
 [[#h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4][Known completion categories]].
 
+** Ido-style navigation through directories
+:PROPERTIES:
+:CUSTOM_ID: h:9a6746dd-0be9-4e29-ac40-0af9612d05a2
+:END:
+
+[ Part of {{{development-version}}}. ]
+
+Older versions of MCT had a command for file navigation that would
+delete the whole directory component before point, effectively going
+back up one directory.  While the functionality can be useful, it is not
+integral to the MCT experience and thus should not belong in =mct.el=.
+Add this to your own configuration file instead:
+
+#+begin_src emacs-lisp
+;; Adaptation of `icomplete-fido-backward-updir'.
+(defun my-backward-updir ()
+  "Delete char before point or go up a directory."
+  (interactive nil mct-minibuffer-mode)
+  (cond
+   ((and (eq (char-before) ?/)
+         (eq (mct--completion-category) 'file))
+    (when (string-equal (minibuffer-contents) "~/")
+      (delete-minibuffer-contents)
+      (insert (expand-file-name "~/"))
+      (goto-char (line-end-position)))
+    (save-excursion
+      (goto-char (1- (point)))
+      (when (search-backward "/" (minibuffer-prompt-end) t)
+        (delete-region (1+ (point)) (point-max)))))
+   (t (call-interactively 'backward-delete-char))))
+
+(define-key minibuffer-local-filename-completion-map (kbd "DEL") #'my-backward-updir)
+#+end_src
+
 ** MCT in the current or the other window
 :PROPERTIES:
 :CUSTOM_ID: h:891c7841-9cdc-42df-bba9-45f7409b807c
@@ -1363,10 +1384,9 @@ They all make for a natural complement to the standard Emacs experience
   of the end-user.  ~fido-mode~ and its accoutrements are defined in
   =icomplete.el=.
 
-  What MCT borrows from Icomplete is the ~mct-backward-updir~ command, the
-  tidying of the shadowed file paths, and ideas for the input delay
-  (explained elsewhere in this document).  Internally, I also learnt how
-  to extend local keymaps by studying =icomplete.el=.
+  What MCT borrows from Icomplete is for the input delay (explained
+  elsewhere in this document).  Internally, I also learnt how to extend
+  local keymaps by studying =icomplete.el=.
 
   I had used Icomplete for several months before moving to what now has
   become =mct.el=.  I think it is excellent at providing a thin layer over
@@ -1387,9 +1407,9 @@ MCT is meant to be a collective effort.  Every bit of help matters.
   Kaludercic.
 
 + Ideas and user feedback :: Andrew Tropin, Benjamin (@zealotrush), Case
-  Duckworth, Jonathan Irving, José Antonio Ortega Ruiz, Kostadin Ninev,
-  Manuel Uberti, Philip Kaludercic, Theodor Thornhill, Tomasz
-  Hołubowicz, Z.Du.  As well as users: danrobi11.
+  Duckworth, Chris Burroughs, Jonathan Irving, José Antonio Ortega Ruiz,
+  Kostadin Ninev, Manuel Uberti, Philip Kaludercic, Theodor Thornhill,
+  Tomasz Hołubowicz, Z.Du.  As well as users: danrobi11.
 
 + Packaging :: Andrew Tropin and Nicolas Goaziou (Guix).
 
