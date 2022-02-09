@@ -1099,7 +1099,7 @@ accepts a custom function.  Consider any of the following examples:
   "Sort ELEMS first alphabetically, then by length."
   (sort elems (lambda (c1 c2)
                 (or (string-version-lessp c1 c2)
-                    (< (length c1) (length c2)))))))
+                    (< (length c1) (length c2))))))
 
 (defun my-sort-by-history (elems)
   "Sort ELEMS by minibuffer history.
