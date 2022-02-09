@@ -330,6 +330,22 @@ thousands of candidates to the passlist.  So no ~command~, ~function~,
 
 When in doubt, do not add a symbol to either the pass- or block- list.
 
+[[#h:499ee65d-429d-48c0-9e3a-a60ca649e32d][Find completion category]].
+
+*** Find completion category
+:PROPERTIES:
+:CUSTOM_ID: h:499ee65d-429d-48c0-9e3a-a60ca649e32d
+:END:
+
+While using a command that provides a minibuffer prompt, type =M-:= (the
+~eval-expression~ command) and evaluate =(mct--completion-category)=.  It
+will return the completion category, if any.  Note that this only works
+when the variable ~enable-recursive-minibuffers~ is non-nil.
+
+To review echo area messages, use =C-h e= (~view-echo-area-messages~).
+
+[[#h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4][Known completion categories]].
+
 ** Size boundaries of the Completions
 :PROPERTIES:
 :CUSTOM_ID: h:2fcf708f-4edf-41f3-9e29-0e750f3a80af
