@@ -1113,7 +1113,7 @@ Use `mct-sort-sort-by-alpha-length' if no history is available."
 :CUSTOM_ID: h:9a6746dd-0be9-4e29-ac40-0af9612d05a2
 :END:
 
-[ Part of {{{development-version}}}. ]
+[ Part of {{{development-version}}} ]
 
 Older versions of MCT had a command for file navigation that would
 delete the whole directory component before point, effectively going
