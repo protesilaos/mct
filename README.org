@@ -687,10 +687,11 @@ Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour
    such headings, placing the point at the first candidate right below
    the heading's text.  Use =M-n= (~mct-next-completion-group~) and =M-p=
    (~mct-previous-completion-group~) to move to the next or previous one,
-   respectively.  Both commands accept an optional numeric argument.
-   For the sake of avoiding surprises, these commands do not cycle
-   between the completions and the minibuffer: they stop at the first or
-   last heading.
+   respectively (also work with they keys for ~forward-paragraph~ and
+   ~backward-paragraph~).  Both commands accept an optional numeric
+   argument.  For the sake of avoiding surprises, these commands do not
+   cycle between the completions and the minibuffer: they stop at the
+   first or last heading.
 
 ** Interaction model of mct-region-mode
 :PROPERTIES:
