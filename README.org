@@ -994,7 +994,6 @@ locally for the =*Completions*= buffer like this:
 #+cindex: Keymaps
 #+vindex: mct-completion-list-mode-map
 #+vindex: mct-minibuffer-local-completion-map
-#+vindex: mct-minibuffer-local-filename-completion-map
 #+vindex: mct-region-buffer-map
 #+vindex: mct-region-completion-list-map
 
@@ -1003,7 +1002,6 @@ minibuffer and the =*Completions*= buffer, respectively:
 
 + ~mct-completion-list-mode-map~
 + ~mct-minibuffer-local-completion-map~
-+ ~mct-minibuffer-local-filename-completion-map~
 + ~mct-region-buffer-map~
 + ~mct-region-completion-list-map~
 
