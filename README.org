@@ -1186,7 +1186,7 @@ activate it with the =C-.= key.
   (define-key map (kbd "C-.") #'my-avy-completions-select))
 #+end_src
 
-If you are declaring =mct= before =avsy= in your init file, then the above
+If you are declaring =mct= before =avy= in your init file, then the above
 can be wrapped in ~with-eval-after-load~, like this:
 
 #+begin_src emacs-lisp
