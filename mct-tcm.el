@@ -34,7 +34,7 @@
 ;; NOTE 2022-02-22: This is highly experimental!
 
 (defun mct-tcm--redirect-self-insert (&rest _args)
-  "Redirect to the minibuffer per `mct-tcm-continuous-self-insert'."
+  "Redirect single character keys as input to the minibuffer."
   (when-let* ((mct-tcm-mode)
               (keys (this-single-command-keys))
               (char (aref keys 0))
@@ -45,13 +45,18 @@
       (insert char))))
 
 (defun mct-tcm--setup-redirect-self-insert ()
-  "Set up `mct-tcm-continuous-self-insert'."
+  "Set up `mct-tcm--redirect-self-insert'."
   (when (mct--minibuffer-p)
     (add-hook 'pre-command-hook #'mct-tcm--redirect-self-insert nil t)))
 
 ;; FIXME 2022-02-22: Silence message when key binding is undefined.
 (define-minor-mode mct-tcm-mode
-  "MCT extension to narrow through the Completions."
+  "MCT extension to narrow through the Completions.
+It intercepts any single character input (without modifiers) in
+the Completions' buffer and passes it to the minibuffer as input.
+This practically means that the user can switch to the
+Completions and then type something to bring focus to the
+minibuffer while narrowing to the given input."
   :global t
   (if mct-tcm-mode
       (add-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)
