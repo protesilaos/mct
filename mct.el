@@ -1424,8 +1424,8 @@ minibuffer)."
                   minibuffer-force-complete
                   minibuffer-complete-and-exit
                   minibuffer-force-complete-and-exit))
-      (advice-add fn :around #'mct--shared-messageless))
-    (advice-add #'minibuffer-message :around #'mct--shared-honor-inhibit-message)))
+      (advice-remove fn #'mct--shared-messageless))
+    (advice-remove #'minibuffer-message #'mct--shared-honor-inhibit-message)))
 
 (provide 'mct)
 ;;; mct.el ends here
