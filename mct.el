@@ -258,20 +258,6 @@ affairs."
   :type 'boolean
   :group 'mct)
 
-;; NOTE 2022-02-22: This is highly experimental!
-(defcustom mct-continuous-self-insert nil
-  "Redirect self-insertions from the Completions to the minibuffer.
-When this variable is set to non-nil value, MCT will intercept
-any call to `self-insert-command' or single character key and
-send it to the minibuffer.
-
-This practically means that while typing in the Completions, the
-input is used to narrow the list of candidates (whereas the
-default is to let the Completions use their own keys and not try
-to send the input to the minibuffer)."
-  :type 'boolean
-  :group 'mct)
-
 ;;;; Completion metadata
 
 (defun mct--this-command ()
@@ -314,22 +300,6 @@ to send the input to the minibuffer)."
   "Completion categories that perform dynamic completion.")
 
 ;;;; Basics of intersection between minibuffer and Completions' buffer
-
-;; FIXME 2022-02-22: Silence message when key binding is undefined.
-(defun mct--redirect-self-insert (&rest _args)
-  "Redirect to the minibuffer per `mct-continuous-self-insert'."
-  (when-let* ((mct-continuous-self-insert)
-              (keys (this-single-command-keys))
-              (char (aref keys 0))
-              (mini (active-minibuffer-window)))
-    (when (and (char-or-string-p char)
-               (not (event-modifiers char)))
-      (select-window mini)
-      (insert char))))
-
-(defun mct--setup-redirect-self-insert ()
-  "Set up `mct-continuous-self-insert'."
-  (add-hook 'pre-command-hook #'mct--redirect-self-insert nil t))
 
 (define-obsolete-variable-alias
   'mct-hl-line 'mct-highlight-candidate "0.3.0")
@@ -1200,7 +1170,6 @@ region.")
     (mct--setup-appearance)
     (mct--setup-completion-list-keymap)
     (mct--setup-highlighting)
-    (mct--setup-redirect-self-insert)
     (mct--setup-line-numbers)
     (cursor-sensor-mode)))
 
