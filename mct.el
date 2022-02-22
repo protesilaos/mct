@@ -1189,7 +1189,7 @@ region.")
 (defun mct--setup-dynamic-completion-persist ()
   "Set up `mct-persist-dynamic-completion'."
   (let ((commands '(choose-completion minibuffer-complete minibuffer-force-complete)))
-    (if mct-minibuffer-mode
+    (if (bound-and-true-p mct-minibuffer-mode)
         (dolist (fn commands)
           (advice-add fn :after #'mct--persist-dynamic-completion))
       (dolist (fn commands)
