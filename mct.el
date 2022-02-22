@@ -745,12 +745,9 @@ when point can no longer move in that direction it switches to
 the minibuffer."
   (interactive "p" mct-minibuffer-mode)
   (let ((count (or arg 1)))
-    (cond
-     ((mct--bottom-of-completions-p count)
-      (mct-focus-minibuffer))
-     (t
-      (mct--next-completion count))
-     (setq this-command 'next-line))))
+    (if (mct--bottom-of-completions-p count)
+        (mct-focus-minibuffer)
+      (mct--next-completion count))))
 
 (defun mct--motion-below-point-min-p (arg)
   "Return non-nil if backward ARG motion exceeds `point-min'."
