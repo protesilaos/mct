@@ -58,6 +58,10 @@ minibuffer while narrowing to the given input."
                (or (memq 'shift (event-modifiers char))
                    (not (event-modifiers char))))
       (select-window mini)
+      (goto-char (point-max))
+      (setq-local mct-live-completion 'visible)
+      (setq-local mct-live-update-delay 0)
+      (setq-local mct-minimum-input 0)
       (insert char))))
 
 (declare-function mct--minibuffer-p "mct")
