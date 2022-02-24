@@ -25,7 +25,11 @@
 ;;; Commentary:
 ;;
 ;; An extension to MCT that intercepts single character keys in the
-;; Completions' buffer and send them as input in the minibuffer.
+;; Completions' buffer and sends them as input in the minibuffer.  In
+;; practice, this means that the user can start typing something in the
+;; minibuffer, switch to the Completions to select something, realise
+;; that they need to narrow further, type some further input which takes
+;; them back to the minibuffer.
 
 ;;; Code:
 
