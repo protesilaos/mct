@@ -24,12 +24,18 @@
 
 ;;; Commentary:
 ;;
-;; An extension to MCT that intercepts single character keys in the
-;; Completions' buffer and sends them as input in the minibuffer.  In
-;; practice, this means that the user can start typing something in the
-;; minibuffer, switch to the Completions to select something, realise
-;; that they need to narrow further, type some further input which takes
-;; them back to the minibuffer.
+;; MCT extension which Treats the Completions as the Minibuffer.  It
+;; intercepts any single character input (without Control or Alt
+;; modifiers) in the Completions' buffer and passes it to the minibuffer
+;; as input.  This practically means that the user can (i) narrow the
+;; list of candidates from the minibuffer, (ii) switch to the
+;; Completions in anticipation of selecting a candidate, (iii) change
+;; their mind and opt to narrow further, (iv) type something to bring
+;; focus back to the minibuffer while narrowing to the given input.
+;;
+;; When the `mct-tcm-mode' is enabled and the above sequence takes
+;; place, the current session is treated as if it belongs to the
+;; `mct-completion-passlist' (read its doc string).
 
 ;;; Code:
 
@@ -40,12 +46,19 @@
 ;; FIXME 2022-02-22: Silence message when key binding is undefined.
 ;;;###autoload
 (define-minor-mode mct-tcm-mode
-  "MCT extension to narrow through the Completions.
-It intercepts any single character input (without modifiers) in
-the Completions' buffer and passes it to the minibuffer as input.
-This practically means that the user can switch to the
-Completions and then type something to bring focus to the
-minibuffer while narrowing to the given input."
+  "MCT extension which Treats the Completions as the Minibuffer.
+It intercepts any single character input (without Control or Alt
+modifiers) in the Completions' buffer and passes it to the
+minibuffer as input.  This practically means that the user
+can (i) narrow the list of candidates from the minibuffer, (ii)
+switch to the Completions in anticipation of selecting a
+candidate, (iii) change their mind and opt to narrow
+further, (iv) type something to bring focus back to the
+minibuffer while narrowing to the given input.
+
+When this mode is enabled and the above sequence takes place, the
+current session is treated as if it belongs to the
+`mct-completion-passlist' (read its doc string)."
   :global t
   :group 'mct
   (if mct-tcm-mode
