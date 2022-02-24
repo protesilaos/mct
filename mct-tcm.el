@@ -31,25 +31,8 @@
 
 ;;;; General utilities
 
-;; NOTE 2022-02-22: This is highly experimental!
-
-(defun mct-tcm--redirect-self-insert (&rest _args)
-  "Redirect single character keys as input to the minibuffer."
-  (when-let* ((mct-tcm-mode)
-              (keys (this-single-command-keys))
-              (char (aref keys 0))
-              (mini (active-minibuffer-window)))
-    (when (and (char-or-string-p char)
-               (not (event-modifiers char)))
-      (select-window mini)
-      (insert char))))
-
-(defun mct-tcm--setup-redirect-self-insert ()
-  "Set up `mct-tcm--redirect-self-insert'."
-  (when (mct--minibuffer-p)
-    (add-hook 'pre-command-hook #'mct-tcm--redirect-self-insert nil t)))
-
 ;; FIXME 2022-02-22: Silence message when key binding is undefined.
+;;;###autoload
 (define-minor-mode mct-tcm-mode
   "MCT extension to narrow through the Completions.
 It intercepts any single character input (without modifiers) in
@@ -58,9 +41,29 @@ This practically means that the user can switch to the
 Completions and then type something to bring focus to the
 minibuffer while narrowing to the given input."
   :global t
+  :group 'mct
   (if mct-tcm-mode
-      (add-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)
+        (add-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)
     (remove-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)))
 
-(provide 'mct)
-;;; mct.el ends here
+(defun mct-tcm--redirect-self-insert (&rest _args)
+  "Redirect single character keys as input to the minibuffer."
+  (when-let* ((mct-tcm-mode)
+              (keys (this-single-command-keys))
+              (char (aref keys 0))
+              (mini (active-minibuffer-window)))
+    (when (and (char-or-string-p char)
+               (or (memq 'shift (event-modifiers char))
+                   (not (event-modifiers char))))
+      (select-window mini)
+      (insert char))))
+
+(declare-function mct--minibuffer-p "mct")
+
+(defun mct-tcm--setup-redirect-self-insert ()
+  "Set up `mct-tcm--redirect-self-insert'."
+  (when (mct--minibuffer-p)
+    (add-hook 'pre-command-hook #'mct-tcm--redirect-self-insert nil t)))
+
+(provide 'mct-tcm)
+;;; mct-tcm.el ends here
