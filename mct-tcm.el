@@ -72,8 +72,6 @@ minibuffer while narrowing to the given input."
       (when (>= emacs-major-version 28)
         (insert char)))))
 
-(declare-function mct--minibuffer-p "mct")
-
 (defun mct-tcm--setup-redirect-self-insert ()
   "Set up `mct-tcm--redirect-self-insert'."
   (when (mct--minibuffer-p)
