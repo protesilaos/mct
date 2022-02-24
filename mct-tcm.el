@@ -31,6 +31,8 @@
 
 ;;;; General utilities
 
+(require 'mct)
+
 ;; FIXME 2022-02-22: Silence message when key binding is undefined.
 ;;;###autoload
 (define-minor-mode mct-tcm-mode
