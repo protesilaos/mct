@@ -33,8 +33,8 @@
 ;; their mind and opt to narrow further, (iv) type something to bring
 ;; focus back to the minibuffer while narrowing to the given input.
 ;;
-;; When the `mct-tcm-mode' is enabled and the above sequence takes
-;; place, the current session is treated as if it belongs to the
+;; When the `mct-tcm-mode' is enabled and the above sequence of events
+;; takes place, the current session is treated as if it belongs to the
 ;; `mct-completion-passlist' (read its doc string).
 
 ;;; Code:
@@ -56,8 +56,8 @@ candidate, (iii) change their mind and opt to narrow
 further, (iv) type something to bring focus back to the
 minibuffer while narrowing to the given input.
 
-When this mode is enabled and the above sequence takes place, the
-current session is treated as if it belongs to the
+When this mode is enabled and the above sequence of events takes
+place, the current session is treated as if it belongs to the
 `mct-completion-passlist' (read its doc string)."
   :global t
   :group 'mct
