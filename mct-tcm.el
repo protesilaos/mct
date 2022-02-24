@@ -49,7 +49,7 @@ minibuffer while narrowing to the given input."
   :global t
   :group 'mct
   (if mct-tcm-mode
-        (add-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)
+      (add-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)
     (remove-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)))
 
 (defun mct-tcm--redirect-self-insert (&rest _args)
