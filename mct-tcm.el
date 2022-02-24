@@ -66,7 +66,11 @@ minibuffer while narrowing to the given input."
       (setq-local mct-live-completion t)
       (setq-local mct-live-update-delay 0)
       (setq-local mct-minimum-input 0)
-      (insert char))))
+      ;; FIXME 2022-02-24: Why does Emacs 27 insert twice?  In other
+      ;; words, why does it add the character even if the following is
+      ;; commented out?
+      (when (>= emacs-major-version 28)
+        (insert char)))))
 
 (declare-function mct--minibuffer-p "mct")
 
