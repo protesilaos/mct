@@ -76,6 +76,7 @@ place, the current session is treated as if it belongs to the
                    (not (event-modifiers char))))
       (select-window mini)
       (goto-char (point-max))
+      (setq-local completion-at-point-functions nil)
       (setq-local mct-live-completion t)
       (setq-local mct-live-update-delay 0)
       (setq-local mct-minimum-input 0)
