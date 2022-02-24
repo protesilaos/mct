@@ -52,7 +52,7 @@ minibuffer while narrowing to the given input."
       (add-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)
     (remove-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)))
 
-(defun mct-tcm--redirect-self-insert (&rest _args)
+(defun mct-tcm--redirect-self-insert (&rest _)
   "Redirect single character keys as input to the minibuffer."
   (when-let* ((mct-tcm-mode)
               (keys (this-single-command-keys))
