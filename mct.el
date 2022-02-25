@@ -419,13 +419,29 @@ Meant to be added to `after-change-functions'."
   "Set up the completions' buffer."
   (cond
    ((null mct-live-completion))
-   ((mct--passlist-p)
-    (setq-local mct-minimum-input 0)
-    (setq-local mct-live-update-delay 0)
-    (mct--show-completions)
-    (add-hook 'after-change-functions #'mct--live-completions-refresh nil t))
+   ;; ;; NOTE 2022-02-25: The passlist setup we had here was being
+   ;; ;; called too early in `mct--completing-read-advice'.  It would
+   ;; ;; fail to filter out the current candidate from the list
+   ;; ;; (e.g. current buffer from `switch-to-buffer').  This would, in
+   ;; ;; turn, hinder the scrolling behaviour of `minibuffer-complete'.
+   ;; ;; See: <https://gitlab.com/protesilaos/mct/-/issues/24>.  The
+   ;; ;; replacement function is `mct--setup-passlist' which is hooked
+   ;; ;; directly to `minibuffer-setup-hook'.
+   ;;
+   ;; ((mct--passlist-p)
+   ;;  (setq-local mct-minimum-input 0)
+   ;;  (setq-local mct-live-update-delay 0)
+   ;;  (mct--show-completions)
+   ;;  (add-hook 'after-change-functions #'mct--live-completions-refresh nil t))
    ((not (mct--blocklist-p))
     (add-hook 'after-change-functions #'mct--live-completions-refresh nil t))))
+
+(defun mct--setup-passlist ()
+  "Set up the minibuffer for `mct-completion-passlist'."
+  (when (and (mct--passlist-p) (mct--minibuffer-p))
+    (setq-local mct-minimum-input 0)
+    (setq-local mct-live-update-delay 0)
+    (mct--show-completions)))
 
 (defvar-local mct--active nil
   "Minibuffer local variable, t if Mct is active.")
@@ -1207,11 +1223,13 @@ region.")
   (if mct-minibuffer-mode
       (progn
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
+        (add-hook 'minibuffer-setup-hook #'mct--setup-passlist)
         (advice-add #'completing-read-default :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
         (advice-add #'minibuffer-completion-help :around #'mct--minibuffer-completion-help-advice)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
+    (remove-hook 'minibuffer-setup-hook #'mct--setup-passlist)
     (advice-remove #'completing-read-default #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
     (advice-remove #'minibuffer-completion-help #'mct--minibuffer-completion-help-advice)
