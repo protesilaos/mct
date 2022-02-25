@@ -1169,7 +1169,7 @@ activate it with the =C-.= key.
   (when-let ((window (mct--get-completion-window)))
     (with-selected-window window
       (avy-with avy-completion
-        (let ((avy-action 'prot/mct-avy--choose))
+        (let ((avy-action 'mct-avy--choose))
           (avy-process
            (save-excursion
              (let (completions)
