@@ -104,6 +104,8 @@ place, the current session is treated as if it belongs to the
            (delete-char
             (unless empty
               (delete-char -1)))
+           ;; FIXME 2022-02-25: Emacs 27 inserts twice.  It inserts once
+           ;; even without the `insert' here.
            (t
             (insert char))))))))
 
