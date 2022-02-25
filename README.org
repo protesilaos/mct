@@ -963,6 +963,18 @@ Other useful extras from the Emacs source code (read their doc strings):
       '((file (styles . (basic partial-completion orderless)))))
 #+end_src
 
+* MCT extensions
+:PROPERTIES:
+:CUSTOM_ID: h:a6724485-29f3-4632-854c-41963d2698b7
+:END:
+#+cindex: Experimental MCT code
+
+[ Part of {{{development-version}}} ]
+
+The MCT code repository contains an =extensions= directory.  Any file
+found there is considered highly experimental.  The target audience is
+developers or users who wish to help find bugs.
+
 * Known issues and workarounds
 :PROPERTIES:
 :CUSTOM_ID: h:acfb63f4-c2ae-46ff-a840-9c9a6350e567
@@ -1328,7 +1340,7 @@ buffer should be displayed in other window use least recent one."
 (add-hook 'minibuffer-setup-hook 'rde-mct-show-completions)
 #+end_src
 
-* Extensions
+* Third-party extensions
 :PROPERTIES:
 :CUSTOM_ID: h:03227254-d467-4147-b8cf-2fe05a2e279b
 :END:
