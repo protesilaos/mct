@@ -81,10 +81,12 @@ place, the current session is treated as if it belongs to the
       (setq-local mct-live-update-delay 0)
       (setq-local mct-minimum-input 0)
       ;; FIXME 2022-02-24: Why does Emacs 27 insert twice?  In other
-      ;; words, why does it add the character even if the following is
+      ;; words, why does it add the character even if the `insert' is
       ;; commented out?
       (when (>= emacs-major-version 28)
-        (insert char)))))
+        (if (eq char 127) ; DEL or <backspace>
+            (delete-char -1)
+          (insert char))))))
 
 (defun mct-tcm--setup-redirect-self-insert ()
   "Set up `mct-tcm--redirect-self-insert'."
