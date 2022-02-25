@@ -65,28 +65,45 @@ place, the current session is treated as if it belongs to the
       (add-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)
     (remove-hook 'completion-list-mode-hook #'mct-tcm--setup-redirect-self-insert)))
 
+;; NOTE 2022-02-25: This assumes that `kill-word' is bound to those
+;; keys.  Is there a more general method?
+(defun mct-tcm--kill-word-p (keys)
+  "Return non-nil if KEYS are C-DEL or M-DEL."
+  (or (seq-contains-p keys 'C-backspace)
+      (seq-contains-p keys '134217855)))
+
+(defun mct-tcm--insertable-char-p (char)
+  "Retun non-nil if CHAR can be used with `insert'."
+  (and (char-or-string-p char)
+       (or (memq 'shift (event-modifiers char))
+           (not (event-modifiers char)))))
+
 (defun mct-tcm--redirect-self-insert (&rest _)
   "Redirect single character keys as input to the minibuffer."
   (when-let* ((mct-tcm-mode)
               (keys (this-single-command-keys))
               (char (aref keys 0))
               (mini (active-minibuffer-window)))
-    (when (and (char-or-string-p char)
-               (or (memq 'shift (event-modifiers char))
-                   (not (event-modifiers char))))
-      (select-window mini)
-      (goto-char (point-max))
-      (setq-local completion-at-point-functions nil)
-      (setq-local mct-live-completion t)
-      (setq-local mct-live-update-delay 0)
-      (setq-local mct-minimum-input 0)
-      ;; FIXME 2022-02-24: Why does Emacs 27 insert twice?  In other
-      ;; words, why does it add the character even if the `insert' is
-      ;; commented out?
-      (when (>= emacs-major-version 28)
-        (if (eq char 127) ; DEL or <backspace>
-            (delete-char -1)
-          (insert char))))))
+    (let* ((delete-char (seq-contains-p keys '127)) ; Same assumption as `mct-tcm--kill-word-p'
+           (kill-word (mct-tcm--kill-word-p keys))
+           (del (or delete-char kill-word)))
+      (when (or del (mct-tcm--insertable-char-p char))
+        (select-window mini)
+        (setq-local completion-at-point-functions nil
+                    mct-live-completion t
+                    mct-live-update-delay 0
+                    mct-minimum-input 0)
+        (goto-char (point-max))
+        (let ((empty (string-empty-p (minibuffer-contents))))
+          (cond
+           (kill-word
+            (when empty (push-mark))
+            (kill-word -1))
+           (delete-char
+            (unless empty
+              (delete-char -1)))
+           (t
+            (insert char))))))))
 
 (defun mct-tcm--setup-redirect-self-insert ()
   "Set up `mct-tcm--redirect-self-insert'."
