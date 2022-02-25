@@ -42,6 +42,7 @@
 ;;;; General utilities
 
 (require 'mct)
+(require 'seq)
 (eval-when-compile (require 'subr-x))
 
 ;; FIXME 2022-02-22: Silence message when key binding is undefined.
