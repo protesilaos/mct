@@ -1219,7 +1219,7 @@ can be wrapped in ~with-eval-after-load~, like this:
     (when-let ((window (mct--get-completion-window)))
       (with-selected-window window
         (avy-with avy-completion
-          (let ((avy-action 'prot/mct-avy--choose))
+          (let ((avy-action 'mct-avy--choose))
             (avy-process
              (save-excursion
                (let (completions)
