@@ -35,7 +35,9 @@
 ;;;; General utilities
 
 (defgroup mct ()
-  "Extensions for the minibuffer."
+  "Minibuffer and Completions in Tandem.
+A layer of interactivity that integrates the standard minibuffer
+and the Completions."
   :group 'minibuffer)
 
 (make-obsolete 'mct-completion-windows-regexp 'mct--completions-window-name "0.5.0")
