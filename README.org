@@ -975,6 +975,58 @@ The MCT code repository contains an =extensions= directory.  Any file
 found there is considered highly experimental.  The target audience is
 developers or users who wish to help find bugs.
 
+** MCT and Avy
+:PROPERTIES:
+:CUSTOM_ID: h:18a2a223-8544-4294-b847-012c99003de4
+:END:
+#+cindex: Quick selection with Avy
+
+[ Part of {{{development-version}}} ]
+
+The MCT =extensions= directory contains the =mct-avy.el= file.  It
+integrates MCT with the =avy= package to choose completion candidates
+using the latter's mode of interaction.  The commands it defines are:
+
++ ~mct-avy-choose-completion-exit~.
++ ~mct-avy-choose-completion-dwim~.
++ ~mct-avy-choose-completion-jump~.
++ ~mct-avy-region-choose-completion~.
+
+Their respective doc strings describe their functionality.
+
+=mct-avy.el= does not bind any keys.  Choose your own with something
+like this:
+
+#+begin_src emacs-lisp
+(dolist (map (list mct-minibuffer-local-completion-map
+                   mct-minibuffer-completion-list-map))
+  (define-key map (kbd "C-;") #'mct-avy-choose-completion-exit)
+  (define-key map (kbd "M-;") #'mct-avy-choose-completion-dwim))
+
+;; If you are using `mct-region-mode':
+(dolist (map (list mct-region-completion-list-map
+                   mct-region-buffer-map))
+  (define-key map (kbd "C-;") #'mct-avy-region-choose-completion))
+#+end_src
+
+At the heart of the package is the function ~mct-avy-choose~ which
+provides the minimal necessary glue code.  Use it to extend the
+functionality on offer.  For example, here is how to call ~embark-act~
+on the candidate (requires the =embark= package):
+
+#+begin_src emacs-lisp
+(defun my-mct-avy-embark-act ()
+  "Use Avy to run `embark-act' on candidate."
+  (interactive)
+  (mct-avy--choose #'embark-act))
+#+end_src
+
+=mct-avy.el= is inspired by Omar Antolín Camarena's
+=avy-embark-collect.el=.  The ~mct-avy-choose~ function borrows code
+and/or ideas from that libary: <https://github.com/oantolin/embark/>.
+
+[[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Third-party extensions]].
+
 * Known issues and workarounds
 :PROPERTIES:
 :CUSTOM_ID: h:acfb63f4-c2ae-46ff-a840-9c9a6350e567
@@ -1156,84 +1208,6 @@ not be part of =mct.el=.  Use this in your init file instead:
   (cons (concat "[CRM] " (car args)) (cdr args)))
 
 (advice-add #'completing-read-multiple :filter-args #'my-crm-indicator)
-#+end_src
-
-** Select completion candidate with Avy
-:PROPERTIES:
-:CUSTOM_ID: h:18a2a223-8544-4294-b847-012c99003de4
-:END:
-#+cindex: Quick selection with Avy
-
-The =avy= package by Oleh Krehel can be used to quickly select a candidate
-from a visible =*Completions*= buffer.  In the following example, we
-activate it with the =C-.= key.
-
-#+begin_src emacs-lisp
-;; Adapted from Omar Antolín Camarena's `avy-embark-collect.el'.
-(defun my-avy--choose (pt)
-  "Choose completion at PT."
-  (goto-char pt)
-  (mct-choose-completion-exit))
-
-(defun my-avy-completions-select ()
-  "Choose completion and exit using Avy."
-  (interactive)
-  (when-let ((window (mct--get-completion-window)))
-    (with-selected-window window
-      (avy-with avy-completion
-        (let ((avy-action 'mct-avy--choose))
-          (avy-process
-           (save-excursion
-             (let (completions)
-               (goto-char (mct--first-completion-point))
-               (while (not (eobp))
-                 (push (point) completions)
-                 (next-completion 1))
-               (nreverse completions)))))))))
-
-(dolist (map (list mct-minibuffer-local-completion-map
-                   mct-minibuffer-completion-list-map
-                   mct-region-completion-list-map
-                   mct-region-buffer-map))
-  (define-key map (kbd "C-.") #'my-avy-completions-select))
-#+end_src
-
-If you are declaring =mct= before =avy= in your init file, then the above
-can be wrapped in ~with-eval-after-load~, like this:
-
-#+begin_src emacs-lisp
-(require 'mct)
-
-;; more mct code here
-
-(with-eval-after-load 'avy
-  ;; Adapted from Omar Antolín Camarena's `avy-embark-collect.el'.
-  (defun my-avy--choose (pt)
-    "Choose completion at PT."
-    (goto-char pt)
-    (mct-choose-completion-exit))
-
-  (defun my-avy-completions-select ()
-    "Choose completion and exit using Avy."
-    (interactive)
-    (when-let ((window (mct--get-completion-window)))
-      (with-selected-window window
-        (avy-with avy-completion
-          (let ((avy-action 'mct-avy--choose))
-            (avy-process
-             (save-excursion
-               (let (completions)
-                 (goto-char (mct--first-completion-point))
-                 (while (not (eobp))
-                   (push (point) completions)
-                   (next-completion 1))
-                 (nreverse completions)))))))))
-
-  (dolist (map (list mct-minibuffer-local-completion-map
-                     mct-minibuffer-completion-list-map
-                     mct-region-completion-list-map
-                     mct-region-buffer-map))
-    (define-key map (kbd "C-.") #'my-avy-completions-select)))
 #+end_src
 
 ** Ido-style navigation through directories
