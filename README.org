@@ -663,20 +663,8 @@ Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour
    can also be assigned to the global keymap, though MCT leaves such a
    decision up to the user (same for ~mct-focus-mini-or-completions~).
 
-   #+findex: mct-choose-completion-number
-5. Select a candidate by its line number by typing =M-g M-g= in either the
-   minibuffer or the =*Completions*= buffer.  This calls the command
-   ~mct-choose-completion-number~ which internally enables line numbers
-   and always makes the completions' buffer visible.  Selection in this
-   way exits the minibuffer.
-
-   NOTE: This method only works when ~mct-completions-format~ is set to
-   its default value of =one-column=.  The other formats show completions
-   in a grid view, which makes navigation based on line numbers
-   imprecise.
-
    #+findex: mct-choose-completion-dwim
-6. In prompts that allow the selection of multiple candidates
+5. In prompts that allow the selection of multiple candidates
    (internally via the ~completing-read-multiple~ function) using =M-RET=
    (~mct-choose-completion-dwim~) in the =*Completions*= will append the
    candidate at point to the list of selections and keep the completions
@@ -690,7 +678,7 @@ Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour
    [[#h:162f232d-1e9d-4756-90d3-d6bf5bb4d8ef][Indicator for completing-read-multiple]].
 
    #+findex: mct-complete-and-exit
-7. When point is at the minibuffer, select the current candidate in
+6. When point is at the minibuffer, select the current candidate in
    the completions buffer with =C-RET= (~mct-complete-and-exit~), which
    has the same effect as first completing with =TAB= and then
    immediately exit the minibuffer with the completed candidate as the
@@ -698,7 +686,7 @@ Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour
 
    #+findex: mct-next-completion-group
    #+findex: mct-previous-completion-group
-8. Emacs 28 has the ability to group candidates inside the completions'
+7. Emacs 28 has the ability to group candidates inside the completions'
    buffer under headings.  For example, the Consult package makes good
    use of those ([[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Extensions]]).  MCT provides motions that jump between
    such headings, placing the point at the first candidate right below
@@ -848,7 +836,6 @@ And with more options:
 (setq mct-completion-window-size (cons #'mct--frame-height-fraction 1))
 (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
 (setq mct-hide-completion-mode-line t)
-(setq mct-show-completion-line-numbers nil)
 (setq mct-apply-completion-stripes t)
 (setq mct-minimum-input 3)
 (setq mct-live-completion t)
@@ -1074,69 +1061,6 @@ You can invoke ~describe-keymap~ to learn more about them.
 If you want to edit any key bindings, do it in these keymaps, not in
 those they extend and override (the names of the original ones are the
 same as above, minus the =mct-= prefix).
-
-** The use of remap for key bindings
-:PROPERTIES:
-:CUSTOM_ID: h:de19a74f-e305-4311-a9fe-2905bc5e06a0
-:END:
-#+cindex: Remap key bindings
-
-MCT tries not to hardcode key bindings in order to respect user
-configurations.  To this end, Emacs provides the ~remap~ mechanism which
-effectively intercepts the key binding of the original command and
-applies it to the one specified.  Think of it like redirecting from the
-old to the new one.
-
-The code looks like this:
-
-#+begin_src emacs-lisp
-(defvar mct-minibuffer-local-completion-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-j") #'exit-minibuffer)
-    (define-key map [remap goto-line] #'mct-choose-completion-number)
-    (define-key map [remap next-line] #'mct-switch-to-completions-top)
-    (define-key map [remap next-line-or-history-element] #'mct-switch-to-completions-top)
-    (define-key map [remap previous-line] #'mct-switch-to-completions-bottom)
-    (define-key map [remap previous-line-or-history-element] #'mct-switch-to-completions-bottom)
-    (define-key map (kbd "M-e") #'mct-edit-completion)
-    (define-key map (kbd "C-<return>") #'mct-complete-and-exit)
-    (define-key map (kbd "C-l") #'mct-list-completions-toggle)
-    map)
-  "Derivative of `minibuffer-local-completion-map'.")
-#+end_src
-
-The ~remap~ might cause unwanted behaviour in cases where a user
-maintaints their own remappings which conflict with those of the
-package.  Consider, for example, this scenario:
-
-#+begin_src emacs-lisp
-(require 'mct)
-
-;; Here goes the MCT setup
-
-;; More code...
-
-;; The user remaps `goto-line' to `my-goto-line-replacement' in the
-;; `global-map'.
-(define-key global-map [remap goto-line] #'my-goto-line-replacement)
-#+end_src
-
-If a user loads MCT first and later in their configuration defines a
-remap for ~goto-line~, then that will take precedence over what MCT wants
-to do.  The solution is for the user to update their code to specify an
-explicit key binding:
-
-#+begin_src emacs-lisp
-(require 'mct)
-
-;; Here goes the MCT setup
-
-;; More code...
-
-;; The user specifies an explicit key binding for
-;; `my-goto-line-replacement' in the `global-map'.
-(define-key global-map (kbd "M-g M-g") #'my-goto-line-replacement)
-#+end_src
 
 * User-level tweaks or custom code
 :PROPERTIES:
