@@ -81,5 +81,14 @@ completion where the minibuffer is not active."
   (interactive)
   (mct-avy-choose #'choose-completion))
 
+;;;###autoload
+(defun mct-avy-embark-act ()
+  "Use Avy to run `embark-act' on candidate.
+Requires the `embark' package."
+  (interactive)
+  (if (require 'embark nil t)
+      (mct-avy-choose #'embark-act)
+    (user-error "The `embark' package has not been loaded")))
+
 (provide 'mct-avy)
 ;;; mct-avy.el ends here
