@@ -879,6 +879,21 @@ And with more options:
 ;; Optionally use MCT for in-buffer completion (though `corfu' is a
 ;; better option).
 (mct-region-mode 1)
+
+;;; Integration with Oleh Krehel's `avy' package
+(require 'mct-avy)
+
+(dolist (map (list mct-minibuffer-local-completion-map
+                   mct-minibuffer-completion-list-map))
+  (define-key map (kbd "C-,") #'mct-avy-embark-act)
+  (define-key map (kbd "C-.") #'mct-avy-choose-completion-exit)
+  (define-key map (kbd "C-;") #'mct-avy-choose-completion-dwim))
+
+;; If you are using `mct-region-mode':
+(dolist (map (list mct-region-completion-list-map
+                   mct-region-buffer-map))
+  (define-key map (kbd "C-,") #'mct-avy-embark-act)
+  (define-key map (kbd "C-.") #'mct-avy-region-choose-completion))
 #+end_src
 
 Other useful extras from the Emacs source code (read their doc strings):
@@ -959,8 +974,8 @@ Other useful extras from the Emacs source code (read their doc strings):
 [ Part of {{{development-version}}} ]
 
 The MCT code repository contains an =extensions= directory.  Any file
-found there is considered highly experimental.  The target audience is
-developers or users who wish to help find bugs.
+found there is considered experimental.  The target audience is
+developers or users who can tolerate the occasional bug.
 
 ** MCT and Avy
 :PROPERTIES:
@@ -974,10 +989,20 @@ The MCT =extensions= directory contains the =mct-avy.el= file.  It
 integrates MCT with the =avy= package to choose completion candidates
 using the latter's mode of interaction.  The commands it defines are:
 
-+ ~mct-avy-choose-completion-exit~.
-+ ~mct-avy-choose-completion-dwim~.
-+ ~mct-avy-choose-completion-jump~.
-+ ~mct-avy-region-choose-completion~.
+#+findex: mct-avy-choose-completion-exit
++ ~mct-avy-choose-completion-exit~
+
+#+findex: mct-avy-choose-completion-dwim
++ ~mct-avy-choose-completion-dwim~
+
+#+findex: mct-avy-choose-completion-jump
++ ~mct-avy-choose-completion-jump~
+
+#+findex: mct-avy-region-choose-completion
++ ~mct-avy-region-choose-completion~
+
+#+findex: mct-avy-embark-act
++ ~mct-avy-embark-act~
 
 Their respective doc strings describe their functionality.
 
@@ -988,24 +1013,14 @@ like this:
 (dolist (map (list mct-minibuffer-local-completion-map
                    mct-minibuffer-completion-list-map))
   (define-key map (kbd "C-;") #'mct-avy-choose-completion-exit)
+  (define-key map (kbd "C-,") #'mct-avy-embark-act)
   (define-key map (kbd "M-;") #'mct-avy-choose-completion-dwim))
 
 ;; If you are using `mct-region-mode':
 (dolist (map (list mct-region-completion-list-map
                    mct-region-buffer-map))
+  (define-key map (kbd "C-,") #'mct-avy-embark-act)
   (define-key map (kbd "C-;") #'mct-avy-region-choose-completion))
-#+end_src
-
-At the heart of the package is the function ~mct-avy-choose~ which
-provides the minimal necessary glue code.  Use it to extend the
-functionality on offer.  For example, here is how to call ~embark-act~
-on the candidate (requires the =embark= package):
-
-#+begin_src emacs-lisp
-(defun my-mct-avy-embark-act ()
-  "Use Avy to run `embark-act' on candidate."
-  (interactive)
-  (mct-avy--choose #'embark-act))
 #+end_src
 
 =mct-avy.el= is inspired by Omar Antolín Camarena's
