@@ -687,16 +687,16 @@ Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour
    #+findex: mct-next-completion-group
    #+findex: mct-previous-completion-group
 7. Emacs 28 has the ability to group candidates inside the completions'
-   buffer under headings.  For example, the Consult package makes good
-   use of those ([[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Extensions]]).  MCT provides motions that jump between
-   such headings, placing the point at the first candidate right below
-   the heading's text.  Use =M-n= (~mct-next-completion-group~) and =M-p=
-   (~mct-previous-completion-group~) to move to the next or previous one,
-   respectively (also work with they keys for ~forward-paragraph~ and
-   ~backward-paragraph~).  Both commands accept an optional numeric
-   argument.  For the sake of avoiding surprises, these commands do not
-   cycle between the completions and the minibuffer: they stop at the
-   first or last heading.
+   buffer under headings.  For example, the Consult package makes use of
+   those ([[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Third-party extensions]]).  MCT provides motions that jump
+   between such headings, placing the point at the first candidate right
+   below the heading's text.  Use =M-n= (~mct-next-completion-group~)
+   and =M-p= (~mct-previous-completion-group~) to move to the next or
+   previous one, respectively (also work with they keys for
+   ~forward-paragraph~ and ~backward-paragraph~).  Both commands accept
+   an optional numeric argument.  For the sake of avoiding surprises,
+   these commands do not cycle between the completions and the
+   minibuffer: they stop at the first or last heading.
 
 ** Interaction model of mct-region-mode
 :PROPERTIES:
@@ -941,7 +941,7 @@ Other useful extras from the Emacs source code (read their doc strings):
 (setq-default tab-always-indent 'complete) ; useful for `mct-region-mode'
 (setq-default tab-first-completion 'word-or-paren-or-punct) ; Emacs 27
 
-;;; Extensions
+;;; Third-party extensions
 
 ;;;; Enable Consult previews in the Completions buffer.
 ;; Requires the `consult' package.
@@ -973,9 +973,11 @@ Other useful extras from the Emacs source code (read their doc strings):
 
 [ Part of {{{development-version}}} ]
 
-The MCT code repository contains an =extensions= directory.  Any file
-found there is considered experimental.  The target audience is
-developers or users who can tolerate the occasional bug.
+The MCT code repository contains some Elisp files beside =mct.el= which
+extend the functionality of the core package.  These files are named
+like =mct-SCOPE.el=.  They are considered experimental for the time
+being.  Their target audience is developers or users who can tolerate
+the occasional bug.
 
 ** MCT and Avy
 :PROPERTIES:
@@ -985,9 +987,9 @@ developers or users who can tolerate the occasional bug.
 
 [ Part of {{{development-version}}} ]
 
-The MCT =extensions= directory contains the =mct-avy.el= file.  It
-integrates MCT with the =avy= package to choose completion candidates
-using the latter's mode of interaction.  The commands it defines are:
+The MCT repository contains the =mct-avy.el= file.  It integrates MCT
+with the =avy= package to choose completion candidates using the
+latter's mode of interaction.  The commands it defines are:
 
 #+findex: mct-avy-choose-completion-exit
 + ~mct-avy-choose-completion-exit~
