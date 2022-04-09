@@ -1106,6 +1106,7 @@ region.")
   (when (mct--minibuffer-p)
     (setq-local completion-show-help nil
                 completion-wrap-movement nil ; Emacs 29
+                completions-highlight-face nil
                 truncate-lines t)
     (mct--setup-clean-completions)
     (mct--setup-appearance)
