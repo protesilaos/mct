@@ -802,7 +802,7 @@ mkdir manual-packages
 cd manual-packages
 
 # Clone this repo and name it "mct"
-git clone https://gitlab.com/protesilaos/mct.git mct
+git clone https://git.sr.ht/~protesilaos/mct mct
 #+end_src
 
 Finally, in your =init.el= (or equivalent) evaluate this:
@@ -1469,7 +1469,8 @@ MCT is meant to be a collective effort.  Every bit of help matters.
 
 + Manual :: <https://protesilaos.com/emacs/mct>
 + Change log :: <https://protesilaos.com/emacs/mct-changelog>
-+ Source code :: <https://gitlab.com/protesilaos/mct>
++ Source code :: <https://git.sr.ht/~protesilaos/mct>
++ Mailing list :: <https://lists.sr.ht/~protesilaos/mct>
 
 * GNU Free Documentation License
 :PROPERTIES:
