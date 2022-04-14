@@ -25,6 +25,9 @@
 
 #+texinfo: @insertcopying
 
+UPDATE 2022-04-14: Development of this package has been discontinued:
+<https://protesilaos.com/codelog/2022-04-14-emacs-discontinue-mct/>.
+
 This manual, written by Protesilaos Stavrou, describes the customization
 options for =mct= (or =mct.el= and variants), and provides every other piece
 of information pertinent to it.
