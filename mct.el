@@ -57,7 +57,7 @@ Completions window will shrink or grow to show candidates within
 the specified boundaries.  To disable this bouncing effect, set
 both max-height and min-height to the same number.
 
-If nil, do not try to fit the Completions' buffer to its window.
+If nil, do not try to fit the Completions buffer to its window.
 
 Also see `mct-live-completion'."
   :type '(choice (const :tag "Disable size constraints" nil)
@@ -75,12 +75,12 @@ For example, if the user types ~/ after a long path name,
 everything preceding the ~/ is removed so the interactive
 selection process starts again from the user's $HOME.
 
-Only works when variable `file-name-shadow-mode' is non-nil."
+Only works when `file-name-shadow-mode' is enabled"
   :type 'boolean
   :group 'mct)
 
 (defcustom mct-hide-completion-mode-line nil
-  "When non-nil, hide the Completions' buffer mode line."
+  "When non-nil, hide the Completions buffer mode line."
   :type 'boolean
   :group 'mct)
 
@@ -90,33 +90,33 @@ Only works when variable `file-name-shadow-mode' is non-nil."
   :group 'mct)
 
 (defcustom mct-live-completion t
-  "Control auto-display and live-update of Completions' buffer.
+  "Control auto-display and live-update of Completions buffer.
 
 When nil, the user has to manually request completions, using the
-regular activating commands.  The Completions' buffer is never
+regular activating commands.  The Completions buffer is never
 updated live to match user input.  Updating has to be handled
 manually.  This is like the out-of-the-box minibuffer completion
 experience.
 
-When set to the value `visible', the Completions' buffer is live
+When set to the value `visible', the Completions buffer is live
 updated only if it is visible.  The actual display of the
 completions is still handled manually.  For this reason, the
 `visible' style does not read the `mct-minimum-input', meaning
 that it will always try to live update the visible completions,
 regardless of input length.
 
-When non-nil (the default), the Completions' buffer is
+When non-nil (the default), the Completions buffer is
 automatically displayed once the `mct-minimum-input' is met and
 is hidden if the input drops below that threshold.  While
 visible, the buffer is updated live to match the user's input.
 
 Note that every command or completion category in the
 `mct-completion-passlist' ignores this option altogether.  This
-means that every such symbol will always show the Completions'
+means that every such symbol will always show the Completions
 buffer automatically and will always update its contents live.
 Same principle for `mct-completion-blocklist', which will always
 disable both the automatic display and live updating of the
-Completions' buffer.
+Completions buffer.
 
 Also see `mct-completion-window-size'."
   :type '(choice
@@ -134,7 +134,7 @@ number of candidates that are being computed."
   :group 'mct)
 
 (defcustom mct-live-update-delay 0.3
-  "Delay in seconds before updating the Completions' buffer.
+  "Delay in seconds before updating the Completions buffer.
 Set this to 0 to disable the delay.
 
 This applies in all cases covered by `mct-live-completion'."
@@ -150,10 +150,10 @@ as `file', `buffer', or what other packages define like Consult's
 `consult-location' category.
 
 This means that they ignore `mct-live-completion'.  They do not
-automatically display the Completions' buffer, nor do they update
+automatically display the Completions buffer, nor do they update
 it to match user input.
 
-The Completions' buffer can still be accessed with commands that
+The Completions buffer can still be accessed with commands that
 place it in a window (such as `mct-list-completions-toggle',
 `mct-switch-to-completions-top').
 
@@ -221,7 +221,7 @@ is to hide the `*Completions*' buffer after updating the list of
 candidates in a non-exiting fashion (e.g. select a directory and
 expect to continue typing the path).  This, however, runs
 contrary to the interaction model of MCT when it performs live
-completions, because the user expects the Completions' buffer to
+completions, because the user expects the Completions buffer to
 remain visible while typing out the path to the file.
 
 When this user option is non-nil (the default) it makes all
@@ -296,14 +296,14 @@ affairs."
 (defvar mct--dynamic-completion-categories '(file)
   "Completion categories that perform dynamic completion.")
 
-;;;; Basics of intersection between minibuffer and Completions' buffer
 
 (define-obsolete-variable-alias
   'mct-hl-line 'mct-highlight-candidate "0.3.0")
+;;;; Basics of intersection between minibuffer and Completions buffer
 
 (defface mct-highlight-candidate
   '((t :inherit highlight :extend t))
-  "Face for current candidate in the completions' buffer."
+  "Face for current candidate in the Completions buffer."
   :group 'mct)
 
 (defun mct--first-line-completion-p ()
@@ -353,7 +353,7 @@ Can be used in `mct-completion-window-size'."
    (t 5)))
 
 (defun mct--fit-completions-window (&rest _args)
-  "Fit Completions' buffer to its window."
+  "Fit Completions buffer to its window."
   (when-let* ((window (mct--get-completion-window))
               (size mct-completion-window-size)
               (max (car size))
@@ -365,7 +365,7 @@ Can be used in `mct-completion-window-size'."
 See `mct-minimum-input'."
   (>= (- (point-max) (minibuffer-prompt-end)) mct-minimum-input))
 
-;;;;; Live-updating Completions' buffer
+;;;;; Live-updating Completions buffer
 
 (defvar mct--completions-window-name "\\`\\*Completions.*\\*\\'"
   "Regexp to match window names with completion candidates.")
@@ -394,8 +394,9 @@ See `mct-minimum-input'."
 Meant to be added to `after-change-functions'."
   (when (and
          ;; Check that live completions are enabled by looking at
-         ;; after-change-functions. This check is needed for Consult
-         ;; integration, which refreshes the display asynchronously.
+         ;; `after-change-functions'.  This check is needed for
+         ;; Consult integration, which refreshes the display
+         ;; asynchronously.
          (memq #'mct--live-completions-refresh after-change-functions)
          ;; Update only visible completion windows?
          (or (not (eq mct-live-completion 'visible))
@@ -410,7 +411,7 @@ Meant to be added to `after-change-functions'."
       (mct--live-completions-refresh-immediately))))
 
 (defun mct--setup-live-completions ()
-  "Set up the completions' buffer."
+  "Set up the Completions buffer."
   (cond
    ((null mct-live-completion))
    ;; ;; NOTE 2022-02-25: The passlist setup we had here was being
@@ -569,11 +570,11 @@ Apply APP by first setting up the minibuffer to work with Mct."
       (buffer-name (window-buffer window))))))
 
 (defun mct--show-completions ()
-  "Show the completions' buffer."
   (let ((display-buffer-alist
          (cons (cons mct--completions-window-name mct-display-buffer-action)
                display-buffer-alist))
         ;; don't ring the bell in `minibuffer-completion-help'
+  "Show the Completions buffer."
         ;; when <= 1 completion exists.
         (ring-bell-function #'ignore)
         (message-log-max nil)
@@ -589,17 +590,17 @@ Apply APP by first setting up the minibuffer to work with Mct."
 
 ;;;###autoload
 (defun mct-focus-mini-or-completions ()
-  "Focus the active minibuffer or the completions' window.
+  "Focus the active minibuffer or the Completions window.
 
 If both the minibuffer and the Completions are present, this
 command will first move per invocation to the former, then the
 latter, and then continue to switch between the two.
 
 The continuous switch is essentially the same as running
-`mct-focus-minibuffer' and `switch-to-completions' in
+`mct-focus-minibuffer' and `switch-to-Completions in
 succession.
 
-What constitutes a completions' window is ultimately determined
+What constitutes a Completions window is ultimately determined
 by `mct--completions-window-name'."
   (interactive nil mct-minibuffer-mode)
   (let* ((mini (active-minibuffer-window))
@@ -612,13 +613,13 @@ by `mct--completions-window-name'."
 
 ;;;###autoload
 (defun mct-list-completions-toggle ()
-  "Toggle the presentation of the completions' buffer."
+  "Toggle the presentation of the Completions buffer."
   (interactive nil mct-minibuffer-mode)
   (if (mct--get-completion-window)
       (minibuffer-hide-completions)
     (mct--show-completions)))
 
-;;;;; Cyclic motions between minibuffer and completions' buffer
+;;;;; Cyclic motions between minibuffer and Completions buffer
 
 (defun mct--completion-at-point-p ()
   "Return non-nil if there is a completion at point."
@@ -666,7 +667,7 @@ a `one-column' value."
     (null (mct--completion-at-point-p))))
 
 (defun mct--switch-to-completions ()
-  "Subroutine for switching to the completions' buffer."
+  "Subroutine for switching to the Completions buffer."
   (unless (mct--get-completion-window)
     (mct--show-completions))
   (switch-to-completions))
@@ -684,15 +685,15 @@ a `one-column' value."
             (goto-char old-point)))))))
 
 (defun mct-switch-to-completions-top ()
-  "Switch to the top of the completions' buffer."
   (interactive nil mct-minibuffer-mode mct-region-mode)
+  "Switch to the top of the Completions buffer."
   (mct--switch-to-completions)
   (goto-char (mct--first-completion-point))
   (mct--restore-old-point-in-grid (point)))
 
 (defun mct-switch-to-completions-bottom ()
-  "Switch to the bottom of the completions' buffer."
   (interactive nil mct-minibuffer-mode mct-region-mode)
+  "Switch to the bottom of the Completions buffer."
   (mct--switch-to-completions)
   (goto-char (point-max))
   (next-completion -1)
@@ -896,16 +897,16 @@ In any other prompt use `mct-choose-completion-no-exit'."
   "Edit the current completion candidate inside the minibuffer.
 
 The current candidate is the one at point while inside the
-Completions' buffer.
+Completions buffer.
 
 When point is in the minibuffer, the current candidate is
 determined as follows:
 
-+ The one at the last known position in the Completions'
++ The one at the last known position in the Completions
   window (if the window is deleted and produced again, this value
   is reset).
 
-+ The first candidate in the Completions' buffer.
++ The first candidate in the Completions buffer.
 
 A candidate is recognised for as long as point is not past its
 last character."
@@ -934,7 +935,7 @@ followed by exiting the minibuffer with that candidate."
 
 ;;;;; Miscellaneous commands
 
-;; This is needed to circumvent `mct--setup-clean-completions' with regard to
+;; This is needed to circumvent `mct--setup-clean-Completions with regard to
 ;; `cursor-sensor-functions'.
 (defun mct-beginning-of-buffer ()
   "Go to the top of the Completions buffer."
@@ -942,9 +943,9 @@ followed by exiting the minibuffer with that candidate."
   (goto-char (mct--first-completion-point)))
 
 (defun mct-keyboard-quit-dwim ()
-  "Control the exit behaviour for completions' buffers.
+  "Control the exit behaviour for Completions buffers.
 
-If in a completions' buffer and unless the region is active, run
+If in a Completions buffer and unless the region is active, run
 `abort-recursive-edit'.  Otherwise run `keyboard-quit'.
 
 If the region is active, deactivate it.  A second invocation of
@@ -971,7 +972,7 @@ Apply APP while inhibiting modification hooks."
     (apply app)))
 
 (defun mct--setup-appearance ()
-  "Set up variables for the appearance of the Completions' buffer."
+  "Set up variables for the appearance of the Completions buffer."
   (when mct-hide-completion-mode-line
     (setq-local mode-line-format nil))
   (if mct-apply-completion-stripes
@@ -1002,7 +1003,7 @@ Apply APP while inhibiting modification hooks."
 ;;;;; Highlight current candidate
 
 (defvar-local mct--highlight-overlay nil
-  "Overlay to highlight candidate in the Completions' buffer.")
+  "Overlay to highlight candidate in the Completions buffer.")
 
 (defvar mct--overlay-priority -50
   "Priority used on the `mct--highlight-overlay'.
@@ -1056,7 +1057,7 @@ region.")
   (mct--overlay-move mct--highlight-overlay))
 
 (defun mct--setup-highlighting ()
-  "Highlight the current completion in the Completions' buffer."
+  "Highlight the current completion in the Completions buffer."
   (add-hook 'post-command-hook #'mct--completions-candidate-highlight nil t))
 
 ;;;;; Keymaps
