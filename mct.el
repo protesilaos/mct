@@ -166,6 +166,9 @@ The Completions buffer can still be accessed with commands that
 place it in a window (such as `mct-list-completions-toggle',
 `mct-switch-to-completions-top').
 
+When the `mct-completion-blocklist' and the `mct-completion-passlist'
+are in conflict, the former takes precedence.
+
 Perhaps a less drastic measure is to set `mct-minimum-input' to
 an appropriate value.  Or better use `mct-completion-passlist'.
 
@@ -184,6 +187,9 @@ as `file', `buffer', or what other packages define like Consult's
 This means that they ignore the value of `mct-live-completion'
 and the `mct-minimum-input'.  They also bypass any possible delay
 introduced by `mct-live-update-delay'.
+
+When the `mct-completion-blocklist' and the `mct-completion-passlist'
+are in conflict, the former takes precedence.
 
 Read the manual for known completion categories."
   :type '(repeat symbol)
@@ -390,7 +396,7 @@ Meant to be added to `after-change-functions'."
 (defun mct--setup-live-completions ()
   "Set up the Completions buffer."
   (cond
-   ((null mct-live-completion))
+   ((or (null mct-live-completion) (mct--blocklist-p)))
    ;; ;; NOTE 2022-02-25: The passlist setup we had here was being
    ;; ;; called too early in `mct--completing-read-advice'.  It would
    ;; ;; fail to filter out the current candidate from the list
@@ -410,7 +416,7 @@ Meant to be added to `after-change-functions'."
 
 (defun mct--setup-passlist ()
   "Set up the minibuffer for `mct-completion-passlist'."
-  (when (and (mct--passlist-p) (mct--minibuffer-p))
+  (when (and (mct--passlist-p) (mct--minibuffer-p) (not (mct--blocklist-p)))
     (setq-local mct-minimum-input 0)
     (setq-local mct-live-update-delay 0)
     (mct--show-completions)))

@@ -234,6 +234,9 @@ the ~mct-minimum-input~.  It also bypasses any possible delay introduced
 by ~mct-live-update-delay~.  In other words, it immediately displays the
 =*Completions*= buffer and instantly updates it to match user input.
 
+When the ~mct-completion-blocklist~ and the ~mct-completion-passlist~
+are in conflict, the former takes precedence.
+
 [[#h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4][Known completion categories]].
 
 *** Blocklist for commands or completion categories
@@ -257,6 +260,9 @@ match user input.
 The Completions' buffer can still be accessed with commands that place
 it in a window (such as ~mct-list-completions-toggle~,
 ~mct-switch-to-completions-top~).
+
+When the ~mct-completion-blocklist~ and the ~mct-completion-passlist~
+are in conflict, the former takes precedence.
 
 Perhaps a less drastic measure is to set ~mct-minimum-input~ to an
 appropriate value.  Or better use ~mct-completion-passlist~.
