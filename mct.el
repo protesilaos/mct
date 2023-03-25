@@ -267,7 +267,7 @@ affairs."
 ;;;; Basics of intersection between minibuffer and Completions buffer
 
 (defface mct-highlight-candidate
-  '((t :inherit highlight :extend t))
+  '((t :inherit highlight :extend nil))
   "Face for current candidate in the Completions buffer."
   :group 'mct)
 
