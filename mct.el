@@ -42,18 +42,18 @@ and the Completions."
 
 (make-obsolete 'mct-completion-windows-regexp 'mct--completions-window-name "0.5.0")
 
-(defcustom mct-completion-window-size (cons #'mct--frame-height-fraction 1)
-  "Set the maximum and minimum height of the Completions' buffer.
+(defcustom mct-completion-window-size (cons #'mct-frame-height-third 1)
+  "Set the maximum and minimum height of the Completions buffer.
 
 The value is a cons cell in the form of (max-height . min-height)
 where each value is either a natural number or a function which
 returns such a number.
 
 The default maximum height of the window is calculated by the
-function `mct--frame-height-fraction', which finds the closest
-round number to 1/3 of the frame's height.  While the default
-minimum height is 1.  This means that during live completions the
-Completions' window will shrink or grow to show candidates within
+function `mct-frame-height-third', which finds the closest round
+number to 1/3 of the frame's height.  While the default minimum
+height is 1.  This means that during live completions the
+Completions window will shrink or grow to show candidates within
 the specified boundaries.  To disable this bouncing effect, set
 both max-height and min-height to the same number.
 
@@ -333,10 +333,15 @@ affairs."
                                  (goto-char prev))))))
         (put-text-property (point-min) (point) 'invisible t)))))
 
-(defun mct--frame-height-fraction ()
+(defun mct-frame-height-third ()
   "Return round number of 1/3 of `frame-height'.
 Can be used in `mct-completion-window-size'."
   (floor (frame-height) 3))
+
+(define-obsolete-function-alias
+  'mct--frame-height-fraction
+  'mct-frame-height-third
+  "1.0.0")
 
 (defun mct--height (param)
   "Return height of PARAM in number of lines."
