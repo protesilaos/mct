@@ -119,7 +119,7 @@ Also see `mct-completion-window-size'."
   :type '(choice
           (const :tag "Disable live-updating" nil)
           (const :tag "Enable live-updating" t)
-          (const :tag "Live update only visible Completions" 'visible))
+          (const :tag "Live update only visible Completions" visible))
   :group 'mct)
 
 (defcustom mct-minimum-input 3
