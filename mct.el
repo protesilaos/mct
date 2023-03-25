@@ -289,7 +289,7 @@ affairs."
     (unless (mct--first-line-completion-p)
       (goto-char (point-min))
       (let ((inhibit-read-only t))
-        (delete-region (point-at-bol) (1+ (point-at-eol)))
+        (delete-region (line-beginning-position) (1+ (line-end-position)))
         (insert (propertize " "
                             'cursor-sensor-functions
                             (list
@@ -592,7 +592,7 @@ by `mct--completions-window-name'."
   (mct--switch-to-completions)
   (goto-char (point-max))
   (next-completion -1)
-  (goto-char (point-at-bol))
+  (goto-char (line-beginning-position))
   (unless (mct--completion-at-point-p)
     (next-completion 1))
   (mct--restore-old-point-in-grid (point))
@@ -606,7 +606,7 @@ by `mct--completions-window-name'."
   "Return non-nil if ARGth line is empty."
   (unless (mct--arg-completion-point-p arg)
     (save-excursion
-      (goto-char (point-at-bol))
+      (goto-char (line-beginning-position))
       (and (not (bobp))
 	       (or (beginning-of-line (1+ arg)) t)
 	       (save-match-data
@@ -879,9 +879,7 @@ This value means that it is overriden by the active region.")
   "Return end of completion candidate."
   (if-let ((string (mct--completion-at-point-p)))
       (save-excursion
-        (if (mct--one-column-p)
-            (1+ (point-at-eol))
-          (prop-match-end (mct--completions-text-property-search))))
+        (1+ (line-end-position)))
     (point)))
 
 (defun mct--overlay-make ()
