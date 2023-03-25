@@ -177,14 +177,8 @@ Read the manual for known completion categories."
   :type '(repeat symbol)
   :group 'mct)
 
-(defcustom mct-completions-format 'one-column
-  "Set the presentation of candidates in the Completions' buffer.
-See `completions-format' for possible values."
-  :type '(choice (const horizontal) (const vertical) (const one-column))
-  :group 'mct)
-
-(make-obsolete 'mct-region-completions-format 'mct-completions-format "0.5.0")
 (make-obsolete-variable 'mct-display-buffer-action nil "1.0.0")
+(make-obsolete-variable 'mct-completions-format nil "1.0.0")
 
 (defcustom mct-persist-dynamic-completion t
   "When non-nil, keep dynamic completion live.
@@ -269,7 +263,6 @@ affairs."
 ;; See bug#52389: <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=52389>.
 (defvar mct--dynamic-completion-categories '(file)
   "Completion categories that perform dynamic completion.")
-
 
 (define-obsolete-variable-alias
   'mct-hl-line 'mct-highlight-candidate "0.3.0")
@@ -427,21 +420,9 @@ Meant to be added to `after-change-functions'."
     (buffer-local-value 'mct-region-mode buf)))
 
 (defun mct--minibuffer-completion-help-advice (&rest app)
-  "Prepare advice around `display-completion-list'.
-Apply APP by first let binding the `completions-format' to
-`mct-completions-format'."
+  "Prepare APP advice around `display-completion-list'."
   (if (mct--minibuffer-p)
-      (let ((completions-format mct-completions-format))
-        (apply app)
-        (mct--fit-completions-window))
-    (apply app)))
-
-(defun mct--region-completion-help-advice (&rest app)
-  "Prepare advice around `display-completion-list'.
-Apply APP by first let binding the `completions-format' to
-`mct-completions-format'."
-  (if (mct--region-p)
-      (let ((completions-format mct-completions-format))
+      (let ((completions-format 'one-column))
         (apply app)
         (mct--fit-completions-window))
     (apply app)))
@@ -576,17 +557,6 @@ by `mct--completions-window-name'."
     (next-completion -1)
     (point)))
 
-(defun mct--completions-line-boundary (boundary)
-  "Determine if current line has reached BOUNDARY.
-BOUNDARY is a line position at the top or bottom of the
-Completions' buffer.  See `mct--first-completion-point' or
-`mct--last-completion-point'.
-
-This check only applies when `completions-format' is not assigned
-a `one-column' value."
-  (and (= (line-number-at-pos) (line-number-at-pos boundary))
-       (not (mct--one-column-p))))
-
 (defun mct--completions-no-completion-line-p (arg)
   "Check if ARGth line has a completion candidate."
   (save-excursion
@@ -649,32 +619,11 @@ a `one-column' value."
 ARG is a numeric argument for `next-completion', as described in
 `mct-next-completion-or-mini'."
   (or (eobp)
-      (mct--completions-line-boundary (mct--last-completion-point))
       (= (save-excursion (next-completion arg) (point)) (point-max))
+      (= (save-excursion (forward-line arg) (point)) (point-max))
       ;; The empty final line case which should avoid candidates with
       ;; spaces or line breaks...
       (mct--empty-line-p arg)))
-
-(defun mct--next-completion (arg)
-  "Routine to move to the next ARGth completion candidate."
-  (if (not (mct--one-column-p))
-      ;; Retaining the column number ensures that things work
-      ;; intuitively in a grid view.
-      (let ((col (current-column)))
-        ;; The `when' is meant to skip past lines that do not
-        ;; contain completion candidates, such as those with
-        ;; `completions-group-format'.
-        (when (mct--completions-no-completion-line-p (or arg 1))
-          (if arg
-              (setq arg 2)
-            (setq arg (1+ arg))))
-        (vertical-motion (or arg 1))
-        (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
-          (line-move-to-column col))
-        (when (or (> (current-column) col)
-                  (not (mct--completion-at-point-p)))
-          (next-completion -1)))
-    (next-completion (or arg 1))))
 
 (defun mct-next-completion-or-mini (&optional arg)
   "Move to the next completion or switch to the minibuffer.
@@ -698,31 +647,9 @@ the minibuffer."
 ARG is a numeric argument for `previous-completion', as described in
 `mct-previous-completion-or-mini'."
   (or (bobp)
-      (mct--completions-line-boundary (mct--first-completion-point))
       (mct--motion-below-point-min-p arg)
       ;; FIXME 2021-12-27: Why do we need this now?  Regression upstream?
       (eq (line-number-at-pos) 1)))
-
-(defun mct--previous-completion (arg)
-  "Routine to move to the previous ARGth completion candidate."
-  (if (not (mct--one-column-p))
-      ;; Retaining the column number ensures that things work
-      ;; intuitively in a grid view.
-      (let ((col (current-column)))
-        ;; The `when' is meant to skip past lines that do not
-        ;; contain completion candidates, such as those with
-        ;; `completions-group-format'.
-        (when (mct--completions-no-completion-line-p (or (- arg) -1))
-          (if arg
-              (setq arg 2)
-            (setq arg (1+ arg))))
-        (vertical-motion (or (- arg) -1))
-        (unless (eq col (save-excursion (goto-char (point-at-bol)) (current-column)))
-          (line-move-to-column col))
-        (when (or (> (current-column) col)
-                  (not (mct--completion-at-point-p)))
-          (next-completion -1)))
-    (previous-completion (or (abs arg) 1))))
 
 (defun mct-previous-completion-or-mini (&optional arg)
   "Move to the previous completion or switch to the minibuffer.
