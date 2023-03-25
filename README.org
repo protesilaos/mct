@@ -459,29 +459,6 @@ For example, if the user types =~/= after a long path name, everything
 preceding the =~/= is removed so the interactive selection process starts
 again from the user's =$HOME=.
 
-** Alternating backgrounds in the Completions
-:PROPERTIES:
-:CUSTOM_ID: h:187f325e-fb48-4b7f-9508-97f34d2242e8
-:END:
-#+vindex: mct-apply-completion-stripes
-
-Brief: Use alternating backgrounds in the Completions.
-
-Symbol: ~mct-apply-completion-stripes~ (=boolean= type)
-
-By default, the =*Completions*= buffer uses the main background of the
-active theme (more specifically the =:background= attribute of the ~default~
-face).  When set to non-nil, MCT applies applies alternating background
-colors in the Completions' buffer.  These are in a shade of gray that
-contrasts with the main background.
-
-#+vindex: mct-stripe
-Due to the specific nature of this style, there is no basic face that
-can be inherited to achieve a consistent result across themes.  As such,
-it only looks as intended with the =modus-themes= (built into Emacs 28 or
-higher or available as a package).  Other themes would need to add
-support for the ~mct-stripe~ face.
-
 ** MCT in the minibuffer and in regular buffers
 :PROPERTIES:
 :CUSTOM_ID: h:8109fe09-fcce-4212-88eb-943cc72f2c75
@@ -836,7 +813,6 @@ And with more options:
 (setq mct-completion-window-size (cons #'mct--frame-height-fraction 1))
 (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
 (setq mct-hide-completion-mode-line t)
-(setq mct-apply-completion-stripes t)
 (setq mct-minimum-input 3)
 (setq mct-live-completion t)
 (setq mct-live-update-delay 0.6)
@@ -1030,30 +1006,6 @@ like this:
 and/or ideas from that libary: <https://github.com/oantolin/embark/>.
 
 [[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Third-party extensions]].
-
-* Known issues and workarounds
-:PROPERTIES:
-:CUSTOM_ID: h:acfb63f4-c2ae-46ff-a840-9c9a6350e567
-:END:
-
-This section documents known issues and how to address them.
-
-** Avoid global-hl-line-mode in the Completions
-:PROPERTIES:
-:CUSTOM_ID: h:ee6aa793-3129-4cf0-8138-1224b6052546
-:END:
-
-MCT uses its own overlay to highlight the candidate at point.  To ensure
-that it does not interfere with the optional stripes (provided by the
-user option ~mct-apply-completion-stripes~) the highlight's priority is
-set to a custom value.  This, in turn, means that when the user enables
-~global-hl-line-mode~, its highlighted line takes precedence over the MCT
-highlight.  The solution to this conflict is to disable the hl-line
-locally for the =*Completions*= buffer like this:
-
-#+begin_src emacs-lisp
-(add-hook 'completion-list-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
-#+end_src
 
 * Keymaps
 :PROPERTIES:
@@ -1460,7 +1412,7 @@ MCT is meant to be a collective effort.  Every bit of help matters.
 
 + Inspiration for certain features :: =icomplete.el= (built-in---multiple
   authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
-  =live-completions=), Štěpán Němec (=stripes.el=).
+  =live-completions=).
 
 * Official sources
 :PROPERTIES:

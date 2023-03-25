@@ -84,10 +84,7 @@ Only works when `file-name-shadow-mode' is enabled"
   :type 'boolean
   :group 'mct)
 
-(defcustom mct-apply-completion-stripes nil
-  "When non-nil, use alternating backgrounds in the Completions."
-  :type 'boolean
-  :group 'mct)
+(make-obsolete 'mct-apply-completion-stripes nil "1.0.0")
 
 (defcustom mct-live-completion t
   "Control auto-display and live-update of Completions buffer.
@@ -484,50 +481,6 @@ Apply APP by first setting up the minibuffer to work with Mct."
         (mct--setup-minibuffer-keymap)
         (mct--setup-shadow-files))
     (apply app)))
-
-;;;;; Alternating backgrounds (else "stripes")
-
-;; Based on `stripes.el' (maintained by Štěpán Němec) and the
-;; `embark-collect-zebra-minor-mode' from Omar Antolín Camarena's
-;; Embark:
-;;
-;; 1. <https://gitlab.com/stepnem/stripes-el>
-;; 2. <https://github.com/oantolin/embark>
-(defface mct-stripe
-  '((default :extend t)
-    (((class color) (min-colors 88) (background light))
-     :background "#f0f0f0")
-    (((class color) (min-colors 88) (background dark))
-     :background "#191a1b"))
-  "Face for alternating backgrounds in the Completions' buffer."
-  :group 'mct)
-
-(defun mct--remove-stripes ()
-  "Remove `mct-stripe' overlays."
-  (remove-overlays nil nil 'face 'mct-stripe))
-
-(defun mct--add-stripes ()
-  "Overlay alternate rows with the `mct-stripe' face."
-  (when (derived-mode-p 'completion-list-mode)
-    (mct--remove-stripes)
-    (save-excursion
-      (goto-char (point-min))
-      (when (overlays-at (point)) (forward-line))
-      (while (not (eobp))
-        (condition-case nil
-            (forward-line 1)
-          (user-error (goto-char (point-max))))
-        (unless (eobp)
-          (let ((pt (point)))
-            (condition-case nil
-                (forward-line 1)
-              (user-error (goto-char (point-max))))
-            ;; We set the overlay this way and give it a low priority so
-            ;; that `mct--highlight-overlay' and/or the active region
-            ;; can override it.
-            (let ((stripe (make-overlay pt (point))))
-              (overlay-put stripe 'priority -100)
-              (overlay-put stripe 'face 'mct-stripe))))))))
 
 ;;;; Commands and helper functions
 
@@ -974,10 +927,7 @@ Apply APP while inhibiting modification hooks."
 (defun mct--setup-appearance ()
   "Set up variables for the appearance of the Completions buffer."
   (when mct-hide-completion-mode-line
-    (setq-local mode-line-format nil))
-  (if mct-apply-completion-stripes
-      (mct--add-stripes)
-    (mct--remove-stripes)))
+    (setq-local mode-line-format nil)))
 
 ;;;;; Shadowed path
 
@@ -1007,9 +957,7 @@ Apply APP while inhibiting modification hooks."
 
 (defvar mct--overlay-priority -50
   "Priority used on the `mct--highlight-overlay'.
-This value means that it takes precedence over lines that have
-the `mct-stripe' face, while it is overriden by the active
-region.")
+This value means that it is overriden by the active region.")
 
 ;; This is for Emacs 27 which does not have a completion--string text
 ;; property.
