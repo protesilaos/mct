@@ -30,6 +30,21 @@ commit, is explicitly marked as such.
 
 Current development target is {{{development-version}}}.
 
++ Package name (GNU ELPA): ~mct~
++ Official manual: <https://protesilaos.com/emacs/mct>
++ Change log: <https://protesilaos.com/emacs/mct-changelog>
++ Git repo on SourceHut: <https://git.sr.ht/~protesilaos/mct>
+  - Mirrors:
+    + GitHub: <https://github.com/protesilaos/mct>
+    + GitLab: <https://gitlab.com/protesilaos/mct>
++ Mailing list: <https://lists.sr.ht/~protesilaos/general-issues>
++ Backronym: Minibuffer Confines Transcended; Minibuffer and
+  Completions in Tandem.
+
+If you are viewing the README.org version of this file, please note
+that the GNU ELPA machinery automatically generates an Info manual out
+of it.
+
 #+toc: headlines 8 insert TOC here, with eight headline levels
 
 * COPYING
