@@ -430,11 +430,6 @@ Meant to be added to `after-change-functions'."
               (buf (window-buffer win)))
       (buffer-local-value 'mct--active buf)))
 
-(defun mct--region-p ()
-  "Return non-nil if Mct is completing in region."
-  (when-let ((buf (mct--region-current-buffer)))
-    (buffer-local-value 'mct-region-mode buf)))
-
 (defun mct--minibuffer-completion-help-advice (&rest app)
   "Prepare APP advice around `display-completion-list'."
   (if (mct--minibuffer-p)
@@ -458,26 +453,10 @@ Apply APP by first setting up the minibuffer to work with Mct."
 
 ;;;; Commands and helper functions
 
-;; TODO 2021-11-17: We must `autoload' instead of `declare-function' for
-;; things to work on Emacs 27.  Perhaps we should keep the latter but
-;; add (eval-when-compile (require 'text-property-search))?  That should
-;; work for packages, but not if we just `eval-buffer', right?
-
-(autoload 'text-property-search-backward "text-property-search")
-(autoload 'text-property-search-forward "text-property-search")
-(autoload 'prop-match-beginning "text-property-search")
-(autoload 'prop-match-end "text-property-search")
-
-;; (declare-function text-property-search-backward "text-property-search" (property &optional value predicate not-current))
-;; (declare-function text-property-search-forward "text-property-search" (property &optional value predicate not-current))
-;; (declare-function prop-match-beginning "text-property-search" (cl-x))
-;; (declare-function prop-match-end "text-property-search" (cl-x))
-
-;; We need this to make things work on Emacs 27.
-(defun mct--one-column-p ()
-  "Test if we have a one-column view available."
-  (and (eq mct-completions-format 'one-column)
-       (>= emacs-major-version 28)))
+(declare-function text-property-search-backward "text-property-search" (property &optional value predicate not-current))
+(declare-function text-property-search-forward "text-property-search" (property &optional value predicate not-current))
+(declare-function prop-match-beginning "text-property-search" (cl-x))
+(declare-function prop-match-end "text-property-search" (cl-x))
 
 ;;;;; Focus minibuffer and/or show completions
 
@@ -503,14 +482,7 @@ Apply APP by first setting up the minibuffer to work with Mct."
         (ring-bell-function #'ignore)
         (message-log-max nil)
         (inhibit-message t))
-    (save-excursion
-      (pcase (and completion-in-region-mode completion-in-region--data)
-        (`(,start ,end ,collection . ,plist)
-         (let ((minibuffer-completion-table collection)
-               (minibuffer-completion-predicate (plist-get plist :predicate))
-               (completion-extra-properties plist))
-           (minibuffer-completion-help start end)))
-        (_ (minibuffer-completion-help))))))
+    (minibuffer-completion-help)))
 
 ;;;###autoload
 (defun mct-focus-mini-or-completions ()
@@ -556,7 +528,7 @@ by `mct--completions-window-name'."
 (defun mct--arg-completion-point-p (arg)
   "Return non-nil if ARGth next completion exists."
   (save-excursion
-    (mct--next-completion arg)
+    (next-completion arg)
     (mct--completion-at-point-p)))
 
 (defun mct--first-completion-point ()
@@ -585,35 +557,21 @@ by `mct--completions-window-name'."
     (mct--show-completions))
   (switch-to-completions))
 
-(defun mct--restore-old-point-in-grid (line)
-  "Restore old point in window if LINE is on its line."
-  (unless (mct--one-column-p)
-    (let (old-line old-point)
-      (when-let ((window (mct--get-completion-window)))
-        (setq old-point (window-old-point window)
-              old-line (line-number-at-pos old-point))
-        (when (= (line-number-at-pos line) old-line)
-          (if (eq old-point (point-min))
-              (goto-char (mct--first-completion-point))
-            (goto-char old-point)))))))
-
 (defun mct-switch-to-completions-top ()
-  (interactive nil mct-minibuffer-mode mct-region-mode)
   "Switch to the top of the Completions buffer."
+  (interactive nil mct-minibuffer-mode)
   (mct--switch-to-completions)
-  (goto-char (mct--first-completion-point))
-  (mct--restore-old-point-in-grid (point)))
+  (goto-char (mct--first-completion-point)))
 
 (defun mct-switch-to-completions-bottom ()
-  (interactive nil mct-minibuffer-mode mct-region-mode)
   "Switch to the bottom of the Completions buffer."
+  (interactive nil mct-minibuffer-mode)
   (mct--switch-to-completions)
   (goto-char (point-max))
   (next-completion -1)
   (goto-char (line-beginning-position))
   (unless (mct--completion-at-point-p)
     (next-completion 1))
-  (mct--restore-old-point-in-grid (point))
   (recenter
    (- -1
       (min (max 0 scroll-margin)
@@ -650,7 +608,7 @@ the minibuffer."
   (let ((count (or arg 1)))
     (if (mct--bottom-of-completions-p count)
         (mct-focus-minibuffer)
-      (mct--next-completion count))))
+      (next-completion count))))
 
 (defun mct--motion-below-point-min-p (arg)
   "Return non-nil if backward ARG motion exceeds `point-min'."
@@ -676,12 +634,12 @@ the minibuffer."
   (let ((count (if (natnump arg) arg 1)))
     (if (mct--top-of-completions-p count)
         (mct-focus-minibuffer)
-      (mct--previous-completion count))))
+      (previous-completion count))))
 
 (defun mct-next-completion-group (&optional arg)
   "Move to the next completion group.
 If ARG is supplied, move that many completion groups at a time."
-  (interactive "p" mct-minibuffer-mode mct-region-mode)
+  (interactive "p" mct-minibuffer-mode)
   (dotimes (_ (or arg 1))
     (when-let (group (save-excursion
                        (text-property-search-forward 'face
@@ -695,7 +653,7 @@ If ARG is supplied, move that many completion groups at a time."
 (defun mct-previous-completion-group (&optional arg)
   "Move to the previous completion group.
 If ARG is supplied, move that many completion groups at a time."
-  (interactive "p" mct-minibuffer-mode mct-region-mode)
+  (interactive "p" mct-minibuffer-mode)
   (dotimes (_ (or arg 1))
     ;; skip back, so if we're at the top of a group, we go to the previous one...
     (forward-line -1)
@@ -809,7 +767,7 @@ followed by exiting the minibuffer with that candidate."
 ;; `cursor-sensor-functions'.
 (defun mct-beginning-of-buffer ()
   "Go to the top of the Completions buffer."
-  (interactive nil mct-minibuffer-mode mct-region-mode)
+  (interactive nil mct-minibuffer-mode)
   (goto-char (mct--first-completion-point)))
 
 (defun mct-keyboard-quit-dwim ()
@@ -820,7 +778,7 @@ If in a Completions buffer and unless the region is active, run
 
 If the region is active, deactivate it.  A second invocation of
 this command is then required to abort the session."
-  (interactive nil mct-minibuffer-mode mct-region-mode)
+  (interactive nil mct-minibuffer-mode)
   (when (derived-mode-p 'completion-list-mode)
     (cond
      ((null (active-minibuffer-window))
@@ -985,8 +943,6 @@ This value means that it is overriden by the active region.")
 
 ;;;;; Dynamic completion
 
-;; TODO 2022-01-29: Research how things work for relevant cases in
-;; completion-in-region and adapt accordingly.
 (defun mct--persist-dynamic-completion (&rest _)
   "Persist completion, per `mct-persist-dynamic-completion'."
   (when (and (not (mct--symbol-in-list mct-completion-blocklist))
@@ -1029,211 +985,44 @@ This value means that it is overriden by the active region.")
     (advice-remove #'minibuffer-completion-help #'mct--minibuffer-completion-help-advice)
     (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily))
   (mct--setup-dynamic-completion-persist)
-  (mct--setup-shared))
+  (mct--setup-message-advices))
 
-(define-obsolete-function-alias 'mct-mode 'mct-minibuffer-mode "0.4.0")
-
-;;;;; mct-region-mode declaration
-
-;;;;;; Live completions
-
-(defun mct--region-current-buffer ()
-  "Return current buffer of completion in region."
-  (and completion-in-region--data
-       (marker-buffer (nth 0 completion-in-region--data))))
-
-(defun mct--region-live-completions (&rest _)
-  "Update the *Completions* buffer.
-Meant to be added to `after-change-functions'."
-  (when-let (buf (mct--region-current-buffer))
-    (while-no-input
-      (condition-case nil
-          (save-match-data
-            (mct--show-completions))
-        (quit (keyboard-quit))))))
-
-(defun mct--region-live-update ()
-  "Hook up `mct--region-live-completions'."
-  (add-hook 'after-change-functions #'mct--region-live-completions nil t))
-
-;;;;;; Minor mode specification
-
-(defvar mct-region-buffer-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [remap next-line] #'mct-switch-to-completions-top)
-    (define-key map [remap previous-line] #'mct-switch-to-completions-bottom)
-    ;; TODO: Either keep the TAB=completion-at-point binding or add our own
-    ;; command which is compatible with orderless completion.
-    (define-key map (kbd "TAB") #'ignore)
-    map)
-  "Derivative of `completion-in-region-map'.")
-
-(defun mct--region-setup-completion-in-region ()
-  "Set up Mct for `completion-in-region'."
-  (if completion-in-region-mode
-      (progn
-        (setcdr (assq #'completion-in-region-mode minor-mode-overriding-map-alist)
-                (make-composed-keymap mct-region-buffer-map completion-in-region-mode-map))
-        (mct--region-current-buffer)
-        ;; NOTE: Ignore the predicate in order to support orderless style.
-        ;; TODO: This override should be guarded by a customizable variable,
-        ;; since it is intrusive. See also `corfu-quit-at-boundary'.
-        (setq completion-in-region-mode--predicate (lambda () t))
-        (mct--region-live-update))
-    ;; Teardown
-    (remove-hook 'after-change-functions #'mct--region-live-completions t)))
-
-(defun mct-next-completion-or-quit (&optional arg)
-  "Move to next completion or bury the Completions' buffer.
-
-This performs a regular motion for optional ARG candidates, but
-when point can no longer move in that direction it buries the
-Completions' buffer.
-
-This is a counterpart of `mct-next-completion-or-mini' that is
-meant for the case of completion in region (i.e. not in the
-minibuffer)."
-  (interactive nil mct-region-mode)
-  (let ((count (or arg 1)))
-    (cond
-     ((mct--bottom-of-completions-p count)
-      (minibuffer-hide-completions))
-     (t
-      (mct--next-completion count)))))
-
-(defun mct-previous-completion-or-quit (&optional arg)
-  "Move to previous completion or bury the Completions' buffer.
-
-This performs a regular motion for optional ARG candidates, but
-when point can no longer move in that direction it buries the
-Completions' buffer.
-
-This is a counterpart of `mct-previous-completion-or-mini' that
-is meant for the case of completion in region (i.e. not in the
-minibuffer)."
-  (interactive nil mct-region-mode)
-  (let ((count (if (natnump arg) arg 1)))
-    (cond
-     ((mct--top-of-completions-p count)
-      (minibuffer-hide-completions))
-     (t
-      (mct--previous-completion count)))))
-
-(defvar mct-region-completion-list-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [remap next-line] #'mct-next-completion-or-quit)
-    (define-key map [remap previous-line] #'mct-previous-completion-or-quit)
-    (define-key map (kbd "n") #'mct-next-completion-or-quit)
-    (define-key map (kbd "p") #'mct-previous-completion-or-quit)
-    (define-key map [remap backward-paragraph] #'mct-previous-completion-group)
-    (define-key map [remap forward-paragraph] #'mct-next-completion-group)
-    (define-key map (kbd "M-n") #'mct-next-completion-group)
-    (define-key map (kbd "M-p") #'mct-previous-completion-group)
-    (define-key map (kbd "TAB") #'choose-completion)
-    (define-key map (kbd "RET") #'choose-completion)
-    (define-key map [remap beginning-of-buffer] #'mct-beginning-of-buffer)
-    map)
-  "Derivative of `completion-list-mode-map'.")
-
-(defun mct--region-setup-completion-list-keymap ()
-  "Set up completion list keymap."
-  (use-local-map
-   (make-composed-keymap mct-region-completion-list-map
-                         (current-local-map))))
-
-(defun mct--region-setup-completion-list ()
-  "Set up the completion-list for Mct."
-  (when (mct--region-p)
-    (setq-local completion-show-help nil
-                completion-wrap-movement nil ; Emacs 29
-                truncate-lines t)
-    (mct--setup-clean-completions)
-    (mct--setup-appearance)
-    (mct--region-setup-completion-list-keymap)
-    (mct--setup-highlighting)
-    (cursor-sensor-mode)))
-
-(defun mct--region-completion-done (&rest app)
-  "Apply APP before disabling completion in region."
-  (apply app)
-  (completion-in-region-mode -1))
-
-;; UPDATE 2022-01-01 13:12 +0200: Actually this is not related to mct.
-;; I can reproduce it in emacs -Q with just those:
-;;
-;; (electric-indent-mode 1)
-;; (setq-default tab-always-indent 'complete)
-;;
-;; FIXME 2022-01-01: I experienced a bug which is as follows:
-;;
-;; + (electric-indent-mode 1)
-;; + (setq-default tab-always-indent 'complete)
-;; + visit an Org file with an elisp src block that includes comments
-;; + go to the end of a comment's line and hit RET
-;; + the block temporarily changes background to secondary-selection
-;;   (same as when you type C-c '), seems to be trying to perform
-;;   completion, and then ultimately does what RET is supposed to do.
-;;
-;; Disabling electric-indent-mode fixes the issue, though that is beside
-;; the point.
-
-;; FIXME 2022-01-03: This does not work with either M-x shell or M-x
-;; eshell.  Not on Emacs 29, not on Emacs 27.  Try to tab-complete with
-;; 'cd' and it will not be possible to switch to the Completions'
-;; buffer, even if it works the first time.
-
-;;;###autoload
-(define-minor-mode mct-region-mode
-  "Set up interactivity over the default `completion-in-region'."
-  :global t
-  (if mct-region-mode
-      (progn
-        (advice-add #'completion--done :around #'mct--region-completion-done)
-        (advice-add #'minibuffer-completion-help :around #'mct--region-completion-help-advice)
-        (add-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
-        (add-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region))
-    (advice-remove #'completion--done #'mct--region-completion-done)
-    (advice-remove #'minibuffer-completion-help #'mct--region-completion-help-advice)
-    (remove-hook 'completion-list-mode-hook #'mct--region-setup-completion-list)
-    (remove-hook 'completion-in-region-mode-hook #'mct--region-setup-completion-in-region))
-  (mct--setup-shared))
+(make-obsolete 'mct-region-mode nil "1.0.0")
 
 ;; Adapted from Omar Antolín Camarena's live-completions library:
 ;; <https://github.com/oantolin/live-completions>.
-(defun mct--shared-honor-inhibit-message (&rest app)
-  "Honor `inhibit-message' while applying APP."
-  (unless (and (or (mct--region-p) (mct--minibuffer-p)) inhibit-message)
+(defun mct--honor-inhibit-message (&rest app)
+  "Honor variable `inhibit-message' while applying APP."
+  (unless (and (mct--minibuffer-p) inhibit-message)
     (apply app)))
 
 ;; Thanks to Omar Antolín Camarena for providing the messageless and
 ;; stealthily.  Source: <https://github.com/oantolin/emacs-config>.
-(defun mct--shared-messageless (&rest app)
+(defun mct--messageless (&rest app)
   "Set `minibuffer-message-timeout' to 0 while applying APP."
-  (if (or (mct--region-p) (mct--minibuffer-p))
+  (if (mct--minibuffer-p)
       (let ((minibuffer-message-timeout 0))
         (apply app))
     (apply app)))
 
-(defun mct--setup-shared ()
+(defun mct--setup-message-advices ()
   "Silence the minibuffer and the Completions."
-  (if (or mct-region-mode mct-minibuffer-mode)
+  (if mct-minibuffer-mode
       (progn
-        ;; NOTE 2022-01-09: Only `choose-completion' is relevant for
-        ;; completion-in-region.
         (dolist (fn '(exit-minibuffer
                       choose-completion
                       minibuffer-force-complete
                       minibuffer-complete-and-exit
                       minibuffer-force-complete-and-exit))
-          (advice-add fn :around #'mct--shared-messageless))
-        (advice-add #'minibuffer-message :around #'mct--shared-honor-inhibit-message))
+          (advice-add fn :around #'mct--messageless))
+        (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message))
     (dolist (fn '(exit-minibuffer
                   choose-completion
                   minibuffer-force-complete
                   minibuffer-complete-and-exit
                   minibuffer-force-complete-and-exit))
-      (advice-remove fn #'mct--shared-messageless))
-    (advice-remove #'minibuffer-message #'mct--shared-honor-inhibit-message)))
+      (advice-remove fn #'mct--messageless))
+    (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)))
 
 (provide 'mct)
 ;;; mct.el ends here
