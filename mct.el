@@ -1,6 +1,6 @@
-;;; mct.el --- Minibuffer and Completions in Tandem -*- lexical-binding: t -*-
+;;; mct.el --- Minibuffer Confines Transcended -*- lexical-binding: t -*-
 
-;; Copyright (C) 2021-2022  Free Software Foundation, Inc.
+;; Copyright (C) 2021-2023  Free Software Foundation, Inc.
 
 ;; Author: Protesilaos Stavrou <info@protesilaos.com>
 ;; URL: https://git.sr.ht/~protesilaos/mct
@@ -24,18 +24,30 @@
 
 ;;; Commentary:
 ;;
-;; MCT enhances the default Emacs completion.  It makes the minibuffer
-;; and Completions buffer work together as part of a singular
-;; completion UI.
+;; Enhancements for the default minibuffer completion UI of Emacs.  In
+;; essence, MCT is (i) a very thin layer of interactivity on top of the
+;; out-of-the-box completion experience, and (ii) glue code that combines
+;; built-in functionalities to make the default completion framework work
+;; like that of more featureful third-party options.
 ;;
-;; Read the documentation for basic usage and configuration.
+;; + Package name (GNU ELPA): `mct`
+;; + Official manual: <https://protesilaos.com/emacs/mct>
+;; + Change log: <https://protesilaos.com/emacs/mct-changelog>
+;; + Git repo on SourceHut: <https://git.sr.ht/~protesilaos/mct>
+;;   - Mirrors:
+;;     + GitHub: <https://github.com/protesilaos/mct>
+;;     + GitLab: <https://gitlab.com/protesilaos/mct>
+;; + Mailing list: <https://lists.sr.ht/~protesilaos/general-issues>
+;; + Video demo: <https://protesilaos.com/codelog/2021-10-22-emacs-mct-demo/>
+;; + Backronym: Minibuffer Confines Transcended; Minibuffer and
+;;   Completions in Tandem.
 
 ;;; Code:
 
 ;;;; General utilities
 
 (defgroup mct ()
-  "Minibuffer and Completions in Tandem.
+  "Minibuffer Confines Transcended.
 A layer of interactivity that integrates the standard minibuffer
 and the Completions."
   :group 'minibuffer)
