@@ -1,43 +1,49 @@
-#+title: Minibuffer and Completions in Tandem (mct.el)
-#+author: Protesilaos Stavrou
-#+email: info@protesilaos.com
-#+language: en
-#+options: ':t toc:nil author:t email:t num:t
-#+startup: content
-
-#+macro: stable-version 0.5.0
-#+macro: release-date 2022-02-08
-#+macro: development-version 0.6.0-dev
-#+macro: file @@texinfo:@file{@@$1@@texinfo:}@@
-#+macro: space @@texinfo:@: @@
-#+macro: kbd @@texinfo:@kbd{@@$1@@texinfo:}@@
-
-#+export_file_name: mct.texi
-
-#+texinfo_filename: mct.info
-#+texinfo_dir_category: Emacs misc features
-#+texinfo_dir_title: MCT: (mct)
-#+texinfo_dir_desc: Enhancement of the default minibuffer completion
-#+texinfo_header: @set MAINTAINERSITE @uref{https://protesilaos.com,maintainer webpage}
-#+texinfo_header: @set MAINTAINER Protesilaos Stavrou
-#+texinfo_header: @set MAINTAINEREMAIL @email{info@protesilaos.com}
-#+texinfo_header: @set MAINTAINERCONTACT @uref{mailto:info@protesilaos.com,contact the maintainer}
+#+title:                 Minibuffer Confines Transcended (mct.el)
+#+author:                Protesilaos Stavrou
+#+email:                 info@protesilaos.com
+#+language:              en
+#+options:               ':t toc:nil author:t email:t num:t
+#+startup:               content
+#+macro:                 stable-version 0.5.0
+#+macro:                 release-date 2022-02-08
+#+macro:                 development-version 0.6.0-dev
+#+export_file_name:      mct.texi
+#+texinfo_filename:      mct.info
+#+texinfo_dir_category:  Emacs misc features
+#+texinfo_dir_title:     MCT: (mct)
+#+texinfo_dir_desc:      Enhancement of the default minibuffer completion
+#+texinfo_header:        @set MAINTAINERSITE @uref{https://protesilaos.com,maintainer webpage}
+#+texinfo_header:        @set MAINTAINER Protesilaos Stavrou
+#+texinfo_header:        @set MAINTAINEREMAIL @email{info@protesilaos.com}
+#+texinfo_header:        @set MAINTAINERCONTACT @uref{mailto:info@protesilaos.com,contact the maintainer}
 
 #+texinfo: @insertcopying
-
-UPDATE 2022-04-14: Development of this package has been discontinued:
-<https://protesilaos.com/codelog/2022-04-14-emacs-discontinue-mct/>.
 
 This manual, written by Protesilaos Stavrou, describes the customization
 options for =mct= (or =mct.el= and variants), and provides every other piece
 of information pertinent to it.
 
 The documentation furnished herein corresponds to stable version
-{{{stable-version}}}, released on {{{release-date}}}.  Any reference to a newer
-feature which does not yet form part of the latest tagged commit, is
-explicitly marked as such.
+{{{stable-version}}}, released on {{{release-date}}}.  Any reference
+to a newer feature which does not yet form part of the latest tagged
+commit, is explicitly marked as such.
 
 Current development target is {{{development-version}}}.
+
++ Package name (GNU ELPA): ~mct~
++ Official manual: <https://protesilaos.com/emacs/mct>
++ Change log: <https://protesilaos.com/emacs/mct-changelog>
++ Git repo on SourceHut: <https://git.sr.ht/~protesilaos/mct>
+  - Mirrors:
+    + GitHub: <https://github.com/protesilaos/mct>
+    + GitLab: <https://gitlab.com/protesilaos/mct>
++ Mailing list: <https://lists.sr.ht/~protesilaos/general-issues>
++ Backronym: Minibuffer Confines Transcended; Minibuffer and
+  Completions in Tandem.
+
+If you are viewing the README.org version of this file, please note
+that the GNU ELPA machinery automatically generates an Info manual out
+of it.
 
 #+toc: headlines 8 insert TOC here, with eight headline levels
 
@@ -69,7 +75,7 @@ modify this GNU manual.”
 
 Minibuffer and Completions in Tandem, also known as "MCT", "Mct", =mct=,
 or =mct.el=, is a package that enhances the default minibuffer and
-=*Completions*= buffer of Emacs 27 (or higher) so that they work together
+=*Completions*= buffer of Emacs 28 (or higher) so that they work together
 as part of a unified framework.  The idea is to make the presentation
 and overall functionality be consistent with other popular, vertically
 aligned completion UIs while leveraging built-in functionality.
@@ -92,28 +98,6 @@ input threshold as well as a slight delay before it pops up the
 
 MCT is highly configurable to adapt to the varying needs of users.  This
 section documents each user option.
-
-** Format of the Completions
-:PROPERTIES:
-:CUSTOM_ID: h:2706287d-c887-4356-a6f4-f6c7f9824ffe
-:END:
-#+vindex: mct-completions-format
-
-Brief: Set the presentation of candidates in the Completions' buffer.
-
-Symbol: ~mct-completions-format~ (=choice= type)
-
-Possible values:
-
-1. ~one-column~ (default---only works on Emacs 28 or higher)
-2. ~horizontal~
-3. ~vertical~
-
-By default, MCT tries to display completion candidates in a single
-column.  This only works for Emacs version 28 or higher.  In older
-versions of Emacs, the choices are between two grid views as explained
-in the built-in user option ~completions-format~, with the fallback being
-the ~horizontal~ style.
 
 ** Live completion
 :PROPERTIES:
@@ -250,6 +234,9 @@ the ~mct-minimum-input~.  It also bypasses any possible delay introduced
 by ~mct-live-update-delay~.  In other words, it immediately displays the
 =*Completions*= buffer and instantly updates it to match user input.
 
+When the ~mct-completion-blocklist~ and the ~mct-completion-passlist~
+are in conflict, the former takes precedence.
+
 [[#h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4][Known completion categories]].
 
 *** Blocklist for commands or completion categories
@@ -273,6 +260,9 @@ match user input.
 The Completions' buffer can still be accessed with commands that place
 it in a window (such as ~mct-list-completions-toggle~,
 ~mct-switch-to-completions-top~).
+
+When the ~mct-completion-blocklist~ and the ~mct-completion-passlist~
+are in conflict, the former takes precedence.
 
 Perhaps a less drastic measure is to set ~mct-minimum-input~ to an
 appropriate value.  Or better use ~mct-completion-passlist~.
@@ -462,30 +452,7 @@ For example, if the user types =~/= after a long path name, everything
 preceding the =~/= is removed so the interactive selection process starts
 again from the user's =$HOME=.
 
-** Alternating backgrounds in the Completions
-:PROPERTIES:
-:CUSTOM_ID: h:187f325e-fb48-4b7f-9508-97f34d2242e8
-:END:
-#+vindex: mct-apply-completion-stripes
-
-Brief: Use alternating backgrounds in the Completions.
-
-Symbol: ~mct-apply-completion-stripes~ (=boolean= type)
-
-By default, the =*Completions*= buffer uses the main background of the
-active theme (more specifically the =:background= attribute of the ~default~
-face).  When set to non-nil, MCT applies applies alternating background
-colors in the Completions' buffer.  These are in a shade of gray that
-contrasts with the main background.
-
-#+vindex: mct-stripe
-Due to the specific nature of this style, there is no basic face that
-can be inherited to achieve a consistent result across themes.  As such,
-it only looks as intended with the =modus-themes= (built into Emacs 28 or
-higher or available as a package).  Other themes would need to add
-support for the ~mct-stripe~ face.
-
-** MCT in the minibuffer and in regular buffers
+** MCT in the minibuffer and completion in regular buffers
 :PROPERTIES:
 :CUSTOM_ID: h:8109fe09-fcce-4212-88eb-943cc72f2c75
 :END:
@@ -499,29 +466,14 @@ Emacs draws a distinction between two types of completion sessions:
   minibuffer is not active.  We call this "in-buffer completion" or
   allude to the underlying function: ~completion-in-region~.
 
-The former scenario is what MCT has supported since its inception.
-Starting with version =0.4.0= it also covers the latter case, though only
-experimentally (please report any bugs or point towards areas of
-possible improvement).
-
 #+findex: mct-minibuffer-mode
-#+vindex: mct-minibuffer-mode
-#+findex: mct-region-mode
-#+vindex: mct-region-mode
-To let users fine-tune their setup, MCT provides the ~mct-minibuffer-mode~
-(formerly ~mct-mode~) as well as the global ~mct-region-mode~.
+The former scenario is what MCT has supported since its inception.
+Enable ~mct-minibuffer-mode~ to get started.  There was a time where
+MCT also supported in-buffer completion but this was discontinued in
+version =1.0.0= of the package as it was not good enough.
 
-The decoupling between the two modes makes it possible to configure
-interchangeable components in a variety of combinations, such as MCT for
-the minibuffer and the Corfu package for completion-in-region
-([[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Extensions]]).  Or the Vertico package for the minibuffer and MCT for
-in-buffer completion ([[#h:c9ddedea-e279-4233-94dc-f8d32367a954][Alternatives]]).
-
-We jokingly say that since the introduction of ~mct-region-mode~ the
-acronym "MCT" now stands for "Minibuffer Confines Transcended"---the
-original was "Minibuffer and Completions in Tandem".
-
-[[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Interaction model of mct-region-mode]].
+For in-buffer completion, use the ~corfu~ package by Daniel Mendler
+([[#h:c9ddedea-e279-4233-94dc-f8d32367a954][Alternatives]]).
 
 * Usage
 :PROPERTIES:
@@ -529,12 +481,7 @@ original was "Minibuffer and Completions in Tandem".
 :END:
 
 This section outlines the various patterns of interaction that MCT
-establishes.  Note that completion covers two distinct cases, which are
-reflected in the design of MCT: (i) in the minibuffer and (ii) for
-in-buffer completion ([[#h:8109fe09-fcce-4212-88eb-943cc72f2c75][MCT in the minibuffer and in regular buffers]]).
-Most of this section is about the former scenario, which uses the
-~mct-minibuffer-mode~.  The ~mct-region-mode~ is less featureful by
-comparison.
+establishes.
 
 ** Cyclic behaviour for mct-minibuffer-mode
 :PROPERTIES:
@@ -593,25 +540,14 @@ The display of the =*Completions*= can be toggled at any time from inside
 the minibuffer with =C-l= (mnemonic is "[l]ist completions" and the
 command is ~mct-list-completions-toggle~).
 
-#+vindex: mct-display-buffer-action
-By default, the =*Completions*= buffer appears in a window at the bottom
-of the frame.  Users can change its placement by configuring the
-variable ~mct-display-buffer-action~ (its doc string explains how and
-provides sample code).
-
-This is not the same for in-buffer completion performed by
-~mct-region-mode~ ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Interaction model of mct-region-mode]]).
-
 ** Selecting candidates with mct-minibuffer-mode
 :PROPERTIES:
 :CUSTOM_ID: h:bb445062-2e39-4082-a868-2123bfb793cc
 :END:
 #+cindex: Candidate selection for minibuffer completion
 
-There are several ways to select a completion candidate.  These pertain
-to ~mct-minibuffer-mode~, as ~mct-region-mode~ only has the meaningful
-action of expanding the given candidate (with =RET= or =TAB= in the
-Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour for in-buffer completion]])).
+There are several ways to select a completion candidate with
+~mct-minibuffer-mode~.
 
 1. Suppose that you are typing =mod= with the intent to select the
    =modus-themes.el= buffer.  To complete the candidate follow up =mod= with
@@ -701,67 +637,6 @@ Completions' buffer ([[#h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3][Cyclic behaviour
    these commands do not cycle between the completions and the
    minibuffer: they stop at the first or last heading.
 
-** Interaction model of mct-region-mode
-:PROPERTIES:
-:CUSTOM_ID: h:97eb5898-1e52-4338-bd55-8c52f9d8ccd3
-:END:
-#+cindex: Interactions for in-buffer completion
-
-When ~mct-region-mode~ is enabled, MCT is used for in-buffer completion.
-In this scenario, the cyclic behaviour is less featureful than when the
-minibuffer is active (due to the specifics of the underlying commands),
-so we cover the differences ([[#h:68c61a76-1d64-4f62-a77a-52e7b66a68fe][Cyclic behaviour in the minibuffer]]).
-
-In terms of its interaction model, ~mct-region-mode~ only gets enabled
-manually either by pressing =TAB= or =C-M-i= (~complete-symbol~) in supporting
-major modes.  The =*Completions*= buffer pops up and is narrowed live to
-match any subsequent user input.  While the buffer is visible, we are
-performing ~completion-in-region~, which means that the Completions can be
-narrowed live by typing further.  Furthermore, =C-n= or =C-p= will move the
-point to the top/bottom of the Completions' buffer from where the user
-can select a candidate with =RET=.
-
-In-buffer completion is always invoked manually.  There is no minimum
-input threshold and no delay between updates while live-updating of the
-=*Completions*= buffer is performed.  If the Completions are not visible,
-then no ~completion-in-region~ takes place and thus ~mct-region-mode~ should
-have no effect.
-
-By default, the placement of the Completions for this type of
-interaction is below the current buffer (as opposed to the bottom of the
-frame for ~mct-minibuffer-mode~).  It looks like this:
-
-#+begin_example
-------------------------
-|               |      |
-| Current buffer| Buf  |
-|               |      |
-------------------------
-|               |      |
-|  Completions  | Buf  |
-|               |      |
-------------------------
-|        |      |      |
-|  Buf   | Buf  | Buf  |
-|        |      |      |
-------------------------
-#+end_example
-
-While inside the Completions' buffer, =C-n= and =C-p= move to the next and
-previous line, respectively.  When they reach the top/bottom boundaries
-of the Completions' buffer, they switch focus back to the buffer that
-started the completion.  However, and unlike ~mct-minibuffer-mode~, they
-do not keep the =*Completions*= window around.  This is because we cannot
-tell whether the user wanted to continue with a new completion upon
-returning to the buffer of origin or perform some other motion/command
-(in the minibuffer we can make that assumption because the minibuffer is
-purpose-specific, so for as long as it is active, the completion session
-goes on).  As such, ~completion-in-region~ must be restarted after cycling
-out of the =*Completions*=.
-
-To cancel in-buffer completion, type =C-g= either before switching to the
-Completions' buffer or while inside of it.
-
 * Installation
 :PROPERTIES:
 :CUSTOM_ID: h:1b501ed4-f16c-4118-9a4a-7a5e29143077
@@ -828,7 +703,6 @@ Minimal setup for the minibuffer and in-buffer completion:
 #+begin_src emacs-lisp
 (require 'mct)
 (mct-minibuffer-mode 1)
-(mct-region-mode 1)
 #+end_src
 
 And with more options:
@@ -836,15 +710,13 @@ And with more options:
 #+begin_src emacs-lisp
 (require 'mct)
 
-(setq mct-completion-window-size (cons #'mct--frame-height-fraction 1))
+(setq mct-completion-window-size (cons #'mct-frame-height-third 1))
 (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
 (setq mct-hide-completion-mode-line t)
-(setq mct-apply-completion-stripes t)
 (setq mct-minimum-input 3)
 (setq mct-live-completion t)
 (setq mct-live-update-delay 0.6)
 (setq mct-persist-dynamic-completion t)
-(setq mct-completions-format 'one-column)
 
 ;; This is for commands or completion categories that should always pop
 ;; up the completions' buffer.  It circumvents the default method of
@@ -867,36 +739,7 @@ And with more options:
 ;; disables live completions altogether.
 (setq mct-completion-blocklist nil)
 
-;; You can place the Completions' buffer wherever you want, by following
-;; the syntax of `display-buffer'.  For example, try this:
-
-;; (setq mct-display-buffer-action
-;;       (quote ((display-buffer-reuse-window
-;;                display-buffer-in-side-window)
-;;               (side . left)
-;;               (slot . 99)
-;;               (window-width . 0.3))))
-
 (mct-minibuffer-mode 1)
-
-;; Optionally use MCT for in-buffer completion (though `corfu' is a
-;; better option).
-(mct-region-mode 1)
-
-;;; Integration with Oleh Krehel's `avy' package
-(require 'mct-avy)
-
-(dolist (map (list mct-minibuffer-local-completion-map
-                   mct-minibuffer-completion-list-map))
-  (define-key map (kbd "C-,") #'mct-avy-embark-act)
-  (define-key map (kbd "C-.") #'mct-avy-choose-completion-exit)
-  (define-key map (kbd "C-;") #'mct-avy-choose-completion-dwim))
-
-;; If you are using `mct-region-mode':
-(dolist (map (list mct-region-completion-list-map
-                   mct-region-buffer-map))
-  (define-key map (kbd "C-,") #'mct-avy-embark-act)
-  (define-key map (kbd "C-.") #'mct-avy-region-choose-completion))
 #+end_src
 
 Other useful extras from the Emacs source code (read their doc strings):
@@ -935,14 +778,10 @@ Other useful extras from the Emacs source code (read their doc strings):
 ;;; Minibuffer history
 (require 'savehist)
 (setq savehist-file (locate-user-emacs-file "savehist"))
-(setq history-length 10000)
+(setq history-length 500)
 (setq history-delete-duplicates t)
 (setq savehist-save-minibuffer-history t)
 (add-hook 'after-init-hook #'savehist-mode)
-
-;;; Indentation and the TAB key
-(setq-default tab-always-indent 'complete) ; useful for `mct-region-mode'
-(setq-default tab-first-completion 'word-or-paren-or-punct) ; Emacs 27
 
 ;;; Third-party extensions
 
@@ -968,96 +807,6 @@ Other useful extras from the Emacs source code (read their doc strings):
       '((file (styles . (basic partial-completion orderless)))))
 #+end_src
 
-* MCT extensions
-:PROPERTIES:
-:CUSTOM_ID: h:a6724485-29f3-4632-854c-41963d2698b7
-:END:
-#+cindex: Experimental MCT code
-
-[ Part of {{{development-version}}} ]
-
-The MCT code repository contains some Elisp files beside =mct.el= which
-extend the functionality of the core package.  These files are named
-like =mct-SCOPE.el=.  They are considered experimental for the time
-being.  Their target audience is developers or users who can tolerate
-the occasional bug.
-
-** MCT and Avy
-:PROPERTIES:
-:CUSTOM_ID: h:18a2a223-8544-4294-b847-012c99003de4
-:END:
-#+cindex: Quick selection with Avy
-
-[ Part of {{{development-version}}} ]
-
-The MCT repository contains the =mct-avy.el= file.  It integrates MCT
-with the =avy= package to choose completion candidates using the
-latter's mode of interaction.  The commands it defines are:
-
-#+findex: mct-avy-choose-completion-exit
-+ ~mct-avy-choose-completion-exit~
-
-#+findex: mct-avy-choose-completion-dwim
-+ ~mct-avy-choose-completion-dwim~
-
-#+findex: mct-avy-choose-completion-jump
-+ ~mct-avy-choose-completion-jump~
-
-#+findex: mct-avy-region-choose-completion
-+ ~mct-avy-region-choose-completion~
-
-#+findex: mct-avy-embark-act
-+ ~mct-avy-embark-act~
-
-Their respective doc strings describe their functionality.
-
-=mct-avy.el= does not bind any keys.  Choose your own with something
-like this:
-
-#+begin_src emacs-lisp
-(dolist (map (list mct-minibuffer-local-completion-map
-                   mct-minibuffer-completion-list-map))
-  (define-key map (kbd "C-;") #'mct-avy-choose-completion-exit)
-  (define-key map (kbd "C-,") #'mct-avy-embark-act)
-  (define-key map (kbd "M-;") #'mct-avy-choose-completion-dwim))
-
-;; If you are using `mct-region-mode':
-(dolist (map (list mct-region-completion-list-map
-                   mct-region-buffer-map))
-  (define-key map (kbd "C-,") #'mct-avy-embark-act)
-  (define-key map (kbd "C-;") #'mct-avy-region-choose-completion))
-#+end_src
-
-=mct-avy.el= is inspired by Omar Antolín Camarena's
-=avy-embark-collect.el=.  The ~mct-avy-choose~ function borrows code
-and/or ideas from that libary: <https://github.com/oantolin/embark/>.
-
-[[#h:03227254-d467-4147-b8cf-2fe05a2e279b][Third-party extensions]].
-
-* Known issues and workarounds
-:PROPERTIES:
-:CUSTOM_ID: h:acfb63f4-c2ae-46ff-a840-9c9a6350e567
-:END:
-
-This section documents known issues and how to address them.
-
-** Avoid global-hl-line-mode in the Completions
-:PROPERTIES:
-:CUSTOM_ID: h:ee6aa793-3129-4cf0-8138-1224b6052546
-:END:
-
-MCT uses its own overlay to highlight the candidate at point.  To ensure
-that it does not interfere with the optional stripes (provided by the
-user option ~mct-apply-completion-stripes~) the highlight's priority is
-set to a custom value.  This, in turn, means that when the user enables
-~global-hl-line-mode~, its highlighted line takes precedence over the MCT
-highlight.  The solution to this conflict is to disable the hl-line
-locally for the =*Completions*= buffer like this:
-
-#+begin_src emacs-lisp
-(add-hook 'completion-list-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
-#+end_src
-
 * Keymaps
 :PROPERTIES:
 :CUSTOM_ID: h:b3178edd-f340-444c-8426-fe84f23ac9ea
@@ -1065,16 +814,12 @@ locally for the =*Completions*= buffer like this:
 #+cindex: Keymaps
 #+vindex: mct-completion-list-mode-map
 #+vindex: mct-minibuffer-local-completion-map
-#+vindex: mct-region-buffer-map
-#+vindex: mct-region-completion-list-map
 
 MCT defines its own keymaps, which extend those that are active in the
 minibuffer and the =*Completions*= buffer, respectively:
 
 + ~mct-completion-list-mode-map~
 + ~mct-minibuffer-local-completion-map~
-+ ~mct-region-buffer-map~
-+ ~mct-region-completion-list-map~
 
 You can invoke ~describe-keymap~ to learn more about them.
 
@@ -1188,76 +933,6 @@ Add this to your own configuration file instead:
 (define-key minibuffer-local-filename-completion-map (kbd "DEL") #'my-backward-updir)
 #+end_src
 
-** MCT in the current or the other window
-:PROPERTIES:
-:CUSTOM_ID: h:891c7841-9cdc-42df-bba9-45f7409b807c
-:END:
-
-Over at the [[https://git.sr.ht/~abcdw/rde][rde project]], Andrew Tropin configures MCT to display the
-Completions' buffer in either of two places:
-
-+ Current window ::  This is the default behaviour.  It means that
-  completions are presented where the user is already focused on,
-  instead of the bottom of the display or some side window.
-
-+ Other window :: The least recently used window when the command that
-  performs completion matches certain categories whose candidates are
-  best shown next to the current window/context.  For example, Imenu
-  (and extensions like ~consult-imenu~) creates a dynamically generated
-  index of "points of interest" in the current buffer, so it is useful
-  to have this displayed in the other window.
-
-Implementation details and particular preferences aside, this is a great
-example of using the various ~display-buffer~ functions to control the
-placement of the =*Completions*= buffer.
-
-#+begin_src emacs-lisp
-(defvar rde-completion-categories-other-window
-  '(imenu)
-  "Completion categories that has to be in other window than
-current, otherwise preview functionallity will fail the party.")
-
-(defvar rde-completion-categories-not-show-candidates-on-setup
-  '(command variable function)
-  "Completion categories that has to be in other window than
-current, otherwise preview functionallity will fail the party.")
-
-(defun rde-display-mct-buffer-pop-up-if-apropriate (buffer alist)
-  "Call `display-buffer-pop-up-window' if the completion category
-one of `rde-completion-categories-other-window', it will make
-sure that we don't use same window for completions, which should
-be in separate window."
-  (if (memq (mct--completion-category)
-            rde-completion-categories-other-window)
-      (display-buffer-pop-up-window buffer alist)
-    nil))
-
-(defun rde-display-mct-buffer-apropriate-window (buffer alist)
-  "Displays completion buffer in the same window, where completion
-was initiated (most recent one), but in case, when compeltion
-buffer should be displayed in other window use least recent one."
-  (let* ((window (if (memq (mct--completion-category)
-                           rde-completion-categories-other-window)
-                     (get-lru-window (selected-frame) nil nil)
-                   (get-mru-window (selected-frame) nil nil))))
-    (window--display-buffer buffer window 'reuse alist)))
-
-(setq mct-display-buffer-action
-      (quote ((display-buffer-reuse-window
-               rde-display-mct-buffer-pop-up-if-apropriate
-               rde-display-mct-buffer-apropriate-window))))
-
-(defun rde-mct-show-completions ()
-  "Instantly shows completion candidates for categories listed in
-`rde-completion-categories-show-candidates-on-setup'."
-  (unless (memq (mct--completion-category)
-                rde-completion-categories-not-show-candidates-on-setup)
-    (setq-local mct-minimum-input 0)
-    (mct--live-completions)))
-
-(add-hook 'minibuffer-setup-hook 'rde-mct-show-completions)
-#+end_src
-
 * Third-party extensions
 :PROPERTIES:
 :CUSTOM_ID: h:03227254-d467-4147-b8cf-2fe05a2e279b
@@ -1288,9 +963,9 @@ these exceptionally well-crafted extras:
   make things prettier and/or more informative, while it can also be
   combined with Marginalia.
 
-MCT does support the use-case of ~completion-in-region~.  This is the kind
-of completion session that does not involve the minibuffer and is
-instead about in-buffer text expansion.  However, you may prefer:
+MCT does not support the use-case of ~completion-in-region~.  This is
+the kind of completion session that is done inside the buffer and does
+not involve the minibuffer.  However, you may prefer:
 
 + [[https://github.com/minad/corfu/][Corfu]] by Daniel Mendler :: An interface for the ~completion-in-region~
   which uses a child frame (basically a pop-up) at the position of the
@@ -1300,7 +975,7 @@ instead about in-buffer text expansion.  However, you may prefer:
 
 + [[https://github.com/minad/cape][Cape]] also by Daniel :: Additional ~completion-at-point-functions~
   (CAPFs) that extend those of core Emacs.  These backends can be used
-  by packages that visualise ~completion-in-region~ such as Corfu and MCT.
+  by packages that visualise ~completion-in-region~.
 
 ** Enable Consult previews
 :PROPERTIES:
@@ -1313,28 +988,6 @@ preview the candidate at point.  All we need to enable it in the
 
 #+begin_src emacs-lisp
 (add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode)
-#+end_src
-
-** Avoid conflict between MCT and Corfu
-:PROPERTIES:
-:CUSTOM_ID: h:9b19911c-1dd7-4d4c-b513-feb77237e156
-:END:
-
-Daniel Mendler's =corfu= package provides an alternative to the
-~mct-region-mode~ ([[#h:8109fe09-fcce-4212-88eb-943cc72f2c75][MCT in the minibuffer and in regular buffers]]).  Given
-that MCT's implementation is a global minor-mode, chances are that users
-of both will run into weird issues with conflicting functionality.  The
-following snippet from Corfu's README can be added to user configuration
-files to avoid any potential trouble when using commands such as
-~eval-expression~ (bound to =M-:= by default):
-
-#+begin_src emacs-lisp
-(defun corfu-in-minibuffer ()
-  "Enable Corfu in the minibuffer only if Mct/Vertico are not active."
-  (unless (or (mct--minibuffer-p) vertico--input)
-    (corfu-mode 1)))
-
-(add-hook 'minibuffer-setup-hook #'corfu-in-minibuffer 1)
 #+end_src
 
 * Alternatives
@@ -1385,9 +1038,7 @@ They all make for a natural complement to the standard Emacs experience
   The presence of a fully fledged buffer means that the user can invoke
   all relevant commands at their disposal, such as to write the buffer
   to a file for future review, use Isearch to move around, copy a string
-  or rectangle to a register, and so on.  Also, the placement of such a
-  buffer is configurable (as with all buffers---though refer, in
-  particular, to ~mct-display-buffer-action~).
+  or rectangle to a register, and so on.
 
   Vertico has official extensions which can make it work exactly like
   MCT without any of MCT's drawbacks.  These extensions can also expand
@@ -1400,25 +1051,6 @@ They all make for a natural complement to the standard Emacs experience
   All things considered, there is no compelling reason why one may
   prefer MCT over Vertico in terms of the available functionality:
   Vertico is better.
-
-+ [[https://github.com/karthink/elmo][Elmo - Embark Live MOde for Emacs]] by Karthik Chikmagalur :: this
-  package is best described as a sibling of MCT both in terms of its
-  functionality and overall interaction model.  In fact, the cyclic
-  motions that are at the core of the MCT experience were first
-  developed as part of my personal Emacs setup to cycle between the
-  minibuffer and Embark's "live completions" buffer.  That was until
-  Emacs28 got some refinements to the presentation of the =*Completions*=
-  buffer which allowed for a vertical, single-column view.
-
-  Elmo can, in principle, have identical functionality with MCT, given
-  that the only substantive difference is that the former uses an Embark
-  buffer to show live-updating completions, while the latter relies on
-  the generic =*Completions*= buffer.
-
-  For users who are on Emacs 27 and who need a single-column view, Elmo
-  is a better choice because MCT can only display such a view on Emacs
-  28 or higher (though it has been meticulously tested with the grid
-  views of Emacs 27 and should work perfectly fine with them).
 
 + Icomplete and fido-mode (built-in, multiple authors) :: Icomplete is
   closer in spirit to Vertico, as it too uses the minibuffer to display
@@ -1463,7 +1095,7 @@ MCT is meant to be a collective effort.  Every bit of help matters.
 
 + Inspiration for certain features :: =icomplete.el= (built-in---multiple
   authors), Daniel Mendler (=vertico=), Omar Antolín Camarena (=embark=,
-  =live-completions=), Štěpán Němec (=stripes.el=).
+  =live-completions=).
 
 * Official sources
 :PROPERTIES:
