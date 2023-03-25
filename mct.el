@@ -177,30 +177,6 @@ Read the manual for known completion categories."
   :type '(repeat symbol)
   :group 'mct)
 
-(defcustom mct-display-buffer-action
-  '((display-buffer-reuse-window display-buffer-at-bottom))
-  "The action used to display the Completions' buffer.
-
-The value has the form (FUNCTION . ALIST), where FUNCTIONS is
-either an \"action function\" or a possibly empty list of action
-functions.  ALIST is a possibly empty \"action alist\".
-
-Sample configuration:
-
-    (setq mct-display-buffer-action
-          (quote ((display-buffer-reuse-window
-                   display-buffer-in-side-window)
-                  (side . left)
-                  (slot . 99)
-                  (window-width . 0.3))))
-
-See Info node `(elisp) Displaying Buffers' for more details
-and/or the documentation string of `display-buffer'."
-  :type '(cons (choice (function :tag "Display Function")
-                       (repeat :tag "Display Functions" function))
-               alist)
-  :group 'mct)
-
 (defcustom mct-completions-format 'one-column
   "Set the presentation of candidates in the Completions' buffer.
 See `completions-format' for possible values."
@@ -208,6 +184,7 @@ See `completions-format' for possible values."
   :group 'mct)
 
 (make-obsolete 'mct-region-completions-format 'mct-completions-format "0.5.0")
+(make-obsolete-variable 'mct-display-buffer-action nil "1.0.0")
 
 (defcustom mct-persist-dynamic-completion t
   "When non-nil, keep dynamic completion live.
@@ -523,11 +500,8 @@ Apply APP by first setting up the minibuffer to work with Mct."
       (buffer-name (window-buffer window))))))
 
 (defun mct--show-completions ()
-  (let ((display-buffer-alist
-         (cons (cons mct--completions-window-name mct-display-buffer-action)
-               display-buffer-alist))
-        ;; don't ring the bell in `minibuffer-completion-help'
   "Show the Completions buffer."
+  (let (;; don't ring the bell in `minibuffer-completion-help'
         ;; when <= 1 completion exists.
         (ring-bell-function #'ignore)
         (message-log-max nil)
