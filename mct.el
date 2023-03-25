@@ -264,8 +264,6 @@ affairs."
 (defvar mct--dynamic-completion-categories '(file)
   "Completion categories that perform dynamic completion.")
 
-(define-obsolete-variable-alias
-  'mct-hl-line 'mct-highlight-candidate "0.3.0")
 ;;;; Basics of intersection between minibuffer and Completions buffer
 
 (defface mct-highlight-candidate
