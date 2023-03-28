@@ -266,13 +266,11 @@ affairs."
 
 (defun mct--passlist-p ()
   "Return non-nil if symbol is in the `mct-completion-passlist'."
-  (or (memq (mct--this-command) mct-completion-passlist)
-      (memq (mct--completion-category) mct-completion-passlist)))
+  (mct--symbol-in-list mct-completion-passlist))
 
 (defun mct--blocklist-p ()
   "Return non-nil if symbol is in the `mct-completion-blocklist'."
-  (or (memq (mct--this-command) mct-completion-blocklist)
-      (memq (mct--completion-category) mct-completion-blocklist)))
+  (mct--symbol-in-list mct-completion-blocklist))
 
 ;; Normally we would also include `imenu', but it has its own defcustom
 ;; for popping up the Completions eagerly...  Let's not interfere with
