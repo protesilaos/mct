@@ -461,7 +461,7 @@ Apply APP by first setting up the minibuffer to work with Mct."
 ;;;###autoload
 (defun mct-focus-minibuffer ()
   "Focus the active minibuffer."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (when-let ((mini (active-minibuffer-window)))
     (select-window mini)))
 
@@ -496,7 +496,7 @@ succession.
 
 What constitutes a Completions window is ultimately determined
 by `mct--completions-window-name'."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (let* ((mini (active-minibuffer-window))
          (completions (mct--get-completion-window)))
     (cond
@@ -508,7 +508,7 @@ by `mct--completions-window-name'."
 ;;;###autoload
 (defun mct-list-completions-toggle ()
   "Toggle the presentation of the Completions buffer."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (if (mct--get-completion-window)
       (minibuffer-hide-completions)
     (mct--show-completions)))
@@ -553,13 +553,13 @@ by `mct--completions-window-name'."
 
 (defun mct-switch-to-completions-top ()
   "Switch to the top of the Completions buffer."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (mct--switch-to-completions)
   (goto-char (mct--first-completion-point)))
 
 (defun mct-switch-to-completions-bottom ()
   "Switch to the bottom of the Completions buffer."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (mct--switch-to-completions)
   (goto-char (point-max))
   (next-completion -1)
@@ -598,7 +598,7 @@ ARG is a numeric argument for `next-completion', as described in
 This performs a regular motion for optional ARG candidates, but
 when point can no longer move in that direction it switches to
 the minibuffer."
-  (interactive "p" mct-minibuffer-mode)
+  (interactive "p" mct-mode)
   (let ((count (or arg 1)))
     (if (mct--bottom-of-completions-p count)
         (mct-focus-minibuffer)
@@ -624,7 +624,7 @@ ARG is a numeric argument for `previous-completion', as described in
 This performs a regular motion for optional ARG candidates, but
 when point can no longer move in that direction it switches to
 the minibuffer."
-  (interactive "p" mct-minibuffer-mode)
+  (interactive "p" mct-mode)
   (let ((count (if (natnump arg) arg 1)))
     (if (mct--top-of-completions-p count)
         (mct-focus-minibuffer)
@@ -633,7 +633,7 @@ the minibuffer."
 (defun mct-next-completion-group (&optional arg)
   "Move to the next completion group.
 If ARG is supplied, move that many completion groups at a time."
-  (interactive "p" mct-minibuffer-mode)
+  (interactive "p" mct-mode)
   (dotimes (_ (or arg 1))
     (when-let (group (save-excursion
                        (text-property-search-forward 'face
@@ -647,7 +647,7 @@ If ARG is supplied, move that many completion groups at a time."
 (defun mct-previous-completion-group (&optional arg)
   "Move to the previous completion group.
 If ARG is supplied, move that many completion groups at a time."
-  (interactive "p" mct-minibuffer-mode)
+  (interactive "p" mct-mode)
   (dotimes (_ (or arg 1))
     ;; skip back, so if we're at the top of a group, we go to the previous one...
     (forward-line -1)
@@ -670,14 +670,14 @@ If ARG is supplied, move that many completion groups at a time."
 ;; choose-completion expands the directory and continues the session.
 (defun mct-choose-completion-exit ()
   "Run `choose-completion' in the Completions buffer and exit."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (choose-completion)
   (when (active-minibuffer-window)
     (minibuffer-force-complete-and-exit)))
 
 (defun mct-choose-completion-no-exit ()
   "Run `choose-completion' in the Completions without exiting."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (let ((completion-no-auto-exit t))
     (choose-completion)))
 
@@ -702,7 +702,7 @@ If ARG is supplied, move that many completion groups at a time."
 (defun mct-choose-completion-dwim ()
   "Append to minibuffer when at `completing-read-multiple' prompt.
 In any other prompt use `mct-choose-completion-no-exit'."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (when-let* ((mini (active-minibuffer-window))
               (window (mct--get-completion-window))
               (buffer (window-buffer window)))
@@ -732,7 +732,7 @@ determined as follows:
 
 A candidate is recognised for as long as point is not past its
 last character."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (when-let ((window (mct--get-completion-window))
              ((active-minibuffer-window)))
     (with-current-buffer (window-buffer window)
@@ -751,7 +751,7 @@ last character."
 This has the same effect as with
 \\<mct-minibuffer-local-completion-map>\\[mct-edit-completion],
 followed by exiting the minibuffer with that candidate."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (mct-edit-completion)
   (exit-minibuffer))
 
@@ -761,7 +761,7 @@ followed by exiting the minibuffer with that candidate."
 ;; `cursor-sensor-functions'.
 (defun mct-beginning-of-buffer ()
   "Go to the top of the Completions buffer."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (goto-char (mct--first-completion-point)))
 
 (defun mct-keyboard-quit-dwim ()
@@ -772,7 +772,7 @@ If in a Completions buffer and unless the region is active, run
 
 If the region is active, deactivate it.  A second invocation of
 this command is then required to abort the session."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (when (derived-mode-p 'completion-list-mode)
     (cond
      ((null (active-minibuffer-window))
@@ -942,22 +942,22 @@ This value means that it is overriden by the active region.")
 (defun mct--setup-dynamic-completion-persist ()
   "Set up `mct-persist-dynamic-completion'."
   (let ((commands '(choose-completion minibuffer-complete minibuffer-force-complete)))
-    (if (bound-and-true-p mct-minibuffer-mode)
+    (if (bound-and-true-p mct-mode)
         (dolist (fn commands)
           (advice-add fn :after #'mct--persist-dynamic-completion))
       (dolist (fn commands)
         (advice-remove fn #'mct--persist-dynamic-completion)))))
 
-;;;;; mct-minibuffer-mode declaration
+;;;;; mct-mode declaration
 
 (declare-function minibuf-eldef-setup-minibuffer "minibuf-eldef")
 
 ;;;###autoload
-(define-minor-mode mct-minibuffer-mode
+(define-minor-mode mct-mode
   "Set up opinionated default completion UI."
   :global t
   :group 'mct
-  (if mct-minibuffer-mode
+  (if mct-mode
       (progn
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
         (add-hook 'minibuffer-setup-hook #'mct--setup-passlist)
@@ -973,6 +973,11 @@ This value means that it is overriden by the active region.")
     (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily))
   (mct--setup-dynamic-completion-persist)
   (mct--setup-message-advices))
+
+(define-obsolete-function-alias
+  'mct-minibuffer-mode
+  'mct-mode
+  "1.0.0")
 
 (make-obsolete 'mct-region-mode nil "1.0.0")
 
@@ -994,7 +999,7 @@ This value means that it is overriden by the active region.")
 
 (defun mct--setup-message-advices ()
   "Silence the minibuffer and the Completions."
-  (if mct-minibuffer-mode
+  (if mct-mode
       (progn
         (dolist (fn '(exit-minibuffer
                       choose-completion

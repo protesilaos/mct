@@ -365,7 +365,7 @@ If nil, do not try to fit the Completions' buffer to its window.
 
 [[#h:1a85ed4c-f54d-482b-9915-563f60c64f15][Live completion]].
 
-** Dynamic completion tables in mct-minibuffer-mode
+** Dynamic completion tables in mct-mode
 :PROPERTIES:
 :CUSTOM_ID: h:28dc0355-c461-4e3a-bc3a-479d67827cac
 :END:
@@ -399,7 +399,7 @@ user selects a candidate with ~mct-choose-completion-no-exit~,
 ~mct-edit-completion~, ~minibuffer-complete~, ~minibuffer-force-complete~
 (i.e. any command that does not exit the minibuffer).
 
-[[#h:bb445062-2e39-4082-a868-2123bfb793cc][Selecting candidates with mct-minibuffer-mode]].
+[[#h:bb445062-2e39-4082-a868-2123bfb793cc][Selecting candidates with mct-mode]].
 
 The two  exceptions are (i) when the current completion
 session runs a command or category that is blocked by the
@@ -466,9 +466,9 @@ Emacs draws a distinction between two types of completion sessions:
   minibuffer is not active.  We call this "in-buffer completion" or
   allude to the underlying function: ~completion-in-region~.
 
-#+findex: mct-minibuffer-mode
+#+findex: mct-mode
 The former scenario is what MCT has supported since its inception.
-Enable ~mct-minibuffer-mode~ to get started.  There was a time where
+Enable ~mct-mode~ to get started.  There was a time where
 MCT also supported in-buffer completion but this was discontinued in
 version =1.0.0= of the package as it was not good enough.
 
@@ -483,13 +483,17 @@ For in-buffer completion, use the ~corfu~ package by Daniel Mendler
 This section outlines the various patterns of interaction that MCT
 establishes.
 
-** Cyclic behaviour for mct-minibuffer-mode
+** Cyclic behaviour for mct-mode
 :PROPERTIES:
 :CUSTOM_ID: h:68c61a76-1d64-4f62-a77a-52e7b66a68fe
 :END:
 #+cindex: Cyclic behaviour in the minibuffer
 
-When ~mct-minibuffer-mode~ is enabled, some new keymaps are activated
+[ As part of {{{development-version}}} the ~mct-minibuffer-mode~ is
+  called ~mct-mode~.  The ~mct-region-mode~ (for in-buffer completion)
+  is removed. ]
+
+When ~mct-mode~ is enabled, some new keymaps are activated
 which add commands for cycling between the minibuffer and the
 completions.  Suppose the following standard layout:
 
@@ -540,14 +544,14 @@ The display of the =*Completions*= can be toggled at any time from inside
 the minibuffer with =C-l= (mnemonic is "[l]ist completions" and the
 command is ~mct-list-completions-toggle~).
 
-** Selecting candidates with mct-minibuffer-mode
+** Selecting candidates with mct-mode
 :PROPERTIES:
 :CUSTOM_ID: h:bb445062-2e39-4082-a868-2123bfb793cc
 :END:
 #+cindex: Candidate selection for minibuffer completion
 
 There are several ways to select a completion candidate with
-~mct-minibuffer-mode~.
+~mct-mode~.
 
 1. Suppose that you are typing =mod= with the intent to select the
    =modus-themes.el= buffer.  To complete the candidate follow up =mod= with
@@ -702,7 +706,7 @@ Minimal setup for the minibuffer and in-buffer completion:
 
 #+begin_src emacs-lisp
 (require 'mct)
-(mct-minibuffer-mode 1)
+(mct-mode 1)
 #+end_src
 
 And with more options:
@@ -739,7 +743,7 @@ And with more options:
 ;; disables live completions altogether.
 (setq mct-completion-blocklist nil)
 
-(mct-minibuffer-mode 1)
+(mct-mode 1)
 #+end_src
 
 Other useful extras from the Emacs source code (read their doc strings):
@@ -916,7 +920,7 @@ Add this to your own configuration file instead:
 ;; Adaptation of `icomplete-fido-backward-updir'.
 (defun my-backward-updir ()
   "Delete char before point or go up a directory."
-  (interactive nil mct-minibuffer-mode)
+  (interactive nil mct-mode)
   (cond
    ((and (eq (char-before) ?/)
          (eq (mct--completion-category) 'file))
