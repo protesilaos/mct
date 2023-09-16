@@ -280,6 +280,36 @@ affairs."
 (defvar mct--dynamic-completion-categories '(file)
   "Completion categories that perform dynamic completion.")
 
+;;;; Sorting functions for `completions-sort' (Emacs 29)
+
+(defun mct-sort-by-alpha-length (elements)
+  "Sort ELEMENTS first alphabetically, then by length.
+This function can be used as the value of the user option
+`completions-sort'."
+  (sort
+   elements
+   (lambda (c1 c2)
+     (or (string-version-lessp c1 c2)
+         (< (length c1) (length c2))))))
+
+(defun mct-sort-by-history (elements)
+  "Sort ELEMENTS by minibuffer history, else return them unsorted.
+This function can be used as the value of the user option
+`completions-sort'."
+  (if-let ((hist (and (not (eq minibuffer-history-variable t))
+                      (symbol-value minibuffer-history-variable))))
+      (minibuffer--sort-by-position hist elements)
+    elements))
+
+(defun mct-sort-multi-category (elements)
+  "Sort ELEMENTS per completion category.
+This function can be used as the value of the user option
+`completions-sort'."
+  (pcase (mct--completion-category)
+    ('kill-ring elements) ; no sorting
+    ('file (mct-sort-by-alpha-length elements))
+    (_ (mct-sort-by-history elements))))
+
 ;;;; Basics of intersection between minibuffer and Completions buffer
 
 (defface mct-highlight-candidate
