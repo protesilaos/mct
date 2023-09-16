@@ -331,18 +331,19 @@ This function can be used as the value of the user option
 ;; beginning of the line, unless the point was moved forward).
 (defun mct--setup-clean-completions ()
   "Keep only completion candidates in the Completions."
-  (with-current-buffer standard-output
-    (unless (mct--first-line-completion-p)
-      (goto-char (point-min))
-      (let ((inhibit-read-only t))
-        (delete-region (line-beginning-position) (1+ (line-end-position)))
-        (insert (propertize " "
-                            'cursor-sensor-functions
-                            (list
-                             (lambda (_win prev dir)
-                               (when (eq dir 'entered)
-                                 (goto-char prev))))))
-        (put-text-property (point-min) (point) 'invisible t)))))
+  (unless completions-header-format
+    (with-current-buffer standard-output
+      (unless (mct--first-line-completion-p)
+        (goto-char (point-min))
+        (let ((inhibit-read-only t))
+          (delete-region (line-beginning-position) (1+ (line-end-position)))
+          (insert (propertize " "
+                              'cursor-sensor-functions
+                              (list
+                               (lambda (_win prev dir)
+                                 (when (eq dir 'entered)
+                                   (goto-char prev))))))
+          (put-text-property (point-min) (point) 'invisible t))))))
 
 (defun mct-frame-height-third ()
   "Return round number of 1/3 of `frame-height'.
