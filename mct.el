@@ -559,8 +559,9 @@ by `mct--completions-window-name'."
 (defun mct--first-completion-point ()
   "Return the `point' of the first completion."
   (save-excursion
-    (goto-char (point-min))
-    (next-completion 1)
+    (goto-char (point-max))
+    (when completions-header-format
+     (next-completion 1))
     (point)))
 
 (defun mct--last-completion-point ()
@@ -639,7 +640,11 @@ the minibuffer."
   "Return non-nil if backward ARG motion exceeds `point-min'."
   (let ((line (- (line-number-at-pos) arg)))
     (or (< line 1)
-        (= (save-excursion (previous-completion arg) (point)) (point-min)))))
+        (when completions-header-format
+          (= (save-excursion
+               (previous-completion arg)
+               (line-number-at-pos))
+             (line-number-at-pos (point-max)))))))
 
 (defun mct--top-of-completions-p (arg)
   "Test if point is at the notional top of the Completions.
@@ -827,7 +832,9 @@ Apply APP while inhibiting modification hooks."
 (defun mct--setup-appearance ()
   "Set up variables for the appearance of the Completions buffer."
   (when mct-hide-completion-mode-line
-    (setq-local mode-line-format nil)))
+    (setq-local mode-line-format nil))
+  (when completions-header-format
+    (setq-local display-line-numbers-offset -1)))
 
 ;;;;; Shadowed path
 
