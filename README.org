@@ -917,13 +917,23 @@ nice usability enhancement, it is not specific to MCT and thus should
 not be part of =mct.el=.  Use this in your init file instead:
 
 #+begin_src emacs-lisp
-;; Copied from Daniel Mendler's `vertico' library:
-;; <https://github.com/minad/vertico>.
-(defun my-crm-indicator (args)
-  "Add prompt indicator to `completing-read-multiple' filter ARGS."
-  (cons (concat "[CRM] " (car args)) (cdr args)))
+;; Add prompt indicator to `completing-read-multiple'.  We display
+;; [`completing-read-multiple': <separator>], e.g.,
+;; [`completing-read-multiple': ,] if the separator is a comma.  This
+;; is adapted from the README of the `vertico' package by Daniel
+;; Mendler.  I made some small tweaks to propertize the segments of
+;; the prompt.
+(defun crm-indicator (args)
+  (cons (format "[`crm-separator': %s]  %s"
+                (propertize
+                 (replace-regexp-in-string
+                  "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                  crm-separator)
+                 'face 'error)
+                (car args))
+        (cdr args)))
 
-(advice-add #'completing-read-multiple :filter-args #'my-crm-indicator)
+(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 #+end_src
 
 ** Ido-style navigation through directories
