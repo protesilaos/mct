@@ -468,12 +468,35 @@ Emacs draws a distinction between two types of completion sessions:
 
 #+findex: mct-mode
 The former scenario is what MCT has supported since its inception.
-Enable ~mct-mode~ to get started.  There was a time where
-MCT also supported in-buffer completion but this was discontinued in
-version =1.0.0= of the package as it was not good enough.
+Enable ~mct-mode~ to get started.  There was a time where MCT also
+supported in-buffer completion but this was discontinued in version
+=1.0.0= of the package as Emacs 29 gained the requisite capabilities.
+To get the familiar MCT key bindings for in-buffer completion, use
+these in your init file:
 
-For in-buffer completion, use the ~corfu~ package by Daniel Mendler
-([[#h:c9ddedea-e279-4233-94dc-f8d32367a954][Alternatives]]).
+#+begin_src emacs-lisp
+;; Get the key bindings
+(let ((map completion-in-region-mode-map))
+  (define-key map (kbd "C-n") #'minibuffer-next-completion)
+  (define-key map (kbd "C-p") #'minibuffer-previous-completion)
+  (define-key map (kbd "RET") #'minibuffer-choose-completion))
+
+;; Tweak the appearance
+(setq completions-format 'one-column)
+(setq completion-show-help nil)
+(setq completion-auto-help t)
+
+;; Optionally, tweak the appearance further
+(setq completions-detailed t)
+(setq completion-show-inline-help nil)
+(setq completions-max-height 6)
+(setq completions-highlight-face 'completions-highlight)
+#+end_src
+
+Note that the in-buffer completions will produce a new buffer window
+below the current one.  Some users find this intrusive.  In such a
+case, the use of a popup box is better.  Consider the ~corfu~ package
+by Daniel Mendler, which uses such a popup ([[#h:c9ddedea-e279-4233-94dc-f8d32367a954][Alternatives]]).
 
 * Usage
 :PROPERTIES:
