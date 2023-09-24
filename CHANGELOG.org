@@ -10,6 +10,193 @@ tagged commit on the project's main git repository:
 The newest release is at the top.  For further details, please consult
 the manual: <https://protesilaos.com/emacs/mct>.
 
+* Version 1.0.0 on 2023-09-24
+:PROPERTIES:
+:CUSTOM_ID: h:64daac36-a953-46cf-bc12-81a0a99bf964
+:END:
+
+** Resumption of MCT development
+:PROPERTIES:
+:CUSTOM_ID: h:39f6904b-a045-4539-aa66-76be822064f9
+:END:
+
+In April 2022, I announced that I was discontinuing the development of
+my ~mct~ package.  At the time, Emacs 29 was gaining new MCT-like
+capabilities and I thought we would quickly reach a point where my
+package would be superseded by built-in functionality.  The article I
+published at the time:
+<https://protesilaos.com/codelog/2022-04-14-emacs-discontinue-mct/>.
+
+About a year later and after receiving questions about MCT, I decided
+to restart its development.  This was done in light of the realisation
+that the built-in Emacs functionality was still not as opinionated as
+MCT.  There are good reasons for this state of affairs, due to the
+legacy of this important User Interface element and Emacs' policy to
+not break stuff willy nilly.  Still, the fact remains that MCT can fit
+in a very narrow niche for those who (i) like the built-in completions
+and (ii) appreciate a few extra niceties.  What I wrote in March, 2023:
+<https://protesilaos.com/codelog/2023-03-25-emacs-restart-mct-development/>.
+
+What does MCT offer that the built-in Emacs UI does not?  In short:
+
+- MCT provides a facility for "live completions", to automatically
+  update the =*Completions*= buffer given certain conditions.  A
+  number of user options control the specifics.
+
+- There are user options for a passlist and blocklist, which determine
+  what should automatically display the =*Completions*= buffer and be
+  live updated.  The passlist and the blocklist can target individual
+  commands, such as ~find-file~, as well as completion categories like
+  ~buffer~.  The manual includes a section with several known
+  completion categories.
+
+To be clear: MCT builds on top of the built-in functionality and
+should not compete with it.  Depending on my availability, I will try
+to prepare patches for emacs.git to see whether at least some features
+can be added directly to =mnibuffer.el= or related.
+
+** MCT supports Emacs 29 or higher
+:PROPERTIES:
+:CUSTOM_ID: h:6ee9aea9-91f3-47cf-aab3-984fe9e23157
+:END:
+
+MCT is highly opinionated about how the completions should work.  This
+applies to the presentation of the completion candidates as well as
+the behaviour of commands that cycle between the minibuffer and the
+=*Completions*=, treating the two as a contiguous space.  In previous
+versions of Emacs, MCT could not work exactly as intended due to
+limitations in the underlying framework.  For example, the variable
+~completions-format~ gained the ~one-column~ value only in Emacs 28:
+Emacs 27 supported grid views which are not intuitive as a vertical
+list for up-down cycling between the candidates.
+
+To make things easier to maintain, MCT only works with Emacs 29 or
+higher.  The ~1 year hiatus has hopefully given users enough time to
+assess their options.
+
+** Deprecation of ~mct-region-mode~
+:PROPERTIES:
+:CUSTOM_ID: h:bf50160c-07e9-4625-af0a-5142d79ed35b
+:END:
+
+For a while, MCT supported in-buffer completion via a minor mode that
+would add all the needed functionality.  This was always problematic
+due to underlying constrains and is thus no longer supported.  MCT is
+designed to work exclusively with the minibuffer, where the behaviour
+is more reliable.
+
+Nevertheless, users can still get an MCT-like experience with these
+settings, which affect the default UI (modify as you see fit):
+
+#+begin_src emacs-lisp
+;; Get the key bindings
+(let ((map completion-in-region-mode-map))
+  (define-key map (kbd "C-n") #'minibuffer-next-completion)
+  (define-key map (kbd "C-p") #'minibuffer-previous-completion)
+  (define-key map (kbd "RET") #'minibuffer-choose-completion))
+
+;; Tweak the appearance
+(setq completions-format 'one-column)
+(setq completion-show-help nil)
+(setq completion-auto-help t)
+
+;; Optionally, tweak the appearance further
+(setq completions-detailed t)
+(setq completion-show-inline-help nil)
+(setq completions-max-height 6)
+(setq completions-highlight-face 'completions-highlight)
+#+end_src
+
+** The ~mct-minibuffer-mode~ is renamed to ~mct-mode~
+:PROPERTIES:
+:CUSTOM_ID: h:d93fc6b9-3b21-4072-91d3-29a51d8f26f3
+:END:
+
+The ~mct-mode~ was the original name, which was later given the
+"minibuffer" specifier to disambiguate it from the aforementioned
+~mct-region-mode~.  With the latter gone, this qualification is no
+longer pertinent and the original name can be restored.
+
+** The ~completing-read-multiple~ indicator has been removed
+:PROPERTIES:
+:CUSTOM_ID: h:03b4eae8-fda2-42d4-aaf7-ad87e5211725
+:END:
+
+Previous versions of MCT would prepend a =[CRM]= tag to the minibuffer
+prompt of commands powered by ~completing-read-multiple~.  While this
+is a nice usability enhancement, it is not specific to MCT and thus
+should not be part of =mct.el=.  Use this in your init file instead:
+
+#+begin_src emacs-lisp
+;; Add prompt indicator to `completing-read-multiple'.  We display
+;; [`completing-read-multiple': <separator>], e.g.,
+;; [`completing-read-multiple': ,] if the separator is a comma.  This
+;; is adapted from the README of the `vertico' package by Daniel
+;; Mendler.  I made some small tweaks to propertize the segments of
+;; the prompt.
+(defun crm-indicator (args)
+  (cons (format "[`crm-separator': %s]  %s"
+                (propertize
+                 (replace-regexp-in-string
+                  "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                  crm-separator)
+                 'face 'error)
+                (car args))
+        (cdr args)))
+
+(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+#+end_src
+
+** No more IDO-like file navigation
+:PROPERTIES:
+:CUSTOM_ID: h:4cf5c77c-d991-4a7a-b59c-06f1cf67317b
+:END:
+
+Older versions of MCT had a command for file navigation that would
+delete the whole directory component before point, effectively going
+back up one directory.  While the functionality can be useful, it is not
+integral to the MCT experience and thus should not belong in =mct.el=.
+Add this to your own configuration file instead:
+
+#+begin_src emacs-lisp
+;; Adaptation of `icomplete-fido-backward-updir'.
+(defun my-backward-updir ()
+  "Delete char before point or go up a directory."
+  (interactive nil mct-mode)
+  (cond
+   ((and (eq (char-before) ?/)
+         (eq (mct--completion-category) 'file))
+    (when (string-equal (minibuffer-contents) "~/")
+      (delete-minibuffer-contents)
+      (insert (expand-file-name "~/"))
+      (goto-char (line-end-position)))
+    (save-excursion
+      (goto-char (1- (point)))
+      (when (search-backward "/" (minibuffer-prompt-end) t)
+        (delete-region (1+ (point)) (point-max)))))
+   (t (call-interactively 'backward-delete-char))))
+
+(define-key minibuffer-local-filename-completion-map (kbd "DEL") #'my-backward-updir)
+#+end_src
+
+** Lots of changes under the hood
+:PROPERTIES:
+:CUSTOM_ID: h:ab0091bf-cbd1-4453-a674-66c195a95622
+:END:
+
+I do not intend to refashion MCT.  It works the way it was originally
+intended to.  What I did is to streamline the code for compatibility
+with Emacs 29 and tweak the custom commands to preserve the desired
+cyclic behaviour between the minibuffer and the =*Completions*=.
+
+Experiments such as integration with the ~avy~ package or the ability
+to type-to-complete in the =*Completions*= buffer are abandoned.
+
+Do not expect radical changes henceforth.  I shall monitor and/or
+contribute to developments in core Emacs and am happy to forever
+archive MCT if/when the default completion UI gains the capabilities
+that, I think, make the user experience a little bit easier.
+
 * Version 0.5.0 on 2022-02-08
 :PROPERTIES:
 :CUSTOM_ID: h:c8d8ad3a-06c9-445d-a4e7-11a68ee17df1
