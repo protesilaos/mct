@@ -475,11 +475,39 @@ To get the familiar MCT key bindings for in-buffer completion, use
 these in your init file:
 
 #+begin_src emacs-lisp
+;; Define the small wrapper functions
+(defun my-mct-next-line-or-completion (n)
+  "Select next completion or move to next line N times.
+Select the next completion if `completion-in-region-mode' is
+active and the Completions window is on display."
+  (interactive "p")
+  (if (and completion-in-region-mode (mct--get-completion-window))
+      (minibuffer-next-completion n)
+    (next-line n)))
+
+(defun my-mct-previous-line-or-completion (n)
+  "Select previous completion or move to previous line N times.
+Select the previous completion if `completion-in-region-mode' is
+active and the Completions window is on display."
+  (interactive "p")
+  (if (and completion-in-region-mode (mct--get-completion-window))
+      (minibuffer-previous-completion n)
+    (previous-line n)))
+
+(defun my-mct-return-or-choose-completion (n)
+  "Choose current completion or create N newlines.
+Choose the current completion if `completion-in-region-mode' is
+active and the Completions window is on display."
+  (interactive "p")
+  (if (and completion-in-region-mode (mct--get-completion-window))
+      (minibuffer-choose-completion)
+    (newline n :interactive)))
+
 ;; Get the key bindings
 (let ((map completion-in-region-mode-map))
-  (define-key map (kbd "C-n") #'minibuffer-next-completion)
-  (define-key map (kbd "C-p") #'minibuffer-previous-completion)
-  (define-key map (kbd "RET") #'minibuffer-choose-completion))
+  (define-key map (kbd "C-n") #'my-mct-next-line-or-completion)
+  (define-key map (kbd "C-p") #'my-mct-previous-line-or-completion)
+  (define-key map (kbd "RET") #'my-mct-return-or-choose-completion))
 
 ;; Tweak the appearance
 (setq completions-format 'one-column)
