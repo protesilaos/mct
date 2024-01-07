@@ -368,9 +368,39 @@ Can be used in `mct-completion-window-size'."
   "Fit Completions buffer to its window."
   (when-let* ((window (mct--get-completion-window))
               (size mct-completion-window-size)
-              (max (car size))
-              (min (cdr size)))
-    (fit-window-to-buffer window (mct--height max) (mct--height min))))
+              (max-height (mct--height (car size)))
+              (min-height (mct--height (cdr size)))
+              ;; For vertical alignment of contents and horizontal
+              ;; borders of completion window when content size do
+              ;; not reaches the upper bound of the window height.
+              (window-resize-pixelwise t)
+
+              ;; `fit-window-to-buffer' calculates the an upper
+              ;; bound of window height as the minimum of provided
+              ;; `max-height' and the sum of the content size and
+              ;; some pixels border lines, which results in the
+              ;; final window height lacking for some pixels when
+              ;; the content size larger than `max-height'.  So we
+              ;; need some tricks to align contents and window
+              ;; horizontal borders for this case.  The following
+              ;; few lines calculate the amount of lacked pixels,
+              ;; `delta-px', and enlarge window height if in the
+              ;; case.
+
+              (frame (window-frame window))
+              (line-height-px (window-default-line-height window))
+              ;; `max-height' in pixels
+              (max-height-px (* line-height-px (mct--height max-height)))
+              ;; Current window height, including all the stuffs.
+              (height-px (+ (cdr (window-text-pixel-size
+	                          window nil t nil (frame-pixel-height frame) t))
+                            (window-scroll-bar-height window)
+                            (window-bottom-divider-width window)))
+              (mode-line-height-px (window-mode-line-height window))
+              (delta-px (% mode-line-height-px line-height-px))) ; Offset
+    (fit-window-to-buffer window max-height min-height)
+    (when (< max-height-px height-px)
+      (window-resize window delta-px nil window window-resize-pixelwise))))
 
 (defun mct--minimum-input ()
   "Test for minimum requisite input for live completions.
