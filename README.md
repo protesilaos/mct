@@ -9,11 +9,9 @@ like that of more featureful third-party options.
 + Package name (GNU ELPA): `mct`
 + Official manual: <https://protesilaos.com/emacs/mct>
 + Change log: <https://protesilaos.com/emacs/mct-changelog>
-+ Git repo on SourceHut: <https://git.sr.ht/~protesilaos/mct>
-  - Mirrors:
-    + GitHub: <https://github.com/protesilaos/mct>
-    + GitLab: <https://gitlab.com/protesilaos/mct>
-+ Mailing list: <https://lists.sr.ht/~protesilaos/general-issues>
++ Git repositories:
+  + GitHub: <https://github.com/protesilaos/mct>
+  + GitLab: <https://gitlab.com/protesilaos/mct>
 + Video demo: <https://protesilaos.com/codelog/2021-10-22-emacs-mct-demo/>
 + Backronym: Minibuffer Confines Transcended; Minibuffer and
   Completions in Tandem.
