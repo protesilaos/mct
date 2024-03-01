@@ -451,6 +451,25 @@ For example, if the user types =~/= after a long path name, everything
 preceding the =~/= is removed so the interactive selection process starts
 again from the user's =$HOME=.
 
+** Show an indicator for ~completing-read-multiple~ prompts
+:PROPERTIES:
+:CUSTOM_ID: h:211065de-6ea8-4cfd-b0a2-c1f28a5ae341
+:END:
+#+vindex: mct-completing-read-multiple-indicator
+
+[ Part of {{{development-version}}}. ]
+
+Brief: Show an indicator for ~completing-read-multiple~ prompts.
+
+Symbol: ~mct-completing-read-multiple-indicator~ (=boolean= type)
+
+When non-nil show an indicator for ~completing-read-multiple~ prompts.
+If nil, do not show anything. Those prompts will look like the generic
+ones.
+
+The indicator informs the user this is a ~completing-read-multiple~
+prompt and also shows the ~crm-separator~, which is usually a comma.
+
 ** MCT in the minibuffer and completion in regular buffers
 :PROPERTIES:
 :CUSTOM_ID: h:8109fe09-fcce-4212-88eb-943cc72f2c75
@@ -763,6 +782,7 @@ And with more options:
 (setq mct-completion-window-size (cons #'mct-frame-height-third 1))
 (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
 (setq mct-hide-completion-mode-line t)
+(setq mct-completing-read-multiple-indicator t)
 (setq mct-minimum-input 3)
 (setq mct-live-completion t)
 (setq mct-live-update-delay 0.6)
@@ -931,6 +951,11 @@ Use `mct-sort-sort-by-alpha-length' if no history is available."
 :CUSTOM_ID: h:162f232d-1e9d-4756-90d3-d6bf5bb4d8ef
 :END:
 #+cindex: CRM indicator
+
+[ As part of {{{development-version}}}, this feature is built into the
+  MCT code ([[#h:211065de-6ea8-4cfd-b0a2-c1f28a5ae341][Show an indicator for ~completing-read-multiple~ prompts]]).
+  I decided that it is better to have it on by default, otherwise the
+  ~completing-read-multiple~ prompts are hard to identify. ]
 
 Previous versions of MCT would prepend a =[CRM]= tag to the minibuffer
 prompt of commands powered by ~completing-read-multiple~.  While this is a

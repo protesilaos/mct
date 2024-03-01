@@ -131,6 +131,16 @@ number of candidates that are being computed."
   :type 'natnum
   :group 'mct)
 
+(defcustom mct-completing-read-multiple-indicator t
+  "When non-nil show an indicator for `completing-read-multiple' prompts.
+If nil, do not show anything.  Those prompts will look like the generic ones.
+
+The indicator informs the user this is a `completing-read-multiple'
+prompt and also shows the `crm-separator', which is usually a comma."
+  :type 'boolean
+  :package-version '(mct . "1.1.0")
+  :group 'mct)
+
 (defcustom mct-live-update-delay 0.3
   "Delay in seconds before updating the Completions buffer.
 Set this to 0 to disable the delay.
@@ -763,6 +773,20 @@ If ARG is supplied, move that many completion groups at a time."
 (defvar crm-completion-table)
 (defvar crm-separator)
 
+;; This is adapted from the README of the `vertico' package by Daniel
+;; Mendler.
+(defun mct--crm-indicator (args)
+  (cons (format "%s %s | %s"
+                (propertize "`completing-read-multiple' separator is" 'face 'shadow)
+                (propertize
+                 (format " %s "
+                         (replace-regexp-in-string
+                          "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                          crm-separator))
+                 'face '(highlight bold))
+                (car args))
+        (cdr args)))
+
 (defun mct--regex-to-separator (regex)
   "Parse REGEX of `crm-separator' in `mct-choose-completion-dwim'."
   (save-match-data
@@ -1047,12 +1071,15 @@ This value means that it is overriden by the active region.")
         (add-hook 'minibuffer-setup-hook #'mct--setup-passlist)
         (advice-add #'completing-read-default :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
+        (when mct-completing-read-multiple-indicator
+          (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator))
         (advice-add #'minibuffer-completion-help :around #'mct--minibuffer-completion-help-advice)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
     (remove-hook 'minibuffer-setup-hook #'mct--setup-passlist)
     (advice-remove #'completing-read-default #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
+    (advice-remove #'completing-read-multiple #'mct--crm-indicator)
     (advice-remove #'minibuffer-completion-help #'mct--minibuffer-completion-help-advice)
     (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily))
   (mct--setup-dynamic-completion-persist)
