@@ -1008,6 +1008,8 @@ This value means that it is overriden by the active region.")
     (define-key map (kbd "M-e") #'mct-edit-completion)
     (define-key map (kbd "C-<return>") #'mct-complete-and-exit)
     (define-key map (kbd "C-l") #'mct-list-completions-toggle)
+    (define-key map (kbd "<left>") nil)
+    (define-key map (kbd "<right>") nil)
     map)
   "Derivative of `minibuffer-local-completion-map'.")
 
