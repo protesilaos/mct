@@ -196,49 +196,7 @@ Read the manual for known completion categories."
 
 (make-obsolete-variable 'mct-display-buffer-action nil "1.0.0")
 (make-obsolete-variable 'mct-completions-format nil "1.0.0")
-
-(defcustom mct-persist-dynamic-completion t
-  "When non-nil, keep dynamic completion live.
-
-Without any intervention from MCT, the default Emacs behavior for
-commands such as `find-file' or for a `file' completion category
-is to hide the `*Completions*' buffer after updating the list of
-candidates in a non-exiting fashion (e.g. select a directory and
-expect to continue typing the path).  This, however, runs
-contrary to the interaction model of MCT when it performs live
-completions, because the user expects the Completions buffer to
-remain visible while typing out the path to the file.
-
-When this user option is non-nil (the default) it makes all
-non-exiting commands keep the `*Completions*' visible when
-updating the list of candidates.
-
-This applies to prompts in the `file' completion category
-whenever the user selects a candidate with
-`mct-choose-completion-no-exit', `mct-edit-completion',
-`minibuffer-complete', `minibuffer-force-complete' (i.e. any
-command that does not exit the minibuffer).
-
-The two exceptions are (i) when the current completion session
-runs a command or category that is blocked by the
-`mct-completion-blocklist' or (ii) the user option
-`mct-live-completion' is nil.
-
-The underlying rationale:
-
-Most completion commands present a flat list of candidates to
-choose from.  Picking a candidate concludes the session.  Some
-prompts, however, can recalculate the list of completions based
-on the selected candidate.  A case in point is `find-file' (or
-any command with the `file' completion category) which
-dynamically adjusts the completions to show only the elements
-which extend the given file system path.  We call such cases
-\"dynamic completion\".  Due to their particular nature, these
-need to be handled explicitly.  The present user option is
-provided primarily to raise awareness about this state of
-affairs."
-  :type 'boolean
-  :group 'mct)
+(make-obsolete-variable 'mct-persist-dynamic-completion 'mct-completion-passlist "1.1.0")
 
 ;;;; Completion metadata
 
@@ -270,14 +228,6 @@ affairs."
 (defun mct--blocklist-p ()
   "Return non-nil if symbol is in the `mct-completion-blocklist'."
   (mct--symbol-in-list mct-completion-blocklist))
-
-;; Normally we would also include `imenu', but it has its own defcustom
-;; for popping up the Completions eagerly...  Let's not interfere with
-;; that.
-;;
-;; See bug#52389: <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=52389>.
-(defvar mct--dynamic-completion-categories '(file)
-  "Completion categories that perform dynamic completion.")
 
 ;;;; Sorting functions for `completions-sort' (Emacs 29)
 
@@ -1041,23 +991,26 @@ This value means that it is overriden by the active region.")
 
 ;;;;; Dynamic completion
 
-(defun mct--persist-dynamic-completion (&rest _)
-  "Persist completion, per `mct-persist-dynamic-completion'."
-  (when (and (not (mct--symbol-in-list mct-completion-blocklist))
-             mct-persist-dynamic-completion
-             (memq (mct--completion-category) mct--dynamic-completion-categories)
-             mct-live-completion)
+(defun mct-persist-completions-buffer (&rest _)
+  "Persist the completions buffer if there are still candidates.
+Do this under any of the following conditions:
+
+- The command is in the `mct-completion-passlist'.
+
+- The `mct-live-completion' is non-nil."
+  (when (and (not (mct--blocklist-p))
+             (or (mct--passlist-p) mct-live-completion))
     (mct-focus-minibuffer)
     (mct--show-completions)))
 
-(defun mct--setup-dynamic-completion-persist ()
-  "Set up `mct-persist-dynamic-completion'."
+(defun mct--setup-persistent-completions ()
+  "Set up `mct-persist-completions-buffer'."
   (let ((commands '(choose-completion minibuffer-complete minibuffer-force-complete)))
     (if (bound-and-true-p mct-mode)
         (dolist (fn commands)
-          (advice-add fn :after #'mct--persist-dynamic-completion))
+          (advice-add fn :after #'mct-persist-completions-buffer))
       (dolist (fn commands)
-        (advice-remove fn #'mct--persist-dynamic-completion)))))
+        (advice-remove fn #'mct-persist-completions-buffer)))))
 
 ;;;;; mct-mode declaration
 
@@ -1085,7 +1038,7 @@ This value means that it is overriden by the active region.")
     (advice-remove #'completing-read-multiple #'mct--crm-indicator)
     (advice-remove #'minibuffer-completion-help #'mct--minibuffer-completion-help-advice)
     (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily))
-  (mct--setup-dynamic-completion-persist)
+  (mct--setup-persistent-completions)
   (mct--setup-message-advices))
 
 (define-obsolete-function-alias
