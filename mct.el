@@ -776,6 +776,7 @@ If ARG is supplied, move that many completion groups at a time."
 ;; This is adapted from the README of the `vertico' package by Daniel
 ;; Mendler.
 (defun mct--crm-indicator (args)
+  "Display an indicator for `completing-read-multiple' based on ARGS."
   (cons (format "%s %s | %s"
                 (propertize "`completing-read-multiple' separator is" 'face 'shadow)
                 (propertize
