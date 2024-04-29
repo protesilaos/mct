@@ -319,10 +319,10 @@ This function can be used as the value of the user option
 
 (defun mct-sort-directories-then-files (completions)
   "Sort COMPLETIONS with `mct-sort-by-alpha-length' with directories first."
-  (setq files (mct-sort-by-alpha completions))
+  (setq completions (mct-sort-by-alpha completions))
   ;; But then move directories first
-  (nconc (seq-filter (lambda (x) (string-suffix-p "/" x)) files)
-         (seq-remove (lambda (x) (string-suffix-p "/" x)) files)))
+  (nconc (seq-filter (lambda (x) (string-suffix-p "/" x)) completions)
+         (seq-remove (lambda (x) (string-suffix-p "/" x)) completions)))
 
 (defun mct-sort-multi-category (completions)
   "Sort COMPLETIONS per completion category.
