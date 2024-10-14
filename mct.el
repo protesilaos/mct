@@ -712,7 +712,7 @@ If ARG is supplied, move that many completion groups at a time."
   (interactive nil mct-mode)
   (choose-completion)
   (when (active-minibuffer-window)
-    (minibuffer-force-complete-and-exit)))
+    (exit-minibuffer)))
 
 (defun mct-choose-completion-no-exit ()
   "Run `choose-completion' in the Completions without exiting."
