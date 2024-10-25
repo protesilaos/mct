@@ -674,10 +674,7 @@ the minibuffer."
 If ARG is supplied, move that many completion groups at a time."
   (interactive "p" mct-mode)
   (dotimes (_ (or arg 1))
-    (when-let* (group (save-excursion
-                        (text-property-search-forward 'face
-                                                      'completions-group-separator
-                                                      t nil)))
+    (when-let* ((group (save-excursion (text-property-search-forward 'face 'completions-group-separator t nil))))
       (let ((pos (prop-match-end group)))
         (unless (eq pos (point-max))
           (goto-char pos)
@@ -690,10 +687,7 @@ If ARG is supplied, move that many completion groups at a time."
   (dotimes (_ (or arg 1))
     ;; skip back, so if we're at the top of a group, we go to the previous one...
     (forward-line -1)
-    (if-let* (group (save-excursion
-                      (text-property-search-backward 'face
-                                                     'completions-group-separator
-                                                     t nil)))
+    (if-let* ((group (save-excursion (text-property-search-backward 'face 'completions-group-separator t nil))))
         (let ((pos (prop-match-beginning group)))
           (unless (eq pos (point-min))
             (goto-char pos)
