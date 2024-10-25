@@ -206,7 +206,7 @@ Read the manual for known completion categories."
 
 (defun mct--completion-category ()
   "Return completion category."
-  (when-let ((window (active-minibuffer-window)))
+  (when-let* ((window (active-minibuffer-window)))
     (with-current-buffer (window-buffer window)
       (completion-metadata-get
        (completion-metadata (buffer-substring-no-properties
@@ -366,7 +366,7 @@ Can be used in `mct-completion-window-size'."
               (max-height-px (* line-height-px (mct--height max-height)))
               ;; Current window height, including all the stuffs.
               (height-px (+ (cdr (window-text-pixel-size
-	                          window nil t nil (frame-pixel-height frame) t))
+	                              window nil t nil (frame-pixel-height frame) t))
                             (window-scroll-bar-height window)
                             (window-bottom-divider-width window)))
               (mode-line-height-px (window-mode-line-height window))
@@ -460,7 +460,7 @@ Meant to be added to `after-change-functions'."
   "Return t if Mct is active."
   (when-let* ((win (active-minibuffer-window))
               (buf (window-buffer win)))
-      (buffer-local-value 'mct--active buf)))
+    (buffer-local-value 'mct--active buf)))
 
 (defun mct--minibuffer-completion-help-advice (&rest app)
   "Prepare APP advice around `display-completion-list'."
@@ -496,7 +496,7 @@ Apply APP by first setting up the minibuffer to work with Mct."
 (defun mct-focus-minibuffer ()
   "Focus the active minibuffer."
   (interactive nil mct-mode)
-  (when-let ((mini (active-minibuffer-window)))
+  (when-let* ((mini (active-minibuffer-window)))
     (select-window mini)))
 
 (defun mct--get-completion-window ()
@@ -564,7 +564,7 @@ by `mct--completions-window-name'."
   (save-excursion
     (goto-char (point-max))
     (when completions-header-format
-     (next-completion 1))
+      (next-completion 1))
     (point)))
 
 (defun mct--last-completion-point ()
@@ -674,10 +674,10 @@ the minibuffer."
 If ARG is supplied, move that many completion groups at a time."
   (interactive "p" mct-mode)
   (dotimes (_ (or arg 1))
-    (when-let (group (save-excursion
-                       (text-property-search-forward 'face
-                                                     'completions-group-separator
-                                                     t nil)))
+    (when-let* (group (save-excursion
+                        (text-property-search-forward 'face
+                                                      'completions-group-separator
+                                                      t nil)))
       (let ((pos (prop-match-end group)))
         (unless (eq pos (point-max))
           (goto-char pos)
@@ -690,10 +690,10 @@ If ARG is supplied, move that many completion groups at a time."
   (dotimes (_ (or arg 1))
     ;; skip back, so if we're at the top of a group, we go to the previous one...
     (forward-line -1)
-    (if-let (group (save-excursion
-                     (text-property-search-backward 'face
-                                                    'completions-group-separator
-                                                    t nil)))
+    (if-let* (group (save-excursion
+                      (text-property-search-backward 'face
+                                                     'completions-group-separator
+                                                     t nil)))
         (let ((pos (prop-match-beginning group)))
           (unless (eq pos (point-min))
             (goto-char pos)
@@ -787,8 +787,8 @@ determined as follows:
 A candidate is recognised for as long as point is not past its
 last character."
   (interactive nil mct-mode)
-  (when-let ((window (mct--get-completion-window))
-             ((active-minibuffer-window)))
+  (when-let* ((window (mct--get-completion-window))
+              ((active-minibuffer-window)))
     (with-current-buffer (window-buffer window)
       (let* ((old-point (save-excursion
                           (select-window window)
@@ -884,19 +884,19 @@ Apply APP while inhibiting modification hooks."
   "Priority used on the `mct--highlight-overlay'.
 This value means that it is overriden by the active region.")
 
-;; The `if-let' is to prevent highlighting of empty space, such as by
+;; The `if-let*' is to prevent highlighting of empty space, such as by
 ;; clicking on it with the mouse.
 (defun mct--completions-completion-beg ()
   "Return point of completion candidate at START and END."
-  (if-let ((string (mct--completion-at-point-p)))
+  (if-let* ((string (mct--completion-at-point-p)))
       (save-excursion
         (prop-match-beginning (text-property-search-forward 'completion--string)))
     (point)))
 
-;; Same as above for the `if-let'.
+;; Same as above for the `if-let*'.
 (defun mct--completions-completion-end ()
   "Return end of completion candidate."
-  (if-let ((string (mct--completion-at-point-p)))
+  (if-let* ((string (mct--completion-at-point-p)))
       (save-excursion
         (1+ (line-end-position)))
     (point)))
