@@ -136,9 +136,13 @@ number of candidates that are being computed."
 If nil, do not show anything.  Those prompts will look like the generic ones.
 
 The indicator informs the user this is a `completing-read-multiple'
-prompt and also shows the `crm-separator', which is usually a comma."
+prompt and also shows the `crm-separator', which is usually a comma.
+
+The `mct-completing-read-multiple-indicator' has no effect on versions
+of Emacs >= 31, as those have the user option `crm-prompt' which covers
+the same use-case."
   :type 'boolean
-  :package-version '(mct . "1.1.0")
+  :package-version '(mct . "1.2.0")
   :group 'mct)
 
 (defcustom mct-live-update-delay 0.3
@@ -1021,7 +1025,7 @@ Do this under any of the following conditions:
         (add-hook 'minibuffer-setup-hook #'mct--setup-passlist)
         (advice-add #'completing-read-default :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
-        (when mct-completing-read-multiple-indicator
+        (when (and mct-completing-read-multiple-indicator (< emacs-major-version 31))
           (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator))
         (advice-add #'minibuffer-completion-help :around #'mct--minibuffer-completion-help-advice)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
