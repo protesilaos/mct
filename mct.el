@@ -142,7 +142,7 @@ The `mct-completing-read-multiple-indicator' has no effect on versions
 of Emacs >= 31, as those have the user option `crm-prompt' which covers
 the same use-case."
   :type 'boolean
-  :package-version '(mct . "1.2.0")
+  :package-version '(mct . "1.1.0")
   :group 'mct)
 
 (defcustom mct-live-update-delay 0.3
