@@ -1066,57 +1066,7 @@ Do this under any of the following conditions:
     (mct-focus-minibuffer)
     (mct--show-completions)))
 
-(defun mct--setup-persistent-completions ()
-  "Set up `mct-persist-completions-buffer'."
-  (let ((commands '(choose-completion minibuffer-complete minibuffer-force-complete)))
-    (if (bound-and-true-p mct-mode)
-        (dolist (fn commands)
-          (advice-add fn :after #'mct-persist-completions-buffer))
-      (dolist (fn commands)
-        (advice-remove fn #'mct-persist-completions-buffer)))))
-
 ;;;;; mct-mode declaration
-
-(declare-function minibuf-eldef-setup-minibuffer "minibuf-eldef")
-
-(defvar mct-last-completions-sort-value (bound-and-true-p completions-sort)
-  "Last value of `completions-sort'.")
-
-;;;###autoload
-(define-minor-mode mct-mode
-  "Set up opinionated default completion UI."
-  :global t
-  :group 'mct
-  (if mct-mode
-      (progn
-        (setq completions-sort #'mct-sort-multi-category)
-        (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-        (add-hook 'minibuffer-setup-hook #'mct--setup-passlist)
-        (advice-add #'completing-read-default :around #'mct--completing-read-advice)
-        (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
-        (when (and mct-completing-read-multiple-indicator (< emacs-major-version 31))
-          (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator))
-        (advice-add #'minibuffer-completion-help :around #'mct--minibuffer-completion-help-advice)
-        (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily)
-        (advice-add #'completion--insert-strings :after #'mct--completion--insert-strings))
-    (setq completions-sort mct-last-completions-sort-value)
-    (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-    (remove-hook 'minibuffer-setup-hook #'mct--setup-passlist)
-    (advice-remove #'completing-read-default #'mct--completing-read-advice)
-    (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
-    (advice-remove #'completing-read-multiple #'mct--crm-indicator)
-    (advice-remove #'minibuffer-completion-help #'mct--minibuffer-completion-help-advice)
-    (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily)
-    (advice-remove #'completion--insert-strings #'mct--completion--insert-strings))
-  (mct--setup-persistent-completions)
-  (mct--setup-message-advices))
-
-(define-obsolete-function-alias
-  'mct-minibuffer-mode
-  'mct-mode
-  "1.0.0")
-
-(make-obsolete 'mct-region-mode nil "1.0.0")
 
 ;; Adapted from Omar Antolín Camarena's live-completions library:
 ;; <https://github.com/oantolin/live-completions>.
@@ -1134,10 +1084,30 @@ Do this under any of the following conditions:
         (apply app))
     (apply app)))
 
-(defun mct--setup-message-advices ()
-  "Silence the minibuffer and the Completions."
+(defvar mct-last-completions-sort-value (bound-and-true-p completions-sort)
+  "Last value of `completions-sort'.")
+
+(declare-function minibuf-eldef-setup-minibuffer "minibuf-eldef")
+
+;;;###autoload
+(define-minor-mode mct-mode
+  "Set up opinionated default completion UI."
+  :global t
+  :group 'mct
   (if mct-mode
       (progn
+        (setq completions-sort #'mct-sort-multi-category)
+        (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
+        (add-hook 'minibuffer-setup-hook #'mct--setup-passlist)
+        (advice-add #'completing-read-default :around #'mct--completing-read-advice)
+        (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
+        (when (and mct-completing-read-multiple-indicator (< emacs-major-version 31))
+          (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator))
+        (advice-add #'minibuffer-completion-help :around #'mct--minibuffer-completion-help-advice)
+        (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily)
+        (advice-add #'completion--insert-strings :after #'mct--completion--insert-strings)
+        (dolist (fn '(choose-completion minibuffer-complete minibuffer-force-complete))
+          (advice-add fn :after #'mct-persist-completions-buffer))
         (dolist (fn '(exit-minibuffer
                       choose-completion
                       minibuffer-force-complete
@@ -1145,6 +1115,17 @@ Do this under any of the following conditions:
                       minibuffer-force-complete-and-exit))
           (advice-add fn :around #'mct--messageless))
         (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message))
+    (setq completions-sort mct-last-completions-sort-value)
+    (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
+    (remove-hook 'minibuffer-setup-hook #'mct--setup-passlist)
+    (advice-remove #'completing-read-default #'mct--completing-read-advice)
+    (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
+    (advice-remove #'completing-read-multiple #'mct--crm-indicator)
+    (advice-remove #'minibuffer-completion-help #'mct--minibuffer-completion-help-advice)
+    (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily)
+    (advice-remove #'completion--insert-strings #'mct--completion--insert-strings)
+    (dolist (fn '(choose-completion minibuffer-complete minibuffer-force-complete))
+      (advice-remove fn #'mct-persist-completions-buffer))
     (dolist (fn '(exit-minibuffer
                   choose-completion
                   minibuffer-force-complete
@@ -1152,6 +1133,13 @@ Do this under any of the following conditions:
                   minibuffer-force-complete-and-exit))
       (advice-remove fn #'mct--messageless))
     (advice-remove #'minibuffer-message #'mct--honor-inhibit-message)))
+
+(define-obsolete-function-alias
+  'mct-minibuffer-mode
+  'mct-mode
+  "1.0.0")
+
+(make-obsolete 'mct-region-mode nil "1.0.0")
 
 (provide 'mct)
 ;;; mct.el ends here
