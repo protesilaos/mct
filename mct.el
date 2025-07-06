@@ -837,8 +837,7 @@ this command is then required to abort the session."
 ;;;;; Stylistic tweaks and refinements
 
 ;; Note that this solves bug#45686:
-;; <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=45686>
-;; TODO review that stealthily does not affect the region mode, it seems intrusive.
+;; <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=45686>.
 (defun mct--stealthily (&rest app)
   "Prevent minibuffer default from counting as a modification.
 Apply APP while inhibiting modification hooks."
