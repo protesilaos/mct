@@ -588,7 +588,7 @@ command will first move per invocation to the former, then the
 latter, and then continue to switch between the two.
 
 The continuous switch is essentially the same as running
-`mct-focus-minibuffer' and `switch-to-Completions in
+`mct-focus-minibuffer' and `switch-to-completions' in
 succession.
 
 What constitutes a Completions window is ultimately determined
