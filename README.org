@@ -375,6 +375,11 @@ are:
 To not perform any sorting on the completion candidates that match
 =SYMBOLS= set =SORT-FUNCTION= to ~nil~.
 
+If there are conflicting configurations between a =SYMBOLS= function or
+completion category, then the function takes precedence (for example
+~find-file~ is set to sort directories first whereas the ~file~
+completion category is set to sort by history).
+
 ** Size boundaries of the Completions
 :PROPERTIES:
 :CUSTOM_ID: h:2fcf708f-4edf-41f3-9e29-0e750f3a80af

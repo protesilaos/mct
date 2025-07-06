@@ -223,7 +223,12 @@ are:
 - `mct-sort-by-directory-then-by-file'
 
 To not perform any sorting on the completion candidates that match
-SYMBOLS set SORT-FUNCTION to nil."
+SYMBOLS set SORT-FUNCTION to nil.
+
+If there are conflicting configurations between a SYMBOLS function or
+completion category, then the function takes precedence (for example
+`find-file' is set to sort directories first whereas the `file'
+completion category is set to sort by history)."
   :type '(alist
           :key-type (choice symbol (repeat symbol))
           :value-type (choice
@@ -321,20 +326,22 @@ This function can be used as the value of the user option
 (defalias 'mct-sort-directories-then-files 'mct-sort-by-directory-then-by-file
   "Alias for `mct-sort-by-directory-then-by-file'.")
 
-(defun mct--sort-multi-category-get-function (symbol)
-  "Return sort function for SYMBOL."
+(defun mct--sort-multi-category-get-function (function-and-category)
+  "Return the first sort function among FUNCTION-AND-CATEGORY."
   (catch 'found
-    (pcase-dolist (`(,symbols . ,sort) mct-sort-by-command-or-category)
-      (when (if (listp symbols)
-                (memq symbol symbols)
-              (eq symbol symbols))
-        (throw 'found sort)))))
+    (dolist (element function-and-category)
+      (pcase-dolist (`(,symbols . ,sort) mct-sort-by-command-or-category)
+        (when (if (listp symbols)
+                  (memq element symbols)
+                (eq element symbols))
+          (throw 'found sort))))))
 
 (defun mct-sort-multi-category (completions)
   "Sort COMPLETIONS per command or completion category.
 Do it in accordance with the user option `mct-sort-by-command-or-category'."
-  (if-let* ((symbol (or (mct--this-command) (mct--completion-category) t))
-            (sort-fn (mct--sort-multi-category-get-function symbol))
+  (if-let* ((symbols (list (mct--this-command) (mct--completion-category)))
+            (sort-fn (or (mct--sort-multi-category-get-function symbols)
+                         (alist-get t mct-sort-by-command-or-category)))
             (_ (functionp sort-fn)))
       (funcall sort-fn completions)
     completions))
