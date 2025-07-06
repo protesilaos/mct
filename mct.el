@@ -272,7 +272,7 @@ SYMBOLS set SORT-FUNCTION to nil."
 
 ;;;; Sorting functions for `completions-sort' (Emacs 29)
 
-(defvar mct-sort-alpha-function #'string-version-lessp
+(defvar mct-sort-alpha-function #'string-collate-lessp
   "Function to perform alphabetic sorting between two strings.")
 
 (defun mct-sort-by-alpha (completions)
