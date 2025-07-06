@@ -201,6 +201,40 @@ Read the manual for known completion categories."
   :type '(repeat symbol)
   :group 'mct)
 
+(defcustom mct-sort-by-command-or-category
+  '((file . mct-sort-by-directory-then-by-file)
+    ((magit-checkout vc-retrieve-tag) . mct-sort-by-alpha-then-by-length)
+    ((kill-ring imenu consult-location Info-goto-node Info-index Info-menu) . nil)
+    (t . mct-sort-by-history))
+  "Sort completion candidates based on the command or completion category.
+This is an alist where each element is of the form (SYMBOLS . SORT-FUNCTION).
+
+SYMBOLS is either a symbol or a list of symbols.  SYMBOLS can refer to
+the symbol of a function or completion category.  It can also be t,
+which refers to the fallback value.
+
+SORT-FUNCTION is a function that takes a list of strings and returns a
+list of strings, sorting them accordingly.  Examples of a SORT-FUNCTION
+are:
+
+- `mct-sort-by-alpha'
+- `mct-sort-by-alpha-then-by-length'
+- `mct-sort-by-history'
+- `mct-sort-by-directory-then-by-file'
+
+To not perform any sorting on the completion candidates that match
+SYMBOLS set SORT-FUNCTION to nil."
+  :type '(alist
+          :key-type (choice symbol (repeat symbol))
+          :value-type (choice
+                       (const :tag "Sort A-Z" mct-sort-by-alpha)
+                       (const :tag "Sort A-Z then short to long" mct-sort-by-alpha-then-by-length)
+                       (const :tag "Sort by minibuffer history" mct-sort-by-history)
+                       (const :tag "Sort by directory then by file" mct-sort-by-directory-then-by-file)
+                       (function :tag "Custom sort function accepting COMPLETIONS argument")))
+  :package-version '(mct . "1.1.0")
+  :group 'mct)
+
 (make-obsolete-variable 'mct-display-buffer-action nil "1.0.0")
 (make-obsolete-variable 'mct-completions-format nil "1.0.0")
 (make-obsolete-variable 'mct-persist-dynamic-completion 'mct-completion-passlist "1.1.0")
@@ -250,7 +284,7 @@ This function can be used as the value of the user option
    (lambda (string1 string2)
      (funcall mct-sort-alpha-function string1 string2))))
 
-(defun mct-sort-by-alpha-length (completions)
+(defun mct-sort-by-alpha-then-by-length (completions)
   "Sort COMPLETIONS first alphabetically, then by length.
 This function can be used as the value of the user option
 `completions-sort'."
@@ -259,6 +293,9 @@ This function can be used as the value of the user option
    (lambda (string1 string2)
      (or (funcall mct-sort-alpha-function string1 string2)
          (< (length string1) (length string2))))))
+
+(defalias 'mct-sort-by-alpha-length 'mct-sort-by-alpha-then-by-length
+  "Alias for `mct-sort-by-alpha-then-by-length'.")
 
 ;; Based on `minibuffer-sort-by-history' from Emacs 30.
 (defun mct-sort-by-history (completions)
@@ -274,21 +311,33 @@ This function can be used as the value of the user option
        (minibuffer--sort-preprocess-history minibuffer-completion-base)
        alphabetized))))
 
-(defun mct-sort-directories-then-files (completions)
-  "Sort COMPLETIONS with `mct-sort-by-alpha-length' with directories first."
+(defun mct-sort-by-directory-then-by-file (completions)
+  "Sort COMPLETIONS with `mct-sort-by-alpha-then-by-length' with directories first."
   (setq completions (mct-sort-by-alpha completions))
   ;; But then move directories first
   (nconc (seq-filter (lambda (x) (string-suffix-p "/" x)) completions)
          (seq-remove (lambda (x) (string-suffix-p "/" x)) completions)))
 
+(defalias 'mct-sort-directories-then-files 'mct-sort-by-directory-then-by-file
+  "Alias for `mct-sort-by-directory-then-by-file'.")
+
+(defun mct--sort-multi-category-get-function (symbol)
+  "Return sort function for SYMBOL."
+  (catch 'found
+    (pcase-dolist (`(,symbols . ,sort) mct-sort-by-command-or-category)
+      (when (if (listp symbols)
+                (memq symbol symbols)
+              (eq symbol symbols))
+        (throw 'found sort)))))
+
 (defun mct-sort-multi-category (completions)
-  "Sort COMPLETIONS per completion category.
-This function can be used as the value of the user option
-`completions-sort'."
-  (pcase (mct--completion-category)
-    ('kill-ring completions) ; no sorting
-    ('file (mct-sort-directories-then-files completions))
-    (_ (mct-sort-by-history completions))))
+  "Sort COMPLETIONS per command or completion category.
+Do it in accordance with the user option `mct-sort-by-command-or-category'."
+  (if-let* ((symbol (or (mct--this-command) (mct--completion-category) t))
+            (sort-fn (mct--sort-multi-category-get-function symbol))
+            (_ (functionp sort-fn)))
+      (funcall sort-fn completions)
+    completions))
 
 ;;;; Basics of intersection between minibuffer and Completions buffer
 
@@ -1023,6 +1072,9 @@ Do this under any of the following conditions:
 
 (declare-function minibuf-eldef-setup-minibuffer "minibuf-eldef")
 
+(defvar mct-last-completions-sort-value (bound-and-true-p completions-sort)
+  "Last value of `completions-sort'.")
+
 ;;;###autoload
 (define-minor-mode mct-mode
   "Set up opinionated default completion UI."
@@ -1030,6 +1082,7 @@ Do this under any of the following conditions:
   :group 'mct
   (if mct-mode
       (progn
+        (setq completions-sort #'mct-sort-multi-category)
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
         (add-hook 'minibuffer-setup-hook #'mct--setup-passlist)
         (advice-add #'completing-read-default :around #'mct--completing-read-advice)
@@ -1039,6 +1092,7 @@ Do this under any of the following conditions:
         (advice-add #'minibuffer-completion-help :around #'mct--minibuffer-completion-help-advice)
         (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily)
         (advice-add #'completion--insert-strings :after #'mct--completion--insert-strings))
+    (setq completions-sort mct-last-completions-sort-value)
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
     (remove-hook 'minibuffer-setup-hook #'mct--setup-passlist)
     (advice-remove #'completing-read-default #'mct--completing-read-advice)

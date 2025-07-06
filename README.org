@@ -338,6 +338,43 @@ To review echo area messages, use =C-h e= (~view-echo-area-messages~).
 
 [[#h:1f42c4e6-53c1-4e8a-81ef-deab70822fa4][Known completion categories]].
 
+** Sort completions based on the command or completion category
+:PROPERTIES:
+:CUSTOM_ID: h:d5cd6e2e-d121-425c-96ec-f8bc9c630dd2
+:END:
+#+vindex: mct-sort-by-command-or-category
+[ This is part of {{{development-version}}}. ]
+
+Brief: Sort completion candidates based on the command or completion
+category.
+
+Symbol: ~mct-sort-by-command-or-category~ (=alist= type)
+
+This is an alist where each element is of the form =(SYMBOLS . SORT-FUNCTION)=.
+
+=SYMBOLS= is either a symbol or a list of symbols. =SYMBOLS= can refer to
+the symbol of a function or completion category. It can also be ~t~,
+which refers to the fallback value.
+
+=SORT-FUNCTION= is a function that takes a list of strings and returns a
+list of strings, sorting them accordingly. Examples of a =SORT-FUNCTION=
+are:
+
+#+findex: mct-sort-by-alpha
+- ~mct-sort-by-alpha~
+
+#+findex: mct-sort-by-alpha-then-by-length
+- ~mct-sort-by-alpha-then-by-length~
+
+#+findex: mct-sort-by-history
+- ~mct-sort-by-history~
+
+#+findex: mct-sort-by-directory-then-by-file
+- ~mct-sort-by-directory-then-by-file~
+
+To not perform any sorting on the completion candidates that match
+=SYMBOLS= set =SORT-FUNCTION= to ~nil~.
+
 ** Size boundaries of the Completions
 :PROPERTIES:
 :CUSTOM_ID: h:2fcf708f-4edf-41f3-9e29-0e750f3a80af
@@ -860,6 +897,12 @@ In this section we cover custom code that builds on what MCT offers.
 :CUSTOM_ID: h:493922c7-efdc-4b63-aa96-b31c684eb4fa
 :END:
 #+cindex: Sorting completions
+
+[ As part of {{{development-version}}}, MCT provides the user option
+  ~mct-sort-by-command-or-category~ and sets the ~completions-sort~
+  accordingly ([[#h:d5cd6e2e-d121-425c-96ec-f8bc9c630dd2][Sort completions based on the command or completion category]]).
+  The information herein is thus not needed, but may still be useful
+  in writing a custom sort function. ]
 
 Starting with Emacs 29 (current development target), the user option
 ~completions-sort~ controls the sorting method of candidates in the
