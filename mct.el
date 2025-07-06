@@ -39,7 +39,10 @@
   "Minibuffer Confines Transcended.
 A layer of interactivity that integrates the standard minibuffer
 and the Completions."
-  :group 'minibuffer)
+  :group 'minibuffer
+  :link '(info-link "(mct) Top")
+  :link '(url-link :tag "Homepage" "https://protesilaos.com/emacs/mct")
+
 
 (make-obsolete 'mct-completion-windows-regexp 'mct--completions-window-name "0.5.0")
 
