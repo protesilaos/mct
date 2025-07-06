@@ -852,6 +852,13 @@ Apply APP while inhibiting modification hooks."
   (when completions-header-format
     (setq-local display-line-numbers-offset -1)))
 
+(defun mct--completion--insert-strings (&rest _)
+  "Make `completion--insert-strings' not show the truncation message."
+  (when-let* ((_ (bound-and-true-p completions--lazy-insert-button))
+              (button completions--lazy-insert-button))
+    ;; (replace-region-contents (button-start button) (button-end button) "​"))) ; zero-width space here
+    (overlay-put (car (overlays-at (button-start button))) 'invisible t)))
+
 ;;;;; Shadowed path
 
 ;; Adapted from icomplete.el
@@ -1028,14 +1035,16 @@ Do this under any of the following conditions:
         (when (and mct-completing-read-multiple-indicator (< emacs-major-version 31))
           (advice-add #'completing-read-multiple :filter-args #'mct--crm-indicator))
         (advice-add #'minibuffer-completion-help :around #'mct--minibuffer-completion-help-advice)
-        (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily))
+        (advice-add #'minibuf-eldef-setup-minibuffer :around #'mct--stealthily)
+        (advice-add #'completion--insert-strings :after #'mct--completion--insert-strings))
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
     (remove-hook 'minibuffer-setup-hook #'mct--setup-passlist)
     (advice-remove #'completing-read-default #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--crm-indicator)
     (advice-remove #'minibuffer-completion-help #'mct--minibuffer-completion-help-advice)
-    (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily))
+    (advice-remove #'minibuf-eldef-setup-minibuffer #'mct--stealthily)
+    (advice-remove #'completion--insert-strings #'mct--completion--insert-strings))
   (mct--setup-persistent-completions)
   (mct--setup-message-advices))
 
