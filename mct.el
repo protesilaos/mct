@@ -233,7 +233,7 @@ completion category is set to sort by history)."
           :key-type (choice symbol (repeat symbol))
           :value-type (choice
                        (const :tag "Sort A-Z" mct-sort-by-alpha)
-                       (const :tag "Sort A-Z then short to long" mct-sort-by-alpha-then-by-length)
+                       (const :tag "Sort A-Z then from short to long" mct-sort-by-alpha-then-by-length)
                        (const :tag "Sort by minibuffer history" mct-sort-by-history)
                        (const :tag "Sort by directory then by file" mct-sort-by-directory-then-by-file)
                        (function :tag "Custom sort function accepting COMPLETIONS argument")))
