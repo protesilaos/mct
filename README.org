@@ -66,6 +66,168 @@ included in the section entitled “GNU Free Documentation License.”
 modify this GNU manual.”
 #+end_quote
 
+* Installation
+:PROPERTIES:
+:CUSTOM_ID: h:1b501ed4-f16c-4118-9a4a-7a5e29143077
+:END:
+
+** Install the package
+:PROPERTIES:
+:CUSTOM_ID: h:a191dbaa-22f6-4ad6-8185-1de64fe0a9bc
+:END:
+
+=mct= is available on the official GNU ELPA archive for users of Emacs
+version 29 or higher.  One can install the package without any further
+configuration.  The following commands shall suffice:
+
+#+begin_src emacs-lisp
+M-x package-refresh-contents
+M-x package-install RET mct
+#+end_src
+
+A package is also available via Guix:
+
+#+begin_src sh
+guix package -i emacs-mct
+#+end_src
+
+** Manual installation method
+:PROPERTIES:
+:CUSTOM_ID: h:663ec536-056b-443e-9272-2a365eb28b83
+:END:
+
+Assuming your Emacs files are found in =~/.emacs.d/=, execute the
+following commands in a shell prompt:
+
+#+begin_src sh
+cd ~/.emacs.d
+
+# Create a directory for manually-installed packages
+mkdir manual-packages
+
+# Go to the new directory
+cd manual-packages
+
+# Clone this repo and name it "mct"
+git clone https://github.com/protesilaos/mct mct
+#+end_src
+
+Finally, in your =init.el= (or equivalent) evaluate this:
+
+#+begin_src emacs-lisp
+;; Make Elisp files in that directory available to the user.
+(add-to-list 'load-path "~/.emacs.d/manual-packages/mct")
+#+end_src
+
+Everything is in place to set up the package.
+
+* Sample setup
+:PROPERTIES:
+:CUSTOM_ID: h:318ba6f8-2909-44b0-9bed-558552722667
+:END:
+#+cindex: Sample configuration
+
+Minimal setup for the minibuffer and in-buffer completion:
+
+#+begin_src emacs-lisp
+(use-package mct
+  :ensure t
+  :config
+  (mct-mode 1))
+#+end_src
+
+And with more options:
+
+#+begin_src emacs-lisp
+(use-package mct
+  :ensure t
+  :config
+  (setq mct-completion-window-size (cons #'mct-frame-height-third 1))
+  (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
+  (setq mct-hide-completion-mode-line t)
+  (setq mct-completing-read-multiple-indicator t)
+  (setq mct-minimum-input 3)
+  (setq mct-live-completion t)
+  (setq mct-live-update-delay 0.6)
+
+  ;; This is for commands or completion categories that should always pop
+  ;; up the completions' buffer.  It circumvents the default method of
+  ;; waiting for some user input (see `mct-minimum-input') before
+  ;; displaying and updating the completions' buffer.
+  (setq mct-completion-passlist
+        '(;; Some commands
+          select-frame-by-name
+          Info-goto-node
+          Info-index
+          Info-menu
+          vc-retrieve-tag
+          ;; Some completion categories
+          consult-buffer
+          consult-location
+          embark-keybinding
+          imenu
+          file
+          project-file
+          buffer
+          kill-ring))
+
+  ;; The blocklist follows the same principle as the passlist, except it
+  ;; disables live completions altogether.
+  (setq mct-completion-blocklist nil)
+
+  ;; This is the default value but I am keeping it here for visibility.
+  (setq mct-sort-by-command-or-category
+        '((file . mct-sort-by-directory-then-by-file)
+          ((magit-checkout vc-retrieve-tag) . mct-sort-by-alpha-then-by-length)
+          ((kill-ring imenu consult-location Info-goto-node Info-index Info-menu) . nil) ; no sorting
+          (t . mct-sort-by-history)))
+
+  (mct-mode 1))
+#+end_src
+
+Other useful extras from the Emacs source code (read their doc strings):
+
+#+begin_src emacs-lisp
+;;; General settings for the minibuffer
+
+(setq completion-styles '(basic substring initials flex partial-completion))
+(setq completion-category-defaults nil)
+(setq completion-category-overrides
+      '((file (styles . (basic partial-completion initials substring)))))
+
+(setq completion-cycle-threshold 2)
+(setq completion-ignore-case t)
+(setq completion-show-inline-help nil)
+
+(setq completions-detailed t)
+
+(setq enable-recursive-minibuffers t)
+(setq minibuffer-eldef-shorten-default t)
+
+(setq read-buffer-completion-ignore-case t)
+(setq read-file-name-completion-ignore-case t)
+
+(setq resize-mini-windows t)
+(setq minibuffer-eldef-shorten-default t)
+
+(file-name-shadow-mode 1)
+(minibuffer-depth-indicate-mode 1)
+(minibuffer-electric-default-mode 1)
+
+;; Do not allow the cursor in the minibuffer prompt
+(setq minibuffer-prompt-properties
+      '(read-only t cursor-intangible t face minibuffer-prompt))
+
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+;;; Minibuffer history
+
+(use-package savehist
+  :ensure t
+  :config
+  (savehist-mode 1))
+#+end_src
+
 * Overview of MCT
 :PROPERTIES:
 :CUSTOM_ID: h:ba224631-618c-4e52-b373-e46970cb2242
@@ -703,177 +865,6 @@ There are several ways to select a completion candidate with
    an optional numeric argument.  For the sake of avoiding surprises,
    these commands do not cycle between the completions and the
    minibuffer: they stop at the first or last heading.
-
-* Installation
-:PROPERTIES:
-:CUSTOM_ID: h:1b501ed4-f16c-4118-9a4a-7a5e29143077
-:END:
-
-** Install the package
-:PROPERTIES:
-:CUSTOM_ID: h:a191dbaa-22f6-4ad6-8185-1de64fe0a9bc
-:END:
-
-=mct= is available on the official GNU ELPA archive for users of Emacs
-version 27 or higher.  One can install the package without any further
-configuration.  The following commands shall suffice:
-
-#+begin_src emacs-lisp
-M-x package-refresh-contents
-M-x package-install RET mct
-#+end_src
-
-A package is also available via Guix:
-
-#+begin_src sh
-guix package -i emacs-mct
-#+end_src
-
-** Manual installation method
-:PROPERTIES:
-:CUSTOM_ID: h:663ec536-056b-443e-9272-2a365eb28b83
-:END:
-
-Assuming your Emacs files are found in =~/.emacs.d/=, execute the
-following commands in a shell prompt:
-
-#+begin_src sh
-cd ~/.emacs.d
-
-# Create a directory for manually-installed packages
-mkdir manual-packages
-
-# Go to the new directory
-cd manual-packages
-
-# Clone this repo and name it "mct"
-git clone https://github.com/protesilaos/mct mct
-#+end_src
-
-Finally, in your =init.el= (or equivalent) evaluate this:
-
-#+begin_src emacs-lisp
-;; Make Elisp files in that directory available to the user.
-(add-to-list 'load-path "~/.emacs.d/manual-packages/mct")
-#+end_src
-
-Everything is in place to set up the package.
-
-* Sample setup
-:PROPERTIES:
-:CUSTOM_ID: h:318ba6f8-2909-44b0-9bed-558552722667
-:END:
-#+cindex: Sample configuration
-
-Minimal setup for the minibuffer and in-buffer completion:
-
-#+begin_src emacs-lisp
-(require 'mct)
-(mct-mode 1)
-#+end_src
-
-And with more options:
-
-#+begin_src emacs-lisp
-(require 'mct)
-
-(setq mct-completion-window-size (cons #'mct-frame-height-third 1))
-(setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
-(setq mct-hide-completion-mode-line t)
-(setq mct-completing-read-multiple-indicator t)
-(setq mct-minimum-input 3)
-(setq mct-live-completion t)
-(setq mct-live-update-delay 0.6)
-
-;; This is for commands or completion categories that should always pop
-;; up the completions' buffer.  It circumvents the default method of
-;; waiting for some user input (see `mct-minimum-input') before
-;; displaying and updating the completions' buffer.
-(setq mct-completion-passlist
-      '(;; Some commands
-        Info-goto-node
-        Info-index
-        Info-menu
-        vc-retrieve-tag
-        ;; Some completion categories
-        imenu
-        file
-        project-file
-        buffer
-        kill-ring
-        consult-location))
-
-;; The blocklist follows the same principle as the passlist, except it
-;; disables live completions altogether.
-(setq mct-completion-blocklist nil)
-
-(mct-mode 1)
-#+end_src
-
-Other useful extras from the Emacs source code (read their doc strings):
-
-#+begin_src emacs-lisp
-(setq completion-styles
-      '(basic substring initials flex partial-completion))
-(setq completion-category-overrides
-      '((file (styles . (basic partial-completion initials substring)))))
-
-(setq completion-cycle-threshold 2)
-(setq completion-ignore-case t)
-(setq completion-show-inline-help nil)
-
-(setq completions-detailed t)
-
-(setq enable-recursive-minibuffers t)
-(setq minibuffer-eldef-shorten-default t)
-
-(setq read-buffer-completion-ignore-case t)
-(setq read-file-name-completion-ignore-case t)
-
-(setq resize-mini-windows t)
-(setq minibuffer-eldef-shorten-default t)
-
-(file-name-shadow-mode 1)
-(minibuffer-depth-indicate-mode 1)
-(minibuffer-electric-default-mode 1)
-
-;; Do not allow the cursor in the minibuffer prompt
-(setq minibuffer-prompt-properties
-      '(read-only t cursor-intangible t face minibuffer-prompt))
-
-(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-;;; Minibuffer history
-(require 'savehist)
-(setq savehist-file (locate-user-emacs-file "savehist"))
-(setq history-length 500)
-(setq history-delete-duplicates t)
-(setq savehist-save-minibuffer-history t)
-(add-hook 'after-init-hook #'savehist-mode)
-
-;;; Third-party extensions
-
-;;;; Enable Consult previews in the Completions buffer.
-;; Requires the `consult' package.
-(add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode)
-
-;;;; Setup for Orderless
-;; Requires the `orderless' package
-
-;; We make the SPC key insert a literal space and the same for the
-;; question mark.  Spaces are used to delimit orderless groups, while
-;; the quedtion mark is a valid regexp character.
-(let ((map minibuffer-local-completion-map))
-  (define-key map (kbd "SPC") nil)
-  (define-key map (kbd "?") nil))
-
-;; Because SPC works for Orderless and is trivial to activate, I like to
-;; put `orderless' at the end of my `completion-styles'.  Like this:
-(setq completion-styles
-      '(basic substring initials flex partial-completion orderless))
-(setq completion-category-overrides
-      '((file (styles . (basic partial-completion orderless)))))
-#+end_src
 
 * Keymaps
 :PROPERTIES:
