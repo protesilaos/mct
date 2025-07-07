@@ -277,7 +277,7 @@ completion category is set to sort by history)."
 
 ;;;; Sorting functions for `completions-sort' (Emacs 29)
 
-(defvar mct-sort-alpha-function #'string-collate-lessp
+(defvar mct-sort-alpha-function #'string-version-lessp
   "Function to perform alphabetic sorting between two strings.")
 
 (defun mct-sort-by-alpha (completions)
