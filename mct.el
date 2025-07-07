@@ -43,7 +43,6 @@ and the Completions."
   :link '(info-link "(mct) Top")
   :link '(url-link :tag "Homepage" "https://protesilaos.com/emacs/mct"))
 
-
 (make-obsolete 'mct-completion-windows-regexp 'mct--completions-window-name "0.5.0")
 
 (defcustom mct-completion-window-size (cons #'mct-frame-height-third 1)
@@ -368,7 +367,8 @@ Do it in accordance with the user option `mct-sort-by-command-or-category'."
 ;; beginning of the line, unless the point was moved forward).
 (defun mct--setup-clean-completions ()
   "Keep only completion candidates in the Completions."
-  (unless completions-header-format
+  (when (or (null completions-header-format)
+            (string-blank-p completions-header-format))
     (with-current-buffer standard-output
       (unless (mct--first-line-completion-p)
         (goto-char (point-min))
@@ -627,7 +627,8 @@ by `mct--completions-window-name'."
   "Return the `point' of the first completion."
   (save-excursion
     (goto-char (point-max))
-    (when completions-header-format
+    (when (and completions-header-format
+               (not (string-blank-p completions-header-format)))
       (next-completion 1))
     (point)))
 
@@ -707,7 +708,8 @@ the minibuffer."
   "Return non-nil if backward ARG motion exceeds `point-min'."
   (let ((line (- (line-number-at-pos) arg)))
     (or (< line 1)
-        (when completions-header-format
+        (when (and completions-header-format
+               (not (string-blank-p completions-header-format)))
           (= (save-excursion
                (previous-completion arg)
                (line-number-at-pos))
@@ -908,7 +910,8 @@ Apply APP while inhibiting modification hooks."
   "Set up variables for the appearance of the Completions buffer."
   (when mct-hide-completion-mode-line
     (setq-local mode-line-format nil))
-  (when completions-header-format
+  (when (and completions-header-format
+               (not (string-blank-p completions-header-format)))
     (setq-local display-line-numbers-offset -1)))
 
 (defun mct--completion--insert-strings (&rest _)
