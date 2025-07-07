@@ -627,8 +627,7 @@ by `mct--completions-window-name'."
   "Return the `point' of the first completion."
   (save-excursion
     (goto-char (point-max))
-    (when completions-header-format
-      (next-completion 1))
+    (next-completion 1)
     (point)))
 
 (defun mct--last-completion-point ()
