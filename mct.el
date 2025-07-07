@@ -242,7 +242,7 @@ are:
 To not perform any sorting on the completion candidates that match
 SYMBOLS set SORT-FUNCTION to nil.
 
-If there are conflicting configurations between a SYMBOLS function or
+If there are conflicting configurations between a SYMBOLS function and
 completion category, then the function takes precedence (for example
 `find-file' is set to sort directories first whereas the `file'
 completion category is set to sort by history)."
