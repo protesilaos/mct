@@ -4,9 +4,9 @@
 #+language: en
 #+options: ':t toc:nil author:t email:t num:t
 #+startup: content
-#+macro: stable-version 1.0.0
-#+macro: release-date 2023-09-24
-#+macro: development-version 1.1.0-dev
+#+macro: stable-version 1.1.0
+#+macro: release-date 2025-07-07
+#+macro: development-version 1.2.0-dev
 #+export_file_name: mct.texi
 #+texinfo_filename: mct.info
 #+texinfo_dir_category: Emacs misc features
@@ -511,7 +511,6 @@ To review echo area messages, use =C-h e= (~view-echo-area-messages~).
 :CUSTOM_ID: h:d5cd6e2e-d121-425c-96ec-f8bc9c630dd2
 :END:
 #+vindex: mct-sort-by-command-or-category
-[ This is part of {{{development-version}}}. ]
 
 Brief: Sort completion candidates based on the command or completion
 category.
@@ -611,8 +610,6 @@ again from the user's =$HOME=.
 :CUSTOM_ID: h:211065de-6ea8-4cfd-b0a2-c1f28a5ae341
 :END:
 #+vindex: mct-completing-read-multiple-indicator
-
-[ Part of {{{development-version}}}. ]
 
 Brief: Show an indicator for ~completing-read-multiple~ prompts.
 
@@ -900,7 +897,7 @@ In this section we cover custom code that builds on what MCT offers.
 :END:
 #+cindex: Sorting completions
 
-[ As part of {{{development-version}}}, MCT provides the user option
+[ As part of version =1.1.0=, MCT provides the user option
   ~mct-sort-by-command-or-category~ and sets the ~completions-sort~
   accordingly ([[#h:d5cd6e2e-d121-425c-96ec-f8bc9c630dd2][Sort completions based on the command or completion category]]).
   The information herein is thus not needed, but may still be useful
@@ -947,7 +944,7 @@ Use `mct-sort-sort-by-alpha-length' if no history is available."
 :END:
 #+cindex: CRM indicator
 
-[ As part of {{{development-version}}}, this feature is built into the
+[ As part of version =1.1.0=, this feature is built into the
   MCT code ([[#h:211065de-6ea8-4cfd-b0a2-c1f28a5ae341][Show an indicator for ~completing-read-multiple~ prompts]]).
   I decided that it is better to have it on by default, otherwise the
   ~completing-read-multiple~ prompts are hard to identify. ]

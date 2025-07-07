@@ -10,6 +10,103 @@ tagged commit on the project's main git repository:
 The newest release is at the top.  For further details, please consult
 the manual: <https://protesilaos.com/emacs/mct>.
 
+* Version 1.1.0 on 2025-07-07
+:PROPERTIES:
+:CUSTOM_ID: h:3d13a704-6bdb-4dbc-958e-6b6059270c6a
+:END:
+
+This version contains several refinements to an already stable package.
+
+** Sort by command or completion category
+:PROPERTIES:
+:CUSTOM_ID: h:96f16728-46c4-4e0a-9f5a-90e1a5241c93
+:END:
+
+The new user option ~mct-sort-by-command-or-category~ determines how
+completion candidates are sorted.
+
+This is an alist where each element is of the form =(SYMBOLS . SORT-FUNCTION)=.
+
+=SYMBOLS= is either a symbol or a list of symbols. =SYMBOLS= can refer
+to the symbol of a function or completion category. It can also be ~t~,
+which refers to the fallback value.
+
+=SORT-FUNCTION= is a function that takes a list of strings and returns a
+list of strings, sorting them accordingly.  Examples of a =SORT-FUNCTION=
+are:
+
+- ~mct-sort-by-alpha~
+- ~mct-sort-by-alpha-then-by-length~
+- ~mct-sort-by-history~
+- ~mct-sort-by-directory-then-by-file~
+
+To not perform any sorting on the completion candidates that match
+=SYMBOLS= set =SORT-FUNCTION= to nil.
+
+If there are conflicting configurations between a =SYMBOLS= function and
+completion category, then the function takes precedence (for example
+~find-file~ is set to sort directories first whereas the ~file~
+completion category is set to sort by history).
+
+** Optional indicator for ~completing-read-multiple~
+:PROPERTIES:
+:CUSTOM_ID: h:7c82c656-bf14-4934-938e-567229193f90
+:END:
+
+Users of Emacs prior to version 31 do not have a built-in way to
+inform them when they are dealing with a ~completing-read-multiple~
+minibuffer prompt. Emacs 31 introduces the user option ~crm-prompt~
+and its related functionality to tell the user what they need to know.
+
+The ~mct-completing-read-multiple-indicator~ can be used in the
+meantime to achieve the same results. It is set to a non-nil value by
+default. Opt out by changing it to nil.
+
+** The =*Completions*= are persistent when needed
+:PROPERTIES:
+:CUSTOM_ID: h:14e286c9-5a32-4745-bd7a-f41036263e07
+:END:
+
+This concerns the case where a command or completion category is part
+of the ~mct-completion-passlist~ or when the user option
+~mct-live-completion~ is set to non-nil or =visible=. In such cases,
+the completion candidates are on display and we want to keep them
+there while performing a dynamic completion, such as with the
+~find-file~ command ("dynamic" in the sense that it returns a new list
+of candidates to match the current path).
+
+Persisting the =*Completions*= means that as we narrow the list, we
+still see all the matching results.
+
+In the past, we provided the option ~mct-persist-dynamic-completion~
+though we do not need it anymore.
+
+I was inspired to make this change in response to a question posed by
+Ryan Davis regarding the behaviour of ~mct-persist-dynamic-completion~.
+This was done in issue 7: <https://github.com/protesilaos/mct/issues/7>.
+
+** Miscellaneous
+:PROPERTIES:
+:CUSTOM_ID: h:ec8f6624-f5b0-47fd-b9e6-0950a9a10a60
+:END:
+
+- Vertical alignment of the =*Completions*= buffer is more precise.
+  Thanks to Jessie Hu for the contribution in pull request 6:
+  <https://github.com/protesilaos/mct/pull/6>.
+
+- The command ~mct-choose-completion-exit~ no longer tries to expand
+  further. In the previous implementation it would try to match the
+  last known selection from the history when using a file prompt. For
+  example we have this workflow:
+  
+  - In the previous prompt we type =/path/to/file/= and exit.
+  - Now we type =/pa=, the completions pop up, we select =/path= and
+    invoke ~mct-choose-completion-exit~. This wrongly expands into
+    =/path/foo/= instead of taking just =/path= (given that it has no
+    further input to determine an extension of that string).
+
+  Now the command will do the right thing based on the user's input.
+
 * Version 1.0.0 on 2023-09-24
 :PROPERTIES:
 :CUSTOM_ID: h:64daac36-a953-46cf-bc12-81a0a99bf964
