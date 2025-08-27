@@ -922,6 +922,7 @@ Apply APP while inhibiting modification hooks."
 
 (defun mct--setup-appearance ()
   "Set up variables for the appearance of the Completions buffer."
+  (setq-local cursor-in-non-selected-windows nil)
   (when mct-hide-completion-mode-line
     (setq-local mode-line-format nil))
   (when completions-header-format
