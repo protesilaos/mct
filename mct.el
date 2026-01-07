@@ -284,31 +284,11 @@ completion category is set to sort by history)."
   (or (memq (mct--this-command) list)
       (memq (mct--completion-category) list)))
 
-(defun mct--get-eager-display-categories ()
-  "Return completion categories with `eager-display' property."
-  (when (>= emacs-major-version 31)
-    (or (eq completion-eager-display t)
-        (mapcar #'car
-                (seq-filter
-                 (lambda (category)
-                   (eq (alist-get 'eager-display (cdr category)) t))
-                 (append completion-category-defaults completion-category-overrides))))))
-
-(defvar mct--eager-display-categories (mct--get-eager-display-categories))
-
-(defun mct--completion-categories-watcher (symbol newval operation where)
-  "Watch SYMBOL `completion-category-defaults' or `completion-category-overrides'.
-When NEWVAL is given, OPERATION is `set', and WHERE is nil, then update
-the `mct--eager-display-categories'."
-  (when (and (memq symbol '(completion-category-defaults completion-category-overrides))
-             (eq operation 'set)
-             (null where)
-             (not (eq newval (symbol-value symbol))))
-    (setq mct--eager-display-categories (mct--get-eager-display-categories))))
-
 (defun mct--passlist-p ()
   "Return non-nil if symbol is in the `mct-completion-passlist'."
-  (mct--symbol-in-list (append mct-completion-passlist mct--eager-display-categories)))
+  (or (mct--symbol-in-list mct-completion-passlist)
+      (when (fboundp 'completion-category-get)
+        (completion-category-get (mct--completion-category) 'eager-display))))
 
 (defun mct--blocklist-p ()
   "Return non-nil if symbol is in the `mct-completion-blocklist'."
@@ -1139,8 +1119,6 @@ Do this under any of the following conditions:
         (setq completions-sort #'mct-sort-multi-category)
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
         (add-hook 'minibuffer-setup-hook #'mct--setup-passlist)
-        (add-variable-watcher 'completion-category-defaults #'mct--completion-categories-watcher)
-        (add-variable-watcher 'completion-category-overrides #'mct--completion-categories-watcher)
         (advice-add #'completing-read-default :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
         (when (and mct-completing-read-multiple-indicator (< emacs-major-version 31))
@@ -1160,8 +1138,6 @@ Do this under any of the following conditions:
     (setq completions-sort mct-last-completions-sort-value)
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
     (remove-hook 'minibuffer-setup-hook #'mct--setup-passlist)
-    (remove-variable-watcher 'completion-category-defaults #'mct--completion-categories-watcher)
-    (remove-variable-watcher 'completion-category-overrides #'mct--completion-categories-watcher)
     (advice-remove #'completing-read-default #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--crm-indicator)
