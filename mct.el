@@ -338,7 +338,7 @@ This function can be used as the value of the user option
      (or (funcall mct-sort-alpha-function string1 string2)
          (< (length string1) (length string2))))))
 
-(defalias 'mct-sort-by-alpha-length 'mct-sort-by-alpha-then-by-length
+(defalias 'mct-sort-by-alpha-length #'mct-sort-by-alpha-then-by-length
   "Alias for `mct-sort-by-alpha-then-by-length'.")
 
 ;; Based on `minibuffer-sort-by-history' from Emacs 30.
@@ -363,7 +363,7 @@ Also remove the implicit directories . and .. from the COMPLETIONS."
   (nconc (seq-filter (lambda (x) (string-suffix-p "/" x)) completions)
          (seq-remove (lambda (x) (string-suffix-p "/" x)) completions)))
 
-(defalias 'mct-sort-directories-then-files 'mct-sort-by-directory-then-by-file
+(defalias 'mct-sort-directories-then-files #'mct-sort-by-directory-then-by-file
   "Alias for `mct-sort-by-directory-then-by-file'.")
 
 (defun mct--sort-multi-category-get-function (function-and-category)
@@ -428,7 +428,7 @@ Can be used in `mct-completion-window-size'."
 
 (define-obsolete-function-alias
   'mct--frame-height-fraction
-  'mct-frame-height-third
+  #'mct-frame-height-third
   "1.0.0")
 
 (defun mct--height (param)
@@ -1180,7 +1180,7 @@ Do this under any of the following conditions:
 
 (define-obsolete-function-alias
   'mct-minibuffer-mode
-  'mct-mode
+  #'mct-mode
   "1.0.0")
 
 (make-obsolete 'mct-region-mode nil "1.0.0")
