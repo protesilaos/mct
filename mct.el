@@ -369,7 +369,7 @@ Do it in accordance with the user option `mct-sort-by-command-or-category'."
 ;;;; Basics of intersection between minibuffer and Completions buffer
 
 (defface mct-highlight-candidate
-  '((t :inherit highlight :extend nil))
+  '((t :inherit highlight :extend t))
   "Face for current candidate in the Completions buffer."
   :group 'mct)
 
