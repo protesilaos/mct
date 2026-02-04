@@ -980,8 +980,7 @@ This value means that it is overriden by the active region.")
 (defun mct--completions-completion-end ()
   "Return end of completion candidate."
   (if-let* ((string (mct--completion-at-point-p)))
-      (save-excursion
-        (1+ (line-end-position)))
+      (1+ (line-end-position))
     (point)))
 
 (defun mct--overlay-make ()
