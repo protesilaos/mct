@@ -561,6 +561,7 @@ Apply APP by first setting up the minibuffer to work with Mct."
         (setq-local resize-mini-windows t
                     completion-auto-help t)
         (setq mct--active t)
+        (mct--setup-passlist)
         (mct--setup-live-completions)
         (mct--setup-minibuffer-keymap)
         (mct--setup-shadow-files))
@@ -1117,7 +1118,6 @@ Do this under any of the following conditions:
       (progn
         (setq completions-sort #'mct-sort-multi-category)
         (add-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-        (add-hook 'minibuffer-setup-hook #'mct--setup-passlist)
         (advice-add #'completing-read-default :around #'mct--completing-read-advice)
         (advice-add #'completing-read-multiple :around #'mct--completing-read-advice)
         (when (and mct-completing-read-multiple-indicator (< emacs-major-version 31))
@@ -1136,7 +1136,6 @@ Do this under any of the following conditions:
         (advice-add #'minibuffer-message :around #'mct--honor-inhibit-message))
     (setq completions-sort mct-last-completions-sort-value)
     (remove-hook 'completion-list-mode-hook #'mct--setup-completion-list)
-    (remove-hook 'minibuffer-setup-hook #'mct--setup-passlist)
     (advice-remove #'completing-read-default #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--completing-read-advice)
     (advice-remove #'completing-read-multiple #'mct--crm-indicator)
