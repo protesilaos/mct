@@ -815,20 +815,21 @@ If ARG is supplied, move that many completion groups at a time."
                 (car args))
         (cdr args)))
 
-(defun mct--regex-to-separator (regex)
-  "Parse REGEX of `crm-separator' in `mct-choose-completion-dwim'."
+(defun mct--get-crm-separator ()
+  "Parse `crm-separator' to get the separator.
+Do this because `crm-separator' is a regexp."
   (save-match-data
     (cond
-     ;; whitespace-delimited, like default & org-set-tag-command
-     ((string-match (rx
-                     bos "[" (1+ blank) "]*"
-                     (group (1+ any))
-                     "[" (1+ blank) "]*" eos)
-                    regex)
-      (match-string 1 regex))
-     ;; literal character
-     ((string= regex (regexp-quote regex))
-      regex))))
+     ;; The default value is a propertized string.  Though we need to
+     ;; check further because other functions may `let' bind something
+     ;; else.
+     ((get-text-property 0 'separator crm-separator))
+     ((string-match "\\`\\[[\s\t]*\\(.+\\)[\s\t]*\\]\\'" crm-separator)
+      (match-string 1 crm-separator))
+     ((string= crm-separator (regexp-quote crm-separator))
+      crm-separator)
+     (t
+      ","))))
 
 (defun mct-choose-completion-dwim ()
   "Append to minibuffer when at `completing-read-multiple' prompt.
@@ -840,8 +841,7 @@ In any other prompt use `mct-choose-completion-no-exit'."
     (mct-choose-completion-no-exit)
     (with-current-buffer (window-buffer mini)
       (when crm-completion-table
-        (let ((separator (or (mct--regex-to-separator crm-separator)
-                             ",")))
+        (let ((separator (mct--get-crm-separator)))
           (insert separator))
         (let ((inhibit-message t))
           (switch-to-completions))))))
