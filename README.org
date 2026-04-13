@@ -185,7 +185,7 @@ And with more options:
   (mct-mode 1))
 #+end_src
 
-Other useful extras from the Emacs source code (read their doc strings):
+Other useful extras from the Emacs source code (read their docstrings):
 
 #+begin_src emacs-lisp
 ;;; General settings for the minibuffer
